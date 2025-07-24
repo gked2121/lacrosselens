@@ -147,29 +147,29 @@ export default function EnhancedVideoUpload() {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
+    <Card className="w-full max-w-4xl mx-auto card-modern">
+      <CardHeader className="content-padding pb-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}>
             <Upload className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl">AI-Powered Video Analysis</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
+            <CardTitle className="text-xl font-semibold">AI-Powered Video Analysis</CardTitle>
+            <p className="text-muted-foreground mt-1">
               Upload lacrosse footage for professional-grade coaching insights
             </p>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="content-padding pt-0 space-y-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="file" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 bg-muted p-1 rounded-xl">
+            <TabsTrigger value="file" className="flex items-center gap-2 rounded-lg py-3">
               <Upload className="w-4 h-4" />
               File Upload
             </TabsTrigger>
-            <TabsTrigger value="youtube" className="flex items-center gap-2">
+            <TabsTrigger value="youtube" className="flex items-center gap-2 rounded-lg py-3">
               <Play className="w-4 h-4" />
               YouTube URL
             </TabsTrigger>
@@ -187,7 +187,7 @@ export default function EnhancedVideoUpload() {
                       type="file"
                       accept="video/*"
                       required
-                      className="mt-1"
+                      className="input-modern mt-2"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       MP4, MOV, AVI supported. Max 2GB.
@@ -202,7 +202,7 @@ export default function EnhancedVideoUpload() {
                       placeholder="e.g., Championship Game vs Eagles"
                       value={fileData.title}
                       onChange={(e) => setFileData({ ...fileData, title: e.target.value })}
-                      className="mt-1"
+                      className="input-modern mt-2"
                     />
                   </div>
 

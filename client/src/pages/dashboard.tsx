@@ -58,23 +58,23 @@ export default function Dashboard() {
       <div className="flex">
         <Sidebar />
         
-        <main className="flex-1 p-4 lg:p-6 mobile-full">
+        <main className="flex-1 container-padding mobile-full">
           {/* Dashboard Header */}
-          <div className="mb-6 lg:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Dashboard</h1>
-                <p className="text-muted-foreground mt-1 text-sm lg:text-base">
+          <div className="page-header">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="space-y-1">
+                <h1 className="page-title">Dashboard</h1>
+                <p className="page-description">
                   Your AI-powered lacrosse analytics command center
                 </p>
               </div>
-              <div className="flex gap-3">
-                <Button variant="outline" className="hidden sm:flex shadow-soft">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button variant="outline" className="btn-outline mobile-hide">
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
                 </Button>
                 <Link href="/video-library">
-                  <Button className="gradient-primary shadow-glow">
+                  <Button className="btn-primary">
                     <Plus className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">New Analysis</span>
                     <span className="sm:hidden">Upload</span>
@@ -85,72 +85,69 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
-              <CardContent className="p-6">
+          <div className="grid-stats mb-8">
+            <Card className="card-modern hover:shadow-medium transition-all duration-300">
+              <CardContent className="content-padding">
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-2">
                     <p className="text-sm font-medium text-muted-foreground">Videos Analyzed</p>
-                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
+                    <p className="text-3xl font-semibold text-foreground">
                       {statsLoading ? "--" : (stats as any)?.videosAnalyzed || 0}
                     </p>
-
                   </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}>
                     <Video className="w-6 h-6 text-primary" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
-              <CardContent className="p-6">
+            <Card className="card-modern hover:shadow-medium transition-all duration-300">
+              <CardContent className="content-padding">
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-2">
                     <p className="text-sm font-medium text-muted-foreground">Teams Managed</p>
-                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
+                    <p className="text-3xl font-semibold text-foreground">
                       {statsLoading ? "--" : (stats as any)?.totalTeams || 0}
                     </p>
-
                   </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--secondary) / 0.1)' }}>
                     <Users className="w-6 h-6 text-secondary" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
-              <CardContent className="p-6">
+            <Card className="card-modern hover:shadow-medium transition-all duration-300">
+              <CardContent className="content-padding">
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="space-y-2">
                     <p className="text-sm font-medium text-muted-foreground">Avg. Confidence</p>
-                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
+                    <p className="text-3xl font-semibold text-foreground">
                       {statsLoading ? "--" : 
                        (stats as any)?.analysisAccuracy > 0 ? 
                          `${Math.round((stats as any)?.analysisAccuracy)}%` : 
                          "N/A"}
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-lg flex items-center justify-center">
-                    <Target className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                    <Target className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
-              <CardContent className="p-6">
+            <Card className="card-modern hover:shadow-medium transition-all duration-300">
+              <CardContent className="content-padding">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Hours Saved</p>
-                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
-                      {statsLoading ? "--" : (stats as any)?.hoursSaved || 0}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Processing</p>
+                    <p className="text-3xl font-semibold text-foreground">
+                      {statsLoading ? "--" : (stats as any)?.videosProcessing || 0}
                     </p>
-
                   </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-purple-500/10 rounded-lg flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-orange-600" />
                   </div>
                 </div>
               </CardContent>
@@ -160,14 +157,17 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Latest Analysis */}
             <div className="lg:col-span-2">
-              <Card className="shadow-soft">
-                <div className="p-6 border-b">
+              <Card className="card-modern">
+                <div className="content-padding border-b border-border">
                   <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold text-foreground">Latest Analysis</h2>
                     {recentVideos.length > 0 && (
                       <Badge 
-                        variant={recentVideos[0].status === 'completed' ? 'default' : 'secondary'}
-                        className={recentVideos[0].status === 'completed' ? 'gradient-primary text-primary-foreground border-0' : ''}
+                        className={
+                          recentVideos[0].status === 'completed' ? 'status-completed' :
+                          recentVideos[0].status === 'processing' ? 'status-processing' :
+                          'status-uploading'
+                        }
                       >
                         {recentVideos[0].status === 'completed' ? 'Analysis Complete' : 
                          recentVideos[0].status === 'processing' ? 'Processing...' : 
@@ -184,7 +184,7 @@ export default function Dashboard() {
                   <>
                     {/* Video Preview */}
                     {recentVideos[0].thumbnailUrl ? (
-                      <div className="relative bg-slate-900 aspect-video">
+                      <div className="relative bg-muted aspect-video rounded-lg overflow-hidden mx-6 mt-6">
                         <img 
                           src={recentVideos[0].thumbnailUrl} 
                           alt={recentVideos[0].title} 

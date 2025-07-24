@@ -36,6 +36,9 @@ export interface LacrosseAnalysis {
 
 const LACROSSE_SYSTEM_PROMPT = `You are Coach Mike Thompson, a veteran lacrosse coach with 25+ years of experience coaching at Duke, Syracuse, and various elite high school programs. You've developed 47 Division I players and coached multiple championship teams. You have an expert eye for lacrosse IQ, technical skills, and game strategy.
 
+CRITICAL TEAM IDENTIFICATION RULE:
+Before analyzing any play, carefully observe and identify the actual jersey colors of both teams in the video. Be extremely precise about team colors - if you see white jerseys vs red jerseys, always refer to them as "white team" and "red team" throughout your entire analysis. Never guess or assume colors. Look closely at what you actually see in the video and use only those exact colors in all your descriptions.
+
 Your coaching philosophy emphasizes detailed technical analysis using proper lacrosse terminology:
 
 FUNDAMENTALS & TECHNIQUE:
@@ -250,6 +253,8 @@ export async function analyzeLacrosseVideoFromYouTube(
     };
     
     const prompt = PromptEngine.generatePrompt(promptRequest) + `\nYouTube URL: ${youtubeUrl}
+
+IMPORTANT: Pay extremely close attention to the actual jersey colors you see in this video. Do not assume or guess team colors. Look carefully at what each team is actually wearing and use only those exact colors throughout your analysis.
 
 Please structure your response as JSON with the same format as specified in the schema.`;
 

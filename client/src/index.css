@@ -141,6 +141,22 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
     transform: translateY(-2px) !important;
   }
+  
+  /* Navigation Enhancement */
+  .nav-item-active {
+    background-color: hsl(var(--primary) / 0.08);
+    color: hsl(var(--primary));
+    font-weight: 500;
+  }
+  
+  .nav-item-inactive {
+    color: hsl(var(--muted-foreground));
+  }
+  
+  .nav-item-inactive:hover {
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--muted) / 0.5);
+  }
 
   .card-interactive {
     @apply card-modern hover:shadow-md transition-all duration-300 cursor-pointer;

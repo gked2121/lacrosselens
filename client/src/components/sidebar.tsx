@@ -45,6 +45,25 @@ export default function Sidebar() {
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.href;
+                  const isComingSoon = item.name === "Team Management";
+                  
+                  if (isComingSoon) {
+                    return (
+                      <div key={item.name}>
+                        <span
+                          className="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg cursor-not-allowed opacity-60"
+                        >
+                          <div className="flex items-center">
+                            <Icon className="w-5 h-5 mr-3 text-muted-foreground" />
+                            <span className="text-muted-foreground">{item.name}</span>
+                          </div>
+                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                            Coming Soon
+                          </span>
+                        </span>
+                      </div>
+                    );
+                  }
                   
                   return (
                     <Link key={item.name} href={item.href}>

@@ -48,6 +48,9 @@ export default function Navigation() {
               <span className="font-bold text-lg lg:text-xl text-foreground">
                 LacrosseLens
               </span>
+              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium ml-2">
+                Beta
+              </span>
             </div>
           </Link>
 

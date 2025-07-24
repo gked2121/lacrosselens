@@ -72,7 +72,11 @@ export default function VideoUpload({ children }: VideoUploadProps) {
 
   const youtubeUploadMutation = useMutation({
     mutationFn: async (data: { youtubeUrl: string; title: string; description: string }) => {
-      const response = await apiRequest("POST", "/api/videos/youtube", data);
+      const response = await apiRequest("/api/videos/youtube", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
       return response.json();
     },
     onSuccess: () => {

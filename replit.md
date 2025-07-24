@@ -207,3 +207,15 @@ Preferred communication style: Simple, everyday language.
   - Added comprehensive development pathways: specific drill sequences, practice periodization, skill progressions
 - **Files Modified**: server/services/gemini.ts (prompt depth enhancements)
 - **Status**: AI now generates exhaustive technical breakdowns with championship-level coaching detail and sophisticated lacrosse terminology
+
+### 2025-01-24 - Fixed Stuck Video Processing and Added Retry Functionality
+- **Issue**: User's last upload got stuck in processing status
+- **Changes Made**:
+  - Fixed video ID 9 by updating status from "processing" to "failed" in database
+  - Added retry button for failed videos in the video library
+  - Created new API endpoint POST /api/videos/:id/retry for retrying single failed videos
+  - Fixed apiRequest function parameter order issue causing YouTube upload errors
+  - Added proper error handling and loading states for retry functionality
+  - Discovered dual upload component system: VideoUpload (navbar) and EnhancedVideoUpload (video library page)
+- **Files Modified**: server/routes.ts, client/src/pages/video-library.tsx, client/src/lib/queryClient.ts, client/src/components/video-upload.tsx
+- **Status**: Video processing retry functionality working, users can now retry failed videos with one click

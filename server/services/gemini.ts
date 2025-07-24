@@ -65,7 +65,17 @@ PLAYER EVALUATION FOCUS:
 - Coachability and effort level
 - Situational decision-making
 
-Always provide specific timestamps and speak like you're breaking down film in the coaches' room - detailed, technical, and focused on actionable improvements that develop lacrosse IQ.`;
+Always provide specific timestamps and speak like you're breaking down film in the coaches' room - detailed, technical, and focused on actionable improvements that develop lacrosse IQ.
+
+MAXIMUM DETAIL ANALYSIS REQUIREMENTS:
+- Each player evaluation must be 6-8 sentences minimum with exhaustive technical breakdown
+- Include complete biomechanical analysis: body positioning, stick angle, hand placement, footwork mechanics
+- Analyze decision-making process: what the player saw, options considered, execution quality
+- Reference advanced lacrosse concepts: slide packages, off-ball movement, timing, field geometry
+- Provide comprehensive improvement plans: specific drills, practice focus, skill progression timeline
+- Connect to elite-level coaching: what Division I coaches would emphasize, recruiting evaluation criteria
+- Use sophisticated lacrosse terminology and tactical analysis throughout
+- Include game situation context and how it affects technique and decision-making`;
 
 export async function analyzeLacrosseVideo(videoPath: string, title: string = ""): Promise<LacrosseAnalysis> {
   try {
@@ -113,7 +123,17 @@ ANALYSIS CATEGORIES:
    - Areas requiring immediate coaching attention
    - Game-changing moments and their tactical significance
 
-For each observation, provide the exact timestamp, detailed technical breakdown using proper lax terminology, confidence level (1-100), and specific coaching points for player development.
+EXHAUSTIVE ANALYSIS REQUIREMENTS:
+- Each observation must be 7-10 sentences minimum with complete technical dissection
+- Include full biomechanical breakdown: grip, body mechanics, stick positioning, footwork sequencing
+- Analyze tactical awareness: field vision, recognition patterns, decision-making under pressure
+- Reference elite coaching methodologies: what top college programs emphasize, professional techniques
+- Connect to advanced team concepts: system implementation, role responsibilities, situational adjustments
+- Provide comprehensive skill development roadmaps with specific drill progressions and practice scheduling
+- Use elite-level coaching vocabulary and sophisticated tactical analysis throughout
+- Include recruiting perspective: what college coaches evaluate, skill level comparisons, development potential
+
+For each observation, provide the exact timestamp, extensive technical breakdown using advanced lacrosse terminology, confidence level (1-100), and comprehensive coaching development plan.
 
 Video Title: ${title}
 
@@ -263,7 +283,17 @@ FILM BREAKDOWN CATEGORIES:
    - Areas requiring immediate coaching intervention
    - Examples of proper technique to reinforce in practice
 
-For each observation, include exact timestamp, detailed breakdown using proper lacrosse terminology, confidence assessment (1-100), and specific development recommendations.
+MAXIMUM DEPTH ANALYSIS REQUIREMENTS:
+- Each evaluation must be 8-12 sentences minimum with complete technical and tactical breakdown
+- Include exhaustive biomechanical analysis: grip pressure, stick angle, body rotation, weight transfer, follow-through
+- Analyze complete decision-making process: pre-scan, recognition, option evaluation, execution timing
+- Reference elite coaching philosophies: what championship programs emphasize, Division I standards, professional techniques
+- Connect to sophisticated team concepts: system integration, positional responsibilities, game flow management
+- Provide detailed development pathways: specific drill sequences, practice periodization, skill milestone progressions
+- Use championship-level coaching vocabulary and advanced tactical terminology throughout
+- Include competitive analysis: how this compares to elite players, college recruiting standards, professional benchmarks
+
+For each observation, include exact timestamp, comprehensive technical breakdown using advanced coaching terminology, confidence assessment (1-100), and detailed development roadmap with specific practice applications.
 
 Video Title: ${title}
 YouTube URL: ${youtubeUrl}

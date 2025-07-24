@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "../storage";
 import { analyzeLacrosseVideo, analyzeLacrosseVideoFromYouTube } from "./gemini";
+import { generateVideoThumbnail, getVideoMetadata, getYouTubeThumbnail } from "./thumbnailGenerator";
 
 // Configure multer for video uploads
 const uploadDir = "uploads/videos";
@@ -47,6 +48,23 @@ export async function processVideoUpload(
   try {
     // Update video status to processing
     await storage.updateVideoStatus(videoId, "processing");
+    
+    // Generate thumbnail and get metadata
+    try {
+      const [thumbnailUrl, metadata] = await Promise.all([
+        generateVideoThumbnail(filePath, videoId),
+        getVideoMetadata(filePath)
+      ]);
+      
+      // Update video with thumbnail and metadata
+      await storage.updateVideo(videoId, {
+        thumbnailUrl,
+        duration: metadata.duration
+      });
+    } catch (thumbnailError) {
+      console.error("Error generating thumbnail:", thumbnailError);
+      // Continue processing even if thumbnail generation fails
+    }
 
     // Analyze video with Gemini
     const analysis = await analyzeLacrosseVideo(filePath, title);
@@ -143,6 +161,17 @@ export async function processYouTubeVideo(
   try {
     // Update video status to processing
     await storage.updateVideoStatus(videoId, "processing");
+    
+    // For YouTube videos, get thumbnail from YouTube API
+    try {
+      const thumbnailUrl = getYouTubeThumbnail(youtubeUrl);
+      await storage.updateVideo(videoId, {
+        thumbnailUrl
+      });
+    } catch (thumbnailError) {
+      console.error("Error getting YouTube thumbnail:", thumbnailError);
+      // Continue processing even if thumbnail fails
+    }
 
     // Analyze YouTube video with Gemini
     const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title);

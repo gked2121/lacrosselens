@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { upload, processVideoUpload, processYouTubeVideo } from "./services/videoProcessor";
 import { insertVideoSchema, insertTeamSchema, insertPlayerSchema } from "@shared/schema";
+import * as path from "path";
+import * as fs from "fs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -250,6 +252,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching dashboard stats:", error);
       res.status(500).json({ message: "Failed to fetch dashboard stats" });
     }
+  });
+
+  // Serve thumbnails
+  app.get('/api/thumbnails/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const thumbnailPath = path.join(process.cwd(), 'uploads', 'thumbnails', filename);
+    
+    fs.access(thumbnailPath, fs.constants.F_OK, (err) => {
+      if (err) {
+        res.status(404).json({ message: "Thumbnail not found" });
+        return;
+      }
+      res.sendFile(thumbnailPath);
+    });
   });
 
   const httpServer = createServer(app);

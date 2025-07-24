@@ -64,18 +64,19 @@ export default function Dashboard() {
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Dashboard</h1>
                 <p className="text-muted-foreground mt-1 text-sm lg:text-base">
-                  Welcome back, Coach! Here's your latest video analysis.
+                  Your AI-powered lacrosse analytics command center
                 </p>
               </div>
-              <div className="flex space-x-2 lg:space-x-3">
-                <Button variant="outline" size="sm" className="hide-mobile">
+              <div className="flex gap-3">
+                <Button variant="outline" className="hidden sm:flex shadow-soft">
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
                 </Button>
                 <VideoUpload>
-                  <Button>
+                  <Button className="gradient-primary shadow-glow">
                     <Plus className="w-4 h-4 mr-2" />
-                    New Analysis
+                    <span className="hidden sm:inline">New Analysis</span>
+                    <span className="sm:hidden">Upload</span>
                   </Button>
                 </VideoUpload>
               </div>
@@ -83,77 +84,77 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Videos Analyzed</p>
-                    <p className="text-3xl font-bold text-foreground mt-2">
+                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
                       {statsLoading ? "--" : (stats as any)?.videosAnalyzed || 0}
                     </p>
-                    <p className="text-sm text-green-600 mt-1">
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
                       <span className="text-xs">↗</span> 12% this month
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
                     <Video className="w-6 h-6 text-primary" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Teams Managed</p>
-                    <p className="text-3xl font-bold text-foreground mt-2">
+                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
                       {statsLoading ? "--" : (stats as any)?.totalTeams || 0}
                     </p>
-                    <p className="text-sm text-green-600 mt-1">
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
                       <span className="text-xs">↗</span> 8% this month
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-lg flex items-center justify-center">
                     <Users className="w-6 h-6 text-secondary" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Analysis Accuracy</p>
-                    <p className="text-3xl font-bold text-foreground mt-2">
+                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
                       {statsLoading ? "--" : `${(stats as any)?.analysisAccuracy || 92}%`}
                     </p>
-                    <p className="text-sm text-green-600 mt-1">
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
                       <span className="text-xs">↗</span> 3% this month
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-lg flex items-center justify-center">
                     <Target className="w-6 h-6 text-green-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-soft hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Hours Saved</p>
-                    <p className="text-3xl font-bold text-foreground mt-2">
+                    <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2">
                       {statsLoading ? "--" : (stats as any)?.hoursSaved || 0}
                     </p>
-                    <p className="text-sm text-green-600 mt-1">
+                    <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
                       <span className="text-xs">↗</span> 24% this month
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-purple-500/10 rounded-lg flex items-center justify-center">
                     <Clock className="w-6 h-6 text-purple-600" />
                   </div>
                 </div>
@@ -164,12 +165,15 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Latest Analysis */}
             <div className="lg:col-span-2">
-              <Card>
+              <Card className="shadow-soft">
                 <div className="p-6 border-b">
                   <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold text-foreground">Latest Analysis</h2>
                     {recentVideos.length > 0 && (
-                      <Badge variant={recentVideos[0].status === 'completed' ? 'default' : 'secondary'}>
+                      <Badge 
+                        variant={recentVideos[0].status === 'completed' ? 'default' : 'secondary'}
+                        className={recentVideos[0].status === 'completed' ? 'gradient-primary text-primary-foreground border-0' : ''}
+                      >
                         {recentVideos[0].status === 'completed' ? 'Processing Complete' : 
                          recentVideos[0].status === 'processing' ? 'Processing...' : 
                          'Uploaded'}

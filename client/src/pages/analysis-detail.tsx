@@ -1,21 +1,34 @@
 import { useEffect } from "react";
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import Sidebar from "@/components/sidebar";
-import VideoPlayer from "@/components/video-player";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoaderPinwheel, Users, Target, Zap, Star, Clock, TrendingUp } from "lucide-react";
+import { 
+  Video, 
+  Users, 
+  Target, 
+  Clock, 
+  Download, 
+  ArrowLeft,
+  Play,
+  ChevronRight,
+  Trophy,
+  TrendingUp,
+  AlertCircle,
+  LoaderPinwheel
+} from "lucide-react";
 
 export default function AnalysisDetail() {
-  const { id } = useParams();
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
+  const { id } = useParams();
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -33,453 +46,343 @@ export default function AnalysisDetail() {
   }, [isAuthenticated, isLoading, toast]);
 
   const { data: video, isLoading: videoLoading } = useQuery({
-    queryKey: ["/api/videos", id],
+    queryKey: [`/api/videos/${id}`],
+    enabled: !!id,
     retry: false,
   });
 
   const { data: analyses, isLoading: analysesLoading } = useQuery({
-    queryKey: ["/api/videos", id, "analyses"],
+    queryKey: [`/api/videos/${id}/analyses`],
+    enabled: !!id,
     retry: false,
-    enabled: !!(video as any) && (video as any)?.status === 'completed',
   });
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || !isAuthenticated || videoLoading || analysesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoaderPinwheel className="w-8 h-8 animate-spin" />
+        <LoaderPinwheel className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  if (videoLoading) {
+  if (!video) {
     return (
-      <div className="min-h-screen bg-muted/30">
-        <Navigation />
-        <div className="flex">
-          <Sidebar />
-          <main className="flex-1 p-6">
-            <div className="animate-pulse space-y-6">
-              <div className="h-8 bg-muted rounded w-1/3"></div>
-              <div className="aspect-video bg-muted rounded"></div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-32 bg-muted rounded"></div>
-                ))}
-              </div>
-            </div>
-          </main>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Video not found</h3>
+          <Link href="/videos">
+            <Button variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Videos
+            </Button>
+          </Link>
         </div>
       </div>
     );
   }
 
-  if (!(video as any)) {
-    return (
-      <div className="min-h-screen bg-muted/30">
-        <Navigation />
-        <div className="flex">
-          <Sidebar />
-          <main className="flex-1 p-6">
-            <div className="text-center py-12">
-              <h1 className="text-2xl font-bold text-foreground mb-2">Video Not Found</h1>
-              <p className="text-muted-foreground">The video you're looking for doesn't exist.</p>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
+  const overallAnalysis = (analyses as any[])?.find(a => a.type === 'overall');
+  const playerEvaluations = (analyses as any[])?.filter(a => a.type === 'player_evaluation') || [];
+  const faceOffAnalyses = (analyses as any[])?.filter(a => a.type === 'face_off') || [];
+  const transitionAnalyses = (analyses as any[])?.filter(a => a.type === 'transition') || [];
+  const keyMoments = (analyses as any[])?.filter(a => a.type === 'key_moment') || [];
 
-  const formatTimestamp = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const formatTimestamp = (seconds: number | null) => {
+    if (!seconds) return null;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const getAnalysisByType = (type: string) => {
-    return Array.isArray(analyses) ? (analyses as any[]).filter((analysis: any) => analysis.type === type) : [];
-  };
-
-  const overallAnalysis = getAnalysisByType('overall')[0];
-  const playerEvaluations = getAnalysisByType('player_evaluation');
-  const faceOffAnalyses = getAnalysisByType('face_off');
-  const transitionAnalyses = getAnalysisByType('transition');
-  const keyMoments = getAnalysisByType('key_moment');
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="flex">
         <Sidebar />
         
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 lg:p-6 mobile-full">
           {/* Header */}
           <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">{(video as any).title}</h1>
-                <p className="text-muted-foreground mt-1">
-                  {(video as any).description || "Video analysis and coaching insights"}
-                </p>
-              </div>
+            <div className="flex items-center gap-4 mb-4">
+              <Link href="/videos">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
               <Badge 
                 variant={(video as any).status === 'completed' ? 'default' : 'secondary'}
-                className="capitalize"
+                className="gradient-primary text-primary-foreground border-0"
               >
-                {(video as any).status}
+                {(video as any).status === 'completed' ? 'Analysis Complete' : 'Processing'}
               </Badge>
             </div>
+            
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
+                  {(video as any).title}
+                </h1>
+                {(video as any).description && (
+                  <p className="text-muted-foreground mt-1">
+                    {(video as any).description}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" className="shadow-soft">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Report
+                </Button>
+                {(video as any).youtubeUrl && (
+                  <Button 
+                    className="gradient-primary shadow-glow"
+                    onClick={() => window.open((video as any).youtubeUrl, '_blank')}
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Watch on YouTube
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Video Player */}
-            <div className="lg:col-span-2">
-              <VideoPlayer video={video as any} />
-            </div>
-
-            {/* Quick Stats */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Analysis Overview</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Upload Date</span>
-                    <span className="text-sm font-medium">
-                      {new Date((video as any).createdAt).toLocaleDateString()}
-                    </span>
+          {/* Video Preview */}
+          {(video as any).thumbnailUrl && (
+            <Card className="mb-6 overflow-hidden shadow-soft">
+              <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900">
+                <img 
+                  src={(video as any).thumbnailUrl} 
+                  alt={(video as any).title}
+                  className="w-full h-full object-cover"
+                />
+                {(video as any).youtubeUrl && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Button 
+                      size="lg"
+                      className="glass text-white border-white/20 hover:bg-white/20"
+                      onClick={() => window.open((video as any).youtubeUrl, '_blank')}
+                    >
+                      <Play className="w-6 h-6 mr-2" />
+                      Play Video
+                    </Button>
                   </div>
-                  
-                  {(video as any).duration && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Duration</span>
-                      <span className="text-sm font-medium">
-                        {formatTimestamp((video as any).duration)}
-                      </span>
-                    </div>
-                  )}
-
-                  {analyses && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Total Insights</span>
-                        <span className="text-sm font-medium">{(analyses as any[]).length}</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Avg. Confidence</span>
-                        <span className="text-sm font-medium">
-                          {Math.round((analyses as any[]).reduce((acc: number, a: any) => acc + (a.confidence || 0), 0) / (analyses as any[]).length)}%
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-
-              {(video as any).youtubeUrl && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Source</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Badge variant="outline">YouTube</Badge>
-                    <p className="text-xs text-muted-foreground mt-2 break-all">
-                      {(video as any).youtubeUrl}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
+                )}
+              </div>
+            </Card>
+          )}
 
           {/* Analysis Content */}
-          {(video as any).status === 'completed' && analyses ? (
-            <div className="mt-8">
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="players">Players</TabsTrigger>
-                  <TabsTrigger value="faceoffs">Face-Offs</TabsTrigger>
-                  <TabsTrigger value="transitions">Transitions</TabsTrigger>
-                  <TabsTrigger value="moments">Key Moments</TabsTrigger>
-                </TabsList>
+          {(video as any).status === 'completed' ? (
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className="grid grid-cols-2 lg:grid-cols-5 w-full">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="players">Players</TabsTrigger>
+                <TabsTrigger value="faceoffs">Face-offs</TabsTrigger>
+                <TabsTrigger value="transitions">Transitions</TabsTrigger>
+                <TabsTrigger value="moments">Key Moments</TabsTrigger>
+              </TabsList>
 
-                <TabsContent value="overview" className="mt-6">
-                  <Card>
+              <TabsContent value="overview" className="space-y-6">
+                {overallAnalysis && (
+                  <Card className="shadow-soft">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5" />
-                        Overall Analysis
+                        <Trophy className="w-5 h-5 text-primary" />
+                        Overall Game Analysis
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {overallAnalysis ? (
-                        <div className="prose prose-sm max-w-none">
-                          <p className="text-muted-foreground whitespace-pre-line">
-                            {overallAnalysis.content}
-                          </p>
-                          {overallAnalysis.confidence && (
-                            <div className="mt-4">
-                              <Badge variant="outline">
-                                Confidence: {overallAnalysis.confidence}%
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">Overall analysis not available.</p>
-                      )}
+                      <p className="text-muted-foreground whitespace-pre-wrap">
+                        {overallAnalysis.content}
+                      </p>
+                      <div className="mt-4 flex items-center gap-4">
+                        <Badge variant="outline" className="text-xs">
+                          Confidence: {overallAnalysis.confidence}%
+                        </Badge>
+                      </div>
                     </CardContent>
                   </Card>
-                </TabsContent>
+                )}
+              </TabsContent>
 
-                <TabsContent value="players" className="mt-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <Users className="w-5 h-5" />
-                        Player Evaluations
-                      </h2>
-                      <Badge variant="outline">
-                        {playerEvaluations.length} Players Analyzed
-                      </Badge>
-                    </div>
-                    
-                    {playerEvaluations.length > 0 ? (
-                      <div className="grid gap-4">
-                        {playerEvaluations.map((evaluation: any) => (
-                          <Card key={evaluation.id}>
-                            <CardContent className="p-6">
-                              <div className="flex items-start justify-between mb-3">
-                                <h3 className="font-semibold text-foreground">
-                                  {evaluation.title}
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                  {evaluation.timestamp && (
-                                    <Badge variant="outline" className="text-xs">
-                                      <Clock className="w-3 h-3 mr-1" />
-                                      {formatTimestamp(evaluation.timestamp)}
-                                    </Badge>
-                                  )}
-                                  <Badge variant="outline" className="text-xs">
-                                    {evaluation.confidence}% confidence
-                                  </Badge>
-                                </div>
-                              </div>
-                              <p className="text-muted-foreground whitespace-pre-line">
-                                {evaluation.content}
-                              </p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <Card>
-                        <CardContent className="p-8 text-center">
-                          <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">No player evaluations available.</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </TabsContent>
+              <TabsContent value="players" className="space-y-4">
+                {playerEvaluations.length > 0 ? (
+                  playerEvaluations.map((evaluation: any) => (
+                    <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <Users className="w-5 h-5 text-primary" />
+                            {evaluation.title}
+                          </span>
+                          {evaluation.timestamp && (
+                            <Badge variant="secondary" className="text-xs">
+                              {formatTimestamp(evaluation.timestamp)}
+                            </Badge>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground whitespace-pre-wrap">
+                          {evaluation.content}
+                        </p>
+                        <div className="mt-4 flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            Confidence: {evaluation.confidence}%
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <Card className="shadow-soft">
+                    <CardContent className="py-12 text-center">
+                      <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No player evaluations available</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="faceoffs" className="mt-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <Target className="w-5 h-5" />
-                        Face-Off Analysis
-                      </h2>
-                      <Badge variant="outline">
-                        {faceOffAnalyses.length} Face-Offs Analyzed
-                      </Badge>
-                    </div>
-                    
-                    {faceOffAnalyses.length > 0 ? (
-                      <div className="grid gap-4">
-                        {faceOffAnalyses.map((faceOff: any) => (
-                          <Card key={faceOff.id}>
-                            <CardContent className="p-6">
-                              <div className="flex items-start justify-between mb-3">
-                                <h3 className="font-semibold text-foreground">
-                                  {faceOff.title}
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                  {faceOff.timestamp && (
-                                    <Badge variant="outline" className="text-xs">
-                                      <Clock className="w-3 h-3 mr-1" />
-                                      {formatTimestamp(faceOff.timestamp)}
-                                    </Badge>
-                                  )}
-                                  {faceOff.metadata?.winProbability && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {faceOff.metadata.winProbability}% win rate
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                              <p className="text-muted-foreground whitespace-pre-line">
-                                {faceOff.content}
-                              </p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <Card>
-                        <CardContent className="p-8 text-center">
-                          <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">No face-off analysis available.</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </TabsContent>
+              <TabsContent value="faceoffs" className="space-y-4">
+                {faceOffAnalyses.length > 0 ? (
+                  faceOffAnalyses.map((faceoff: any) => (
+                    <Card key={faceoff.id} className="shadow-soft hover:shadow-glow transition-all">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <Target className="w-5 h-5 text-primary" />
+                            Face-off Analysis
+                          </span>
+                          {faceoff.timestamp && (
+                            <Badge variant="secondary" className="text-xs">
+                              {formatTimestamp(faceoff.timestamp)}
+                            </Badge>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground whitespace-pre-wrap">
+                          {faceoff.content}
+                        </p>
+                        <div className="mt-4 flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            Win Probability: {faceoff.metadata?.winProbability || 'N/A'}%
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Confidence: {faceoff.confidence}%
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <Card className="shadow-soft">
+                    <CardContent className="py-12 text-center">
+                      <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No face-off analyses available</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="transitions" className="mt-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <Zap className="w-5 h-5" />
-                        Transition Intelligence
-                      </h2>
-                      <Badge variant="outline">
-                        {transitionAnalyses.length} Transitions Analyzed
-                      </Badge>
-                    </div>
-                    
-                    {transitionAnalyses.length > 0 ? (
-                      <div className="grid gap-4">
-                        {transitionAnalyses.map((transition: any) => (
-                          <Card key={transition.id}>
-                            <CardContent className="p-6">
-                              <div className="flex items-start justify-between mb-3">
-                                <h3 className="font-semibold text-foreground">
-                                  {transition.title}
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                  {transition.timestamp && (
-                                    <Badge variant="outline" className="text-xs">
-                                      <Clock className="w-3 h-3 mr-1" />
-                                      {formatTimestamp(transition.timestamp)}
-                                    </Badge>
-                                  )}
-                                  {transition.metadata?.successProbability && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {transition.metadata.successProbability}% success rate
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                              <p className="text-muted-foreground whitespace-pre-line">
-                                {transition.content}
-                              </p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <Card>
-                        <CardContent className="p-8 text-center">
-                          <Zap className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">No transition analysis available.</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </TabsContent>
+              <TabsContent value="transitions" className="space-y-4">
+                {transitionAnalyses.length > 0 ? (
+                  transitionAnalyses.map((transition: any) => (
+                    <Card key={transition.id} className="shadow-soft hover:shadow-glow transition-all">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-primary" />
+                            Transition Intelligence
+                          </span>
+                          {transition.timestamp && (
+                            <Badge variant="secondary" className="text-xs">
+                              {formatTimestamp(transition.timestamp)}
+                            </Badge>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground whitespace-pre-wrap">
+                          {transition.content}
+                        </p>
+                        <div className="mt-4 flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            Success Rate: {transition.metadata?.successProbability || 'N/A'}%
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Confidence: {transition.confidence}%
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <Card className="shadow-soft">
+                    <CardContent className="py-12 text-center">
+                      <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No transition analyses available</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="moments" className="mt-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <Star className="w-5 h-5" />
-                        Key Moments
-                      </h2>
-                      <Badge variant="outline">
-                        {keyMoments.length} Moments Identified
-                      </Badge>
-                    </div>
-                    
-                    {keyMoments.length > 0 ? (
-                      <div className="grid gap-4">
-                        {keyMoments.map((moment: any) => (
-                          <Card key={moment.id}>
-                            <CardContent className="p-6">
-                              <div className="flex items-start justify-between mb-3">
-                                <h3 className="font-semibold text-foreground">
-                                  {moment.title}
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                  {moment.timestamp && (
-                                    <Badge variant="outline" className="text-xs">
-                                      <Clock className="w-3 h-3 mr-1" />
-                                      {formatTimestamp(moment.timestamp)}
-                                    </Badge>
-                                  )}
-                                  {moment.metadata?.momentType && (
-                                    <Badge variant="outline" className="text-xs capitalize">
-                                      {moment.metadata.momentType}
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                              <p className="text-muted-foreground whitespace-pre-line">
-                                {moment.content}
-                              </p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <Card>
-                        <CardContent className="p-8 text-center">
-                          <Star className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                          <p className="text-muted-foreground">No key moments identified.</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          ) : (video as any).status === 'processing' ? (
-            <div className="mt-8">
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <LoaderPinwheel className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    AI Analysis in Progress
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Our AI is analyzing your lacrosse video. This usually takes a few minutes.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+              <TabsContent value="moments" className="space-y-4">
+                {keyMoments.length > 0 ? (
+                  keyMoments.map((moment: any) => (
+                    <Card key={moment.id} className="shadow-soft hover:shadow-glow transition-all">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <Clock className="w-5 h-5 text-primary" />
+                            {moment.title}
+                          </span>
+                          {moment.timestamp && (
+                            <Badge variant="secondary" className="text-xs">
+                              {formatTimestamp(moment.timestamp)}
+                            </Badge>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground whitespace-pre-wrap">
+                          {moment.content}
+                        </p>
+                        <div className="mt-4 flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            Type: {moment.metadata?.momentType || 'General'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Confidence: {moment.confidence}%
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <Card className="shadow-soft">
+                    <CardContent className="py-12 text-center">
+                      <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No key moments identified</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           ) : (
-            <div className="mt-8">
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-red-600 text-xl">!</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    Analysis Failed
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    There was an issue analyzing this video. Please try uploading again.
-                  </p>
-                  <Button variant="outline">
-                    Retry Analysis
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="shadow-soft">
+              <CardContent className="py-16 text-center">
+                <LoaderPinwheel className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Processing Video</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Your video is being analyzed by our AI. This may take a few minutes depending on the video length.
+                </p>
+              </CardContent>
+            </Card>
           )}
         </main>
       </div>

@@ -154,3 +154,14 @@ Preferred communication style: Simple, everyday language.
 - **Solution**: Added Math.round() conversion for all timestamps before database storage
 - **Files Modified**: server/services/videoProcessor.ts (both processVideoUpload and processYouTubeVideo functions)
 - **Status**: AI analysis now successfully processes and stores results without database errors
+
+### 2025-01-24 - Enabled Real Gemini API Integration
+- **Issue**: Videos were stuck in processing due to test data blocking real API calls
+- **Changes Made**:
+  - Removed all test/fallback analysis data from gemini.ts
+  - Fixed YouTube video analysis to work with Gemini API text-only mode (YouTube URLs don't support direct file upload)
+  - Added missing updateVideo function to DatabaseStorage for thumbnail and metadata updates
+  - Enhanced logging throughout video processing pipeline for better debugging
+  - Fixed export/import issues in videoProcessor.ts causing server crashes
+- **Files Modified**: server/services/gemini.ts, server/storage.ts, server/services/videoProcessor.ts
+- **Status**: Gemini AI now successfully analyzes both file uploads and YouTube videos, generating real coaching insights

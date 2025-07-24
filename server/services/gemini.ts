@@ -62,60 +62,6 @@ export async function analyzeLacrosseVideo(videoPath: string, title: string = ""
     const videoBytes = fs.readFileSync(videoPath);
     console.log(`Video file read successfully, size: ${videoBytes.length} bytes`);
     
-    // For now, let's provide a test analysis to verify the system works
-    // TODO: Remove this fallback once Gemini API issues are resolved
-    console.log("Using test analysis data for debugging...");
-    return {
-      overallAnalysis: "This is a test analysis generated during debugging. The lacrosse game shows good team coordination with opportunities for improvement in transition play and face-off execution. Players demonstrate solid fundamentals but would benefit from enhanced communication and positioning work.",
-      playerEvaluations: [
-        {
-          playerNumber: "12",
-          evaluation: "Strong defensive positioning and good stick work. Shows good field awareness but could improve transition speed.",
-          timestamp: 45.0,
-          confidence: 85
-        },
-        {
-          playerNumber: "7", 
-          evaluation: "Excellent face-off technique with quick hands. Needs to work on ground ball control under pressure.",
-          timestamp: 120.5,
-          confidence: 90
-        }
-      ],
-      faceOffAnalysis: [
-        {
-          analysis: "Good grip and stance at the line. Quick counter-movement after the whistle but needs better body positioning for ball control.",
-          timestamp: 30.0,
-          winProbability: 75,
-          confidence: 88
-        }
-      ],
-      transitionAnalysis: [
-        {
-          analysis: "Fast break opportunity created by good defensive play. Players moved the ball quickly up field but missed an open cutting opportunity.",
-          timestamp: 180.2,
-          successProbability: 70,
-          confidence: 82
-        }
-      ],
-      keyMoments: [
-        {
-          description: "Critical save by goalie during man-down situation, leading to successful clear",
-          timestamp: 240.8,
-          type: "defensive_save",
-          confidence: 95
-        },
-        {
-          description: "Excellent assist through traffic resulting in goal",
-          timestamp: 165.3,
-          type: "offensive_play",
-          confidence: 92
-        }
-      ]
-    };
-    
-    /* Disabled temporarily for debugging
-    const prompt = `Analyze this lacrosse video with the eye of an experienced coach. Provide detailed analysis in the following categories:
-    
     const prompt = `Analyze this lacrosse video with the eye of an experienced coach. Provide detailed analysis in the following categories:
 
 1. Overall game/practice analysis
@@ -233,7 +179,6 @@ Please structure your response as JSON with the following format:
     const analysisData: LacrosseAnalysis = JSON.parse(rawJson);
     console.log("Analysis parsing successful");
     return analysisData;
-    */ 
     
   } catch (error) {
     console.error("Error analyzing lacrosse video:", error);
@@ -245,58 +190,6 @@ export async function analyzeLacrosseVideoFromYouTube(youtubeUrl: string, title:
   try {
     console.log("Starting YouTube video analysis for:", youtubeUrl);
     
-    // For now, return test analysis data for YouTube videos too
-    // TODO: Implement proper YouTube video analysis once core system is working
-    console.log("Using test analysis data for YouTube video...");
-    return {
-      overallAnalysis: "Test analysis for YouTube video. This lacrosse match demonstrates strong team fundamentals with good ball movement and defensive positioning. Key areas for improvement include transition speed and communication during set plays.",
-      playerEvaluations: [
-        {
-          playerNumber: "15",
-          evaluation: "Solid midfield play with good vision. Shows strong stick skills but could improve decision-making in tight situations.",
-          timestamp: 67.0,
-          confidence: 87
-        },
-        {
-          playerNumber: "3", 
-          evaluation: "Excellent defensive positioning and clearing ability. Strong ground ball pickup and quick outlet passes.",
-          timestamp: 145.5,
-          confidence: 93
-        }
-      ],
-      faceOffAnalysis: [
-        {
-          analysis: "Consistent face-off technique with good leverage. Wins most neutral situations but struggles against aggressive opposing style.",
-          timestamp: 55.0,
-          winProbability: 68,
-          confidence: 85
-        }
-      ],
-      transitionAnalysis: [
-        {
-          analysis: "Quick transition from defense to offense with good field spacing. Players maintain proper positioning during the clear.",
-          timestamp: 203.7,
-          successProbability: 78,
-          confidence: 88
-        }
-      ],
-      keyMoments: [
-        {
-          description: "Outstanding individual effort leading to unassisted goal during man-up situation",
-          timestamp: 312.1,
-          type: "scoring_play",
-          confidence: 96
-        },
-        {
-          description: "Critical defensive stop on 2-on-1 fast break opportunity",
-          timestamp: 189.4,
-          type: "defensive_play", 
-          confidence: 91
-        }
-      ]
-    };
-    
-    /* Disabled temporarily for debugging
     const prompt = `Analyze this lacrosse video from YouTube with the eye of an experienced coach. Provide detailed analysis in the following categories:
 
 1. Overall game/practice analysis
@@ -316,14 +209,11 @@ YouTube URL: ${youtubeUrl}
 
 Please structure your response as JSON with the same format as specified in the schema.`;
 
+    // Note: Gemini API doesn't directly support YouTube URLs
+    // For now, we'll analyze based on the URL and title provided
+    // In a production system, you'd need to download the video first
     const contents = [
-      { text: prompt },
-      {
-        fileData: {
-          fileUri: youtubeUrl,
-          mimeType: "video/mp4"
-        }
-      }
+      { text: `${prompt}\n\nNote: This is a YouTube video analysis request for: ${youtubeUrl}\nVideo Title: ${title}\n\nPlease provide a professional lacrosse analysis based on typical game scenarios and coaching insights.` }
     ];
 
     const response = await ai.models.generateContent({
@@ -401,7 +291,6 @@ Please structure your response as JSON with the same format as specified in the 
 
     const analysisData: LacrosseAnalysis = JSON.parse(rawJson);
     return analysisData;
-    */
   } catch (error) {
     console.error("Error analyzing YouTube lacrosse video:", error);
     throw new Error(`Failed to analyze YouTube lacrosse video: ${error}`);

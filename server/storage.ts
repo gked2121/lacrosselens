@@ -105,6 +105,13 @@ export class DatabaseStorage implements IStorage {
     return video;
   }
 
+  async updateVideo(id: number, updates: Partial<Video>): Promise<void> {
+    await db
+      .update(videos)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(videos.id, id));
+  }
+
   // Analysis operations
   async createAnalysis(analysisData: InsertAnalysis): Promise<Analysis> {
     const [analysis] = await db.insert(analyses).values(analysisData).returning();

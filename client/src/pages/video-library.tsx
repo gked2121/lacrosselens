@@ -217,7 +217,7 @@ export default function VideoLibrary() {
 
                       {video.youtubeUrl && (
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs gradient-primary text-primary-foreground border-0">
+                          <Badge variant="outline" className="text-xs bg-red-100 text-red-700 border-red-200">
                             <Play className="w-3 h-3 mr-1" />
                             YouTube
                           </Badge>

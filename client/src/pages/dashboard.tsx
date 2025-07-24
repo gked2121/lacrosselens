@@ -184,7 +184,7 @@ export default function Dashboard() {
                   <>
                     {/* Video Preview */}
                     {recentVideos[0].thumbnailUrl ? (
-                      <div className="relative bg-muted aspect-video rounded-lg overflow-hidden mx-6 mt-6">
+                      <div className="relative bg-muted aspect-video rounded-lg overflow-hidden m-6">
                         <img 
                           src={recentVideos[0].thumbnailUrl} 
                           alt={recentVideos[0].title} 
@@ -193,7 +193,7 @@ export default function Dashboard() {
                         
                         {/* Status Overlay */}
                         {recentVideos[0].status === 'completed' && (
-                          <div className="absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg">
+                          <div className="absolute top-4 right-4 text-white p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
                             <div className="flex items-center space-x-2">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                               <span className="text-xs font-medium">Analysis Complete</span>
@@ -202,7 +202,7 @@ export default function Dashboard() {
                         )}
                       </div>
                     ) : (
-                      <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 aspect-video flex items-center justify-center">
+                      <div className="relative bg-muted aspect-video flex items-center justify-center m-6 rounded-lg">
                         <div className="text-center">
                           <Video className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
                           <p className="text-sm text-muted-foreground">No preview available</p>
@@ -228,8 +228,11 @@ export default function Dashboard() {
                         <div>
                           <p className="text-sm text-muted-foreground mb-1">Status</p>
                           <Badge 
-                            variant={recentVideos[0].status === 'completed' ? 'default' : 'secondary'}
-                            className={recentVideos[0].status === 'completed' ? 'gradient-primary text-primary-foreground border-0' : ''}
+                            className={
+                              recentVideos[0].status === 'completed' ? 'status-completed' :
+                              recentVideos[0].status === 'processing' ? 'status-processing' :
+                              'status-uploading'
+                            }
                           >
                             {recentVideos[0].status === 'completed' ? 'Analysis Complete' : 
                              recentVideos[0].status === 'processing' ? 'Processing...' : 
@@ -271,8 +274,8 @@ export default function Dashboard() {
             <div className="space-y-6">
               {/* Quick Upload */}
               <Link href="/video-library">
-                <Card className="border-2 border-dashed border-primary/50 hover:border-primary cursor-pointer">
-                  <CardContent className="p-6 text-center">
+                <Card className="card-modern border-2 border-dashed hover:shadow-md cursor-pointer" style={{ borderColor: 'hsl(var(--primary) / 0.5)' }}>
+                  <CardContent className="content-padding text-center">
                     <CloudUpload className="w-8 h-8 text-primary mx-auto mb-2" />
                     <h3 className="font-semibold text-foreground mb-1">Quick Upload</h3>
                     <p className="text-sm text-muted-foreground">
@@ -283,8 +286,8 @@ export default function Dashboard() {
               </Link>
 
               {/* Recent Analysis */}
-              <Card>
-                <div className="p-6">
+              <Card className="card-modern">
+                <div className="content-padding">
                   <h3 className="text-lg font-semibold text-foreground mb-4">Recent Analysis</h3>
                   <div className="space-y-3">
                     {videosLoading ? (
@@ -305,7 +308,8 @@ export default function Dashboard() {
                       recentVideos.map((video: any) => (
                         <div 
                           key={video.id}
-                          className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                          style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}
                         >
                           <div className="w-12 h-8 bg-muted rounded flex-shrink-0 flex items-center justify-center">
                             {video.status === 'processing' ? (
@@ -343,8 +347,8 @@ export default function Dashboard() {
               </Card>
 
               {/* AI Tips */}
-              <Card>
-                <div className="p-6">
+              <Card className="card-modern">
+                <div className="content-padding">
                   <h3 className="text-lg font-semibold text-foreground mb-4">AI Analysis Tips</h3>
                   <div className="space-y-4">
                     <div className="flex items-start space-x-3">

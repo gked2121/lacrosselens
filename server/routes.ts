@@ -187,6 +187,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get video play statistics
+  app.get('/api/videos/:id/statistics', isAuthenticated, async (req: any, res) => {
+    try {
+      const videoId = parseInt(req.params.id);
+      const video = await storage.getVideo(videoId);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+
+      // Check if user owns the video
+      const userId = req.user.claims.sub;
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { AnalysisEnhancer } = await import('./services/analysisEnhancer');
+      const stats = await AnalysisEnhancer.getVideoPlayStatistics(videoId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching statistics:", error);
+      res.status(500).json({ message: "Failed to fetch statistics" });
+    }
+  });
+
   // Team routes
   app.post('/api/teams', isAuthenticated, async (req: any, res) => {
     try {

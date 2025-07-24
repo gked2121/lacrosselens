@@ -22,7 +22,10 @@ import {
   Trophy,
   TrendingUp,
   AlertCircle,
-  LoaderPinwheel
+  LoaderPinwheel,
+  BarChart3,
+  Activity,
+  CheckCircle2
 } from "lucide-react";
 
 export default function AnalysisDetail() {
@@ -54,6 +57,13 @@ export default function AnalysisDetail() {
   const { data: analyses, isLoading: analysesLoading } = useQuery({
     queryKey: [`/api/videos/${id}/analyses`],
     enabled: !!id,
+    retry: false,
+  });
+
+  // Fetch video statistics
+  const { data: statistics } = useQuery({
+    queryKey: [`/api/videos/${id}/statistics`],
+    enabled: !!id && video && (video as any).status === 'completed',
     retry: false,
   });
 
@@ -132,13 +142,13 @@ export default function AnalysisDetail() {
                 )}
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" className="shadow-soft">
+                <Button variant="secondary">
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
                 </Button>
                 {(video as any).youtubeUrl && (
                   <Button 
-                    className="gradient-primary shadow-glow"
+                    className="btn-primary"
                     onClick={() => window.open((video as any).youtubeUrl, '_blank')}
                   >
                     <Play className="w-4 h-4 mr-2" />
@@ -177,15 +187,59 @@ export default function AnalysisDetail() {
           {/* Analysis Content */}
           {(video as any).status === 'completed' ? (
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid grid-cols-2 lg:grid-cols-5 w-full">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="players">Players</TabsTrigger>
-                <TabsTrigger value="faceoffs">Face-offs</TabsTrigger>
-                <TabsTrigger value="transitions">Transitions</TabsTrigger>
-                <TabsTrigger value="moments">Key Moments</TabsTrigger>
+              <TabsList className="grid grid-cols-2 lg:grid-cols-5 w-full p-2 rounded-2xl" style={{ backgroundColor: 'hsl(var(--muted))' }}>
+                <TabsTrigger value="overview" className="rounded-xl font-semibold">Overview</TabsTrigger>
+                <TabsTrigger value="players" className="rounded-xl font-semibold">Players</TabsTrigger>
+                <TabsTrigger value="faceoffs" className="rounded-xl font-semibold">Face-offs</TabsTrigger>
+                <TabsTrigger value="transitions" className="rounded-xl font-semibold">Transitions</TabsTrigger>
+                <TabsTrigger value="moments" className="rounded-xl font-semibold">Key Moments</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
+                {/* Game Statistics Card */}
+                <Card className="card-modern">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-primary" />
+                      Game Statistics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
+                        <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
+                          {statistics?.goals || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Goals</div>
+                      </div>
+                      <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
+                        <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
+                          {statistics?.assists || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Assists</div>
+                      </div>
+                      <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
+                        <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
+                          {statistics?.faceOffTotal ? 
+                            `${Math.round((statistics.faceOffWins / statistics.faceOffTotal) * 100)}%` : 
+                            'N/A'
+                          }
+                        </div>
+                        <div className="text-sm text-muted-foreground">Face-off %</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {statistics?.faceOffWins || 0}/{statistics?.faceOffTotal || 0}
+                        </div>
+                      </div>
+                      <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
+                        <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
+                          {statistics?.saves || 0}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Saves</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {overallAnalysis && (
                   <Card className="shadow-soft">
                     <CardHeader>

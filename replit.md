@@ -62,9 +62,21 @@ Preferred communication style: Simple, everyday language.
 - **Users**: Replit Auth integration with profile data
 - **Teams**: User-owned team management
 - **Videos**: Upload metadata and processing status
-- **Analyses**: AI-generated analysis results
+- **Analyses**: AI-generated analysis results with:
+  - Type field: player_evaluation, face_off, transition, overall, key_moment
+  - Timestamp field: For precise play timing
+  - Metadata JSONB field: Stores structured data like win probabilities, player numbers
+  - Confidence field: AI confidence scoring
 - **Players**: Team roster management
 - **Sessions**: Authentication session storage
+
+### Play Tracking Capabilities
+The database schema is well-designed for detailed play tracking:
+- **Transitions**: Tracked via type="transition" with success probabilities in metadata
+- **Face-offs**: Tracked via type="face_off" with win probabilities in metadata
+- **Goals/Assists**: Extracted from type="key_moment" analyses
+- **Player Stats**: Can be aggregated from analyses with player numbers
+- **Temporal Data**: Timestamps allow play-by-play reconstruction
 
 ## Data Flow
 
@@ -219,3 +231,34 @@ Preferred communication style: Simple, everyday language.
   - Discovered dual upload component system: VideoUpload (navbar) and EnhancedVideoUpload (video library page)
 - **Files Modified**: server/routes.ts, client/src/pages/video-library.tsx, client/src/lib/queryClient.ts, client/src/components/video-upload.tsx
 - **Status**: Video processing retry functionality working, users can now retry failed videos with one click
+
+### 2025-01-24 - Enhanced Button Visibility and UI Improvements
+- **Issue**: Buttons were hard to read until hovered over
+- **Changes Made**:
+  - Updated button component with bold font weights and better default visibility
+  - Enhanced button variants with solid backgrounds instead of transparent states
+  - Improved contrast ratios for all button states
+  - Added active state scaling for better tactile feedback
+  - Updated tab triggers with rounded corners and better styling
+- **Files Modified**: client/src/index.css, client/src/components/ui/button.tsx, client/src/pages/analysis-detail.tsx
+- **Status**: Buttons now have excellent readability and modern styling
+
+### 2025-01-24 - Built Advanced Play Statistics Tracking System
+- **Issue**: User asked if database schema could handle detailed play tracking (transitions, faceoffs, goals, assists)
+- **Changes Made**:
+  - Created AnalysisEnhancer service for extracting structured play data from AI analyses
+  - Added play statistics API endpoint (/api/videos/:id/statistics)
+  - Enhanced analysis detail page with game statistics panel showing:
+    - Goals and assists tracking
+    - Face-off win percentage and counts
+    - Saves tracking
+    - Transition success rates (in metadata)
+  - Implemented play type extraction from analysis content using pattern matching
+  - Added team color and player number extraction from AI analysis text
+- **Database Assessment**: Current schema is well-suited for detailed tracking:
+  - Type field allows categorization of different play types
+  - Timestamp field enables precise temporal tracking
+  - JSONB metadata field stores structured data like probabilities and additional metrics
+  - Confidence field provides reliability scoring
+- **Files Modified**: server/services/analysisEnhancer.ts (new), server/routes.ts, client/src/pages/analysis-detail.tsx
+- **Status**: Play statistics system implemented and displaying real-time game metrics from AI analysis

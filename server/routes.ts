@@ -299,6 +299,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Retry processing for stuck videos
+  app.post('/api/videos/retry-processing', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const videos = await storage.getUserVideos(userId);
+      
+      // Find videos that are uploaded but not processed
+      const unprocessedVideos = videos.filter(v => v.status === 'uploaded');
+      
+      console.log(`Found ${unprocessedVideos.length} unprocessed videos for user ${userId}`);
+      
+      // Trigger processing for each unprocessed video
+      for (const video of unprocessedVideos) {
+        if (video.youtubeUrl) {
+          console.log(`Retrying YouTube video processing for video ${video.id}`);
+          processYouTubeVideo(video.id, video.youtubeUrl, video.title).catch(error => {
+            console.error(`Failed to process YouTube video ${video.id}:`, error);
+          });
+        } else if (video.filePath) {
+          console.log(`Retrying file video processing for video ${video.id}`);
+          processVideoUpload(video.id, video.filePath, video.title).catch(error => {
+            console.error(`Failed to process file video ${video.id}:`, error);
+          });
+        }
+      }
+      
+      res.json({ 
+        message: `Started processing ${unprocessedVideos.length} videos`,
+        count: unprocessedVideos.length 
+      });
+    } catch (error) {
+      console.error("Error retrying video processing:", error);
+      res.status(500).json({ message: "Failed to retry processing" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -40,17 +40,20 @@ export const upload = multer({
   },
 });
 
-export async function processVideoUpload(
+async function processVideoUpload(
   videoId: number,
   filePath: string,
   title: string
 ): Promise<void> {
   try {
+    console.log(`Starting video processing for video ${videoId}: ${title}`);
+    
     // Update video status to processing
     await storage.updateVideoStatus(videoId, "processing");
     
     // Generate thumbnail and get metadata
     try {
+      console.log(`Generating thumbnail and metadata for video ${videoId}`);
       const [thumbnailUrl, metadata] = await Promise.all([
         generateVideoThumbnail(filePath, videoId),
         getVideoMetadata(filePath)
@@ -61,13 +64,16 @@ export async function processVideoUpload(
         thumbnailUrl,
         duration: metadata.duration
       });
+      console.log(`Thumbnail and metadata updated for video ${videoId}`);
     } catch (thumbnailError) {
       console.error("Error generating thumbnail:", thumbnailError);
       // Continue processing even if thumbnail generation fails
     }
 
     // Analyze video with Gemini
+    console.log(`Starting Gemini analysis for video ${videoId}`);
     const analysis = await analyzeLacrosseVideo(filePath, title);
+    console.log(`Gemini analysis completed for video ${videoId}`);
 
     // Store analysis results
     await storage.createAnalysis({
@@ -146,19 +152,22 @@ export async function processVideoUpload(
 
     // Update video status to completed
     await storage.updateVideoStatus(videoId, "completed");
+    console.log(`Video processing completed successfully for video ${videoId}`);
   } catch (error) {
-    console.error("Error processing video:", error);
+    console.error(`Error processing video ${videoId}:`, error);
     await storage.updateVideoStatus(videoId, "failed");
     throw error;
   }
 }
 
-export async function processYouTubeVideo(
+async function processYouTubeVideo(
   videoId: number,
   youtubeUrl: string,
   title: string
 ): Promise<void> {
   try {
+    console.log(`Starting YouTube video processing for video ${videoId}: ${title}`);
+    
     // Update video status to processing
     await storage.updateVideoStatus(videoId, "processing");
     
@@ -256,3 +265,6 @@ export async function processYouTubeVideo(
     throw error;
   }
 }
+
+// Export functions at the end
+export { processVideoUpload, processYouTubeVideo };

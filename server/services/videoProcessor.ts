@@ -162,6 +162,8 @@ async function processVideoUpload(
     console.log(`Video processing completed successfully for video ${videoId}`);
   } catch (error) {
     console.error(`Error processing video ${videoId}:`, error);
+    console.error(`Full error details:`, error instanceof Error ? error.message : error);
+    console.error(`Stack trace:`, error instanceof Error ? error.stack : 'No stack trace');
     await storage.updateVideoStatus(videoId, "failed");
     throw error;
   }
@@ -274,7 +276,9 @@ async function processYouTubeVideo(
     // Update video status to completed
     await storage.updateVideoStatus(videoId, "completed");
   } catch (error) {
-    console.error("Error processing YouTube video:", error);
+    console.error(`Error processing YouTube video ${videoId}:`, error);
+    console.error(`Full error details:`, error instanceof Error ? error.message : error);
+    console.error(`Stack trace:`, error instanceof Error ? error.stack : 'No stack trace');
     await storage.updateVideoStatus(videoId, "failed");
     throw error;
   }

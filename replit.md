@@ -134,3 +134,11 @@ Preferred communication style: Simple, everyday language.
 - Video processing is asynchronous to prevent blocking
 - Static assets served efficiently in production
 - Session storage in database for horizontal scaling
+
+## Recent Changes
+
+### 2025-01-24 - Fixed AI Analysis Timestamp Issue
+- **Issue**: Gemini API returns decimal timestamps (e.g., 147.5 seconds) but database expects integers
+- **Solution**: Added Math.round() conversion for all timestamps before database storage
+- **Files Modified**: server/services/videoProcessor.ts (both processVideoUpload and processYouTubeVideo functions)
+- **Status**: AI analysis now successfully processes and stores results without database errors

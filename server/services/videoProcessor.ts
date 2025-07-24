@@ -69,8 +69,8 @@ export async function processVideoUpload(
         type: "player_evaluation",
         title: `Player Evaluation ${playerEval.playerNumber ? `- #${playerEval.playerNumber}` : ""}`,
         content: playerEval.evaluation,
-        timestamp: playerEval.timestamp,
-        confidence: playerEval.confidence,
+        timestamp: playerEval.timestamp ? Math.round(playerEval.timestamp) : null,
+        confidence: Math.round(playerEval.confidence),
         metadata: { 
           type: "player_evaluation",
           playerNumber: playerEval.playerNumber 
@@ -85,8 +85,8 @@ export async function processVideoUpload(
         type: "face_off",
         title: "Face-Off Analysis",
         content: faceOff.analysis,
-        timestamp: faceOff.timestamp,
-        confidence: faceOff.confidence,
+        timestamp: faceOff.timestamp ? Math.round(faceOff.timestamp) : null,
+        confidence: Math.round(faceOff.confidence),
         metadata: { 
           type: "face_off",
           winProbability: faceOff.winProbability 
@@ -101,8 +101,8 @@ export async function processVideoUpload(
         type: "transition",
         title: "Transition Intelligence",
         content: transition.analysis,
-        timestamp: transition.timestamp,
-        confidence: transition.confidence,
+        timestamp: transition.timestamp ? Math.round(transition.timestamp) : null,
+        confidence: Math.round(transition.confidence),
         metadata: { 
           type: "transition",
           successProbability: transition.successProbability 
@@ -117,8 +117,8 @@ export async function processVideoUpload(
         type: "key_moment",
         title: `Key Moment: ${moment.type}`,
         content: moment.description,
-        timestamp: moment.timestamp,
-        confidence: moment.confidence,
+        timestamp: moment.timestamp ? Math.round(moment.timestamp) : null,
+        confidence: Math.round(moment.confidence),
         metadata: { 
           type: "key_moment",
           momentType: moment.type 
@@ -165,8 +165,8 @@ export async function processYouTubeVideo(
         type: "player_evaluation",
         title: `Player Evaluation ${playerEval.playerNumber ? `- #${playerEval.playerNumber}` : ""}`,
         content: playerEval.evaluation,
-        timestamp: playerEval.timestamp,
-        confidence: playerEval.confidence,
+        timestamp: playerEval.timestamp ? Math.round(playerEval.timestamp) : null,
+        confidence: Math.round(playerEval.confidence),
         metadata: { 
           type: "player_evaluation",
           playerNumber: playerEval.playerNumber 
@@ -180,8 +180,8 @@ export async function processYouTubeVideo(
         type: "face_off",
         title: "Face-Off Analysis",
         content: faceOff.analysis,
-        timestamp: faceOff.timestamp,
-        confidence: faceOff.confidence,
+        timestamp: faceOff.timestamp ? Math.round(faceOff.timestamp) : null,
+        confidence: Math.round(faceOff.confidence),
         metadata: { 
           type: "face_off",
           winProbability: faceOff.winProbability 
@@ -195,8 +195,8 @@ export async function processYouTubeVideo(
         type: "transition",
         title: "Transition Intelligence",
         content: transition.analysis,
-        timestamp: transition.timestamp,
-        confidence: transition.confidence,
+        timestamp: transition.timestamp ? Math.round(transition.timestamp) : null,
+        confidence: Math.round(transition.confidence),
         metadata: { 
           type: "transition",
           successProbability: transition.successProbability 
@@ -210,8 +210,8 @@ export async function processYouTubeVideo(
         type: "key_moment",
         title: `Key Moment: ${moment.type}`,
         content: moment.description,
-        timestamp: moment.timestamp,
-        confidence: moment.confidence,
+        timestamp: moment.timestamp ? Math.round(moment.timestamp) : null,
+        confidence: Math.round(moment.confidence),
         metadata: { 
           type: "key_moment",
           momentType: moment.type 

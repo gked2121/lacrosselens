@@ -36,19 +36,19 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container flex h-14 lg:h-16 items-center justify-between px-4 lg:px-6">
+    <nav className="sticky top-0 z-50" style={{ backgroundColor: 'hsl(var(--background))', borderBottom: '1px solid hsl(var(--border))' }}>
+      <div className="container flex h-16 lg:h-20 items-center justify-between px-6 lg:px-8">
         {/* Logo and Brand */}
         <div className="flex items-center space-x-4 lg:space-x-6">
           <Link href="/">
             <div className="flex items-center space-x-2 cursor-pointer">
-              <div className="w-7 h-7 lg:w-8 lg:h-8 bg-primary rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 lg:w-5 lg:h-5 text-primary-foreground" />
+              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(259 100% 65%)' }}>
+                <BarChart3 className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
               </div>
-              <span className="font-bold text-lg lg:text-xl text-foreground">
+              <span className="font-bold text-xl lg:text-2xl" style={{ color: 'hsl(var(--foreground))' }}>
                 LacrosseLens
               </span>
-              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium ml-2">
+              <span className="text-sm px-3 py-1 rounded-full font-semibold ml-2" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)', color: 'hsl(259 100% 65%)' }}>
                 Beta
               </span>
             </div>
@@ -78,15 +78,15 @@ export default function Navigation() {
         <div className="flex items-center space-x-2 lg:space-x-4">
           {/* Upload Video Button */}
           <VideoUpload>
-            <Button size="sm" className="hidden sm:flex items-center space-x-2">
-              <Upload className="w-4 h-4" />
-              <span>Upload Video</span>
+            <Button className="hidden sm:flex items-center gap-2 btn-primary">
+              <Upload className="w-5 h-5" />
+              <span className="font-semibold">Upload Video</span>
             </Button>
           </VideoUpload>
 
           <VideoUpload>
-            <Button size="sm" variant="outline" className="sm:hidden">
-              <Upload className="w-4 h-4" />
+            <Button variant="outline" className="sm:hidden btn-outline">
+              <Upload className="w-5 h-5" />
             </Button>
           </VideoUpload>
 

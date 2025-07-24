@@ -184,10 +184,10 @@ export default function VideoLibrary() {
                     )}
                     
                     {/* Play overlay */}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <Link href={`/videos/${video.id}`} className="w-full max-w-xs mx-4">
-                        <Button size="sm" className="w-full bg-white text-black hover:bg-gray-100">
-                          <Play className="w-4 h-4 mr-2" />
+                        <Button size="lg" className="w-full font-semibold shadow-lg" style={{ backgroundColor: 'white', color: 'hsl(var(--foreground))' }}>
+                          <Play className="w-5 h-5 mr-2" />
                           {video.status === 'completed' ? 'View Analysis' : 'View Details'}
                         </Button>
                       </Link>
@@ -237,27 +237,27 @@ export default function VideoLibrary() {
                     </div>
                   </div>
 
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-foreground text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-xl mb-3 line-clamp-1 transition-colors" style={{ color: 'hsl(var(--foreground))' }}>
                       {video.title}
                     </h3>
                     
                     {video.description && (
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      <p className="text-base mb-4 line-clamp-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
                         {video.description}
                       </p>
                     )}
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="w-3 h-3" />
+                        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                          <Calendar className="w-4 h-4" />
                           {new Date(video.createdAt).toLocaleDateString()}
                         </div>
                         
                         {video.duration && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Clock className="w-3 h-3" />
+                          <div className="flex items-center gap-2 text-sm font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                            <Clock className="w-4 h-4" />
                             {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
                           </div>
                         )}
@@ -265,8 +265,8 @@ export default function VideoLibrary() {
 
                       {video.youtubeUrl && (
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs bg-red-100 text-red-700 border-red-200">
-                            <Play className="w-3 h-3 mr-1" />
+                          <Badge variant="outline" className="text-sm px-3 py-1 font-semibold" style={{ backgroundColor: 'hsl(0 84% 95%)', color: 'hsl(0 84% 50%)', borderColor: 'hsl(0 84% 85%)' }}>
+                            <Play className="w-4 h-4 mr-1" />
                             YouTube
                           </Badge>
                         </div>

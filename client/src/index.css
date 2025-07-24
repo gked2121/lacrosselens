@@ -4,28 +4,28 @@
 
 :root {
   /* Modern 2025 Color Palette - Clean & Professional */
-  --background: 0 0% 98%;  /* Light gray background */
-  --foreground: 222 47% 11%;
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 46%;
+  --background: 0 0% 100%;  /* Pure white background */
+  --foreground: 240 19% 16%;  /* Softer dark text */
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 5% 40%;  /* Lighter muted text */
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 240 19% 16%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --primary: 262 80% 50%;  /* Modern purple */
+  --card-foreground: 240 19% 16%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --primary: 259 100% 65%;  /* Vibrant purple */
   --primary-foreground: 0 0% 100%;
-  --secondary: 220 14% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --accent: 220 14% 96%;
-  --accent-foreground: 222 47% 11%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 19% 16%;
+  --accent: 259 100% 97%;  /* Light purple accent */
+  --accent-foreground: 240 19% 16%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --success: 142 71% 45%;
+  --success: 142 76% 36%;
   --warning: 38 92% 50%;
-  --ring: 262 80% 50%;
-  --radius: 12px;
+  --ring: 259 100% 65%;
+  --radius: 16px;
 }
 
 .dark {
@@ -59,8 +59,8 @@
 
   body {
     @apply bg-background text-foreground;
-    background-color: #fafafa !important;
-    color: #0a0e27 !important;
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
   }
 
   html {
@@ -76,20 +76,27 @@
 
   /* Typography Scale */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    @apply font-bold;
+    color: hsl(var(--foreground));
+    letter-spacing: -0.025em;
     line-height: 1.2;
   }
 
   h1 {
-    @apply text-3xl lg:text-4xl;
+    @apply text-4xl lg:text-5xl;
   }
 
   h2 {
-    @apply text-2xl lg:text-3xl;
+    @apply text-3xl lg:text-4xl;
   }
 
   h3 {
-    @apply text-xl lg:text-2xl;
+    @apply text-2xl lg:text-3xl;
+  }
+  
+  p {
+    line-height: 1.7;
+    font-size: 1rem;
   }
 
   /* Modern Scrollbar */
@@ -123,10 +130,10 @@
 
   /* Modern Card System */
   .card-modern {
-    background-color: white !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 1rem !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    background-color: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
   }
 
   .card-interactive {
@@ -143,59 +150,84 @@
 
   /* Button System - Clean & Modern */
   .btn-primary {
-    @apply bg-primary text-primary-foreground rounded-xl px-6 py-3 font-medium transition-all duration-200 active:scale-[0.98];
+    @apply text-primary-foreground font-semibold transition-all duration-200 active:scale-[0.98];
+    background-color: hsl(var(--primary)) !important;
+    border-radius: 12px !important;
+    padding: 12px 24px !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   }
   
   .btn-primary:hover {
-    background-color: hsl(var(--primary) / 0.9);
+    background-color: hsl(var(--primary) / 0.9) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 
   .btn-secondary {
-    @apply border rounded-xl px-6 py-3 font-medium transition-all duration-200;
-    background-color: hsl(var(--secondary) / 0.1);
-    color: hsl(var(--secondary-foreground));
-    border-color: hsl(var(--secondary) / 0.2);
+    @apply font-medium transition-all duration-200;
+    background-color: hsl(var(--secondary)) !important;
+    color: hsl(var(--secondary-foreground)) !important;
+    border-radius: 12px !important;
+    padding: 12px 24px !important;
+    border: 1px solid hsl(var(--border)) !important;
   }
   
   .btn-secondary:hover {
-    background-color: hsl(var(--secondary) / 0.2);
+    background-color: hsl(var(--secondary) / 0.8) !important;
   }
 
   .btn-ghost {
-    @apply text-foreground rounded-xl px-6 py-3 font-medium transition-all duration-200;
+    @apply font-medium transition-all duration-200;
+    color: hsl(var(--foreground)) !important;
+    border-radius: 12px !important;
+    padding: 12px 24px !important;
   }
   
   .btn-ghost:hover {
-    background-color: hsl(var(--accent));
+    background-color: hsl(var(--accent)) !important;
   }
 
   .btn-outline {
-    @apply border border-border text-foreground rounded-xl px-6 py-3 font-medium transition-all duration-200;
+    @apply font-medium transition-all duration-200;
+    border: 2px solid hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+    border-radius: 12px !important;
+    padding: 12px 24px !important;
+    background-color: transparent !important;
   }
   
   .btn-outline:hover {
-    background-color: hsl(var(--accent));
+    background-color: hsl(var(--accent)) !important;
+    border-color: hsl(var(--primary) / 0.3) !important;
   }
 
   /* Status System */
   .status-badge {
-    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold;
+    letter-spacing: 0.025em;
   }
 
   .status-completed {
-    @apply status-badge bg-emerald-50 text-emerald-700 border-emerald-200;
+    background-color: hsl(142 76% 96%) !important;
+    color: hsl(142 76% 36%) !important;
+    border: 1.5px solid hsl(142 76% 86%) !important;
   }
 
   .status-processing {
-    @apply status-badge bg-amber-50 text-amber-700 border-amber-200;
+    background-color: hsl(38 92% 95%) !important;
+    color: hsl(38 92% 40%) !important;
+    border: 1.5px solid hsl(38 92% 85%) !important;
   }
 
   .status-failed {
-    @apply status-badge bg-red-50 text-red-700 border-red-200;
+    background-color: hsl(0 84% 95%) !important;
+    color: hsl(0 84% 50%) !important;
+    border: 1.5px solid hsl(0 84% 85%) !important;
   }
 
   .status-uploading {
-    @apply status-badge bg-blue-50 text-blue-700 border-blue-200;
+    background-color: hsl(217 91% 95%) !important;
+    color: hsl(217 91% 50%) !important;
+    border: 1.5px solid hsl(217 91% 85%) !important;
   }
 
   /* Dark mode status variants */
@@ -225,11 +257,24 @@
 
   /* Input System */
   .input-modern {
-    @apply w-full px-4 py-3 bg-background border border-input rounded-xl text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-all duration-200;
+    @apply w-full font-medium transition-all duration-200;
+    padding: 14px 20px !important;
+    background-color: hsl(var(--background)) !important;
+    border: 2px solid hsl(var(--border)) !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    color: hsl(var(--foreground)) !important;
+  }
+  
+  .input-modern::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+    font-weight: 400;
   }
   
   .input-modern:focus {
-    ring: 2px solid hsl(var(--primary) / 0.2);
+    outline: none !important;
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1) !important;
   }
 
   .textarea-modern {
@@ -262,11 +307,17 @@
   }
 
   .page-title {
-    @apply text-3xl lg:text-4xl font-semibold tracking-tight;
+    @apply text-4xl lg:text-5xl font-bold;
+    color: hsl(var(--foreground));
+    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 
   .page-description {
-    @apply text-muted-foreground text-base lg:text-lg leading-relaxed;
+    @apply text-lg lg:text-xl;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.7;
+    font-weight: 400;
   }
 
   /* Modern Shadows - Clean & Subtle */

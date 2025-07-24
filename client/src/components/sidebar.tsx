@@ -33,12 +33,12 @@ export default function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="w-64 bg-card shadow-soft border-r border-border hidden lg:block">
-      <div className="p-4 lg:p-6">
-        <div className="space-y-6">
+    <aside className="w-72 hidden lg:block" style={{ backgroundColor: 'hsl(var(--background))', borderRight: '1px solid hsl(var(--border))' }}>
+      <div className="p-6 lg:p-8">
+        <div className="space-y-8">
           {navigation.map((section) => (
             <div key={section.name}>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'hsl(var(--muted-foreground))', letterSpacing: '0.1em' }}>
                 {section.name}
               </h3>
               <nav className="space-y-2">
@@ -51,13 +51,13 @@ export default function Sidebar() {
                     return (
                       <div key={item.name}>
                         <span
-                          className="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg cursor-not-allowed opacity-60"
+                          className="flex items-center justify-between px-4 py-3 text-base font-medium rounded-xl cursor-not-allowed opacity-50"
                         >
                           <div className="flex items-center">
-                            <Icon className="w-5 h-5 mr-3 text-muted-foreground" />
-                            <span className="text-muted-foreground">{item.name}</span>
+                            <Icon className="w-6 h-6 mr-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
+                            <span style={{ color: 'hsl(var(--muted-foreground))' }}>{item.name}</span>
                           </div>
-                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                          <span className="text-xs px-3 py-1 rounded-full font-semibold" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)', color: 'hsl(259 100% 65%)' }}>
                             Coming Soon
                           </span>
                         </span>
@@ -69,13 +69,18 @@ export default function Sidebar() {
                     <Link key={item.name} href={item.href}>
                       <span
                         className={cn(
-                          "flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors",
+                          "flex items-center px-4 py-3 text-base font-medium rounded-xl cursor-pointer transition-all duration-200",
                           isActive
-                            ? "text-primary bg-primary/10"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                            ? ""
+                            : "hover:translate-x-1"
                         )}
+                        style={{
+                          backgroundColor: isActive ? 'hsl(259 100% 65% / 0.1)' : 'transparent',
+                          color: isActive ? 'hsl(259 100% 65%)' : 'hsl(var(--foreground))',
+                          borderLeft: isActive ? '3px solid hsl(259 100% 65%)' : '3px solid transparent'
+                        }}
                       >
-                        <Icon className="w-5 h-5 mr-3" />
+                        <Icon className="w-6 h-6 mr-4" />
                         {item.name}
                       </span>
                     </Link>
@@ -85,10 +90,10 @@ export default function Sidebar() {
             </div>
           ))}
           
-          <div className="pt-6 border-t border-border">
+          <div className="pt-8 border-t" style={{ borderColor: 'hsl(var(--border))' }}>
             <Link href="/settings">
-              <span className="flex items-center px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors">
-                <Settings className="w-5 h-5 mr-3" />
+              <span className="flex items-center px-4 py-3 text-base font-medium rounded-xl cursor-pointer transition-all duration-200 hover:translate-x-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                <Settings className="w-6 h-6 mr-4" />
                 Settings
               </span>
             </Link>

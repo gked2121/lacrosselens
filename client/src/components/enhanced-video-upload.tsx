@@ -148,29 +148,29 @@ export default function EnhancedVideoUpload() {
 
   return (
     <Card className="w-full max-w-4xl mx-auto card-modern">
-      <CardHeader className="content-padding pb-4">
+      <CardHeader className="p-8 pb-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}>
-            <Upload className="w-6 h-6 text-primary" />
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
+            <Upload className="w-7 h-7" style={{ color: 'hsl(259 100% 65%)' }} />
           </div>
           <div>
-            <CardTitle className="text-xl font-semibold">AI-Powered Video Analysis</CardTitle>
-            <p className="text-muted-foreground mt-1">
+            <CardTitle className="text-2xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>AI-Powered Video Analysis</CardTitle>
+            <p className="mt-1 text-lg" style={{ color: 'hsl(var(--muted-foreground))' }}>
               Upload lacrosse footage for professional-grade coaching insights
             </p>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="content-padding pt-0 space-y-8">
+      <CardContent className="p-8 pt-0 space-y-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-muted p-1 rounded-xl">
-            <TabsTrigger value="file" className="flex items-center gap-2 rounded-lg py-3">
-              <Upload className="w-4 h-4" />
+          <TabsList className="grid w-full grid-cols-2 p-2 rounded-2xl" style={{ backgroundColor: 'hsl(var(--muted))' }}>
+            <TabsTrigger value="file" className="flex items-center gap-2 rounded-xl py-3 font-semibold text-base">
+              <Upload className="w-5 h-5" />
               File Upload
             </TabsTrigger>
-            <TabsTrigger value="youtube" className="flex items-center gap-2 rounded-lg py-3">
-              <Play className="w-4 h-4" />
+            <TabsTrigger value="youtube" className="flex items-center gap-2 rounded-xl py-3 font-semibold text-base">
+              <Play className="w-5 h-5" />
               YouTube URL
             </TabsTrigger>
           </TabsList>
@@ -231,17 +231,19 @@ export default function EnhancedVideoUpload() {
                             key={type}
                             type="button"
                             onClick={() => setAnalysisType(type)}
-                            className={`p-3 rounded-lg border text-left transition-colors ${
-                              analysisType === type
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-primary/50"
-                            }`}
+                            className={`p-4 rounded-xl border-2 text-left transition-all duration-200`}
+                            style={{
+                              borderColor: analysisType === type ? 'hsl(259 100% 65%)' : 'hsl(var(--border))',
+                              backgroundColor: analysisType === type ? 'hsl(259 100% 65% / 0.05)' : 'transparent'
+                            }}
                           >
-                            <div className="flex items-center gap-2 mb-1">
-                              {info.icon}
-                              <span className="font-medium text-sm">{info.title}</span>
+                            <div className="flex items-center gap-3 mb-2">
+                              <span style={{ color: analysisType === type ? 'hsl(259 100% 65%)' : 'hsl(var(--foreground))' }}>
+                                {info.icon}
+                              </span>
+                              <span className="font-semibold text-base" style={{ color: 'hsl(var(--foreground))' }}>{info.title}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground">{info.desc}</p>
+                            <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{info.desc}</p>
                           </button>
                         );
                       })}
@@ -322,11 +324,21 @@ export default function EnhancedVideoUpload() {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full btn-primary" 
                 disabled={fileUploadMutation.isPending}
                 size="lg"
               >
-                {fileUploadMutation.isPending ? "Uploading..." : "Upload & Analyze Video"}
+                {fileUploadMutation.isPending ? (
+                  <>
+                    <div className="loading-spinner mr-2" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-5 h-5 mr-2" />
+                    Upload & Analyze Video
+                  </>
+                )}
               </Button>
             </form>
           </TabsContent>
@@ -382,17 +394,19 @@ export default function EnhancedVideoUpload() {
                             key={type}
                             type="button"
                             onClick={() => setAnalysisType(type)}
-                            className={`p-3 rounded-lg border text-left transition-colors ${
-                              analysisType === type
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-primary/50"
-                            }`}
+                            className={`p-4 rounded-xl border-2 text-left transition-all duration-200`}
+                            style={{
+                              borderColor: analysisType === type ? 'hsl(259 100% 65%)' : 'hsl(var(--border))',
+                              backgroundColor: analysisType === type ? 'hsl(259 100% 65% / 0.05)' : 'transparent'
+                            }}
                           >
-                            <div className="flex items-center gap-2 mb-1">
-                              {info.icon}
-                              <span className="font-medium text-sm">{info.title}</span>
+                            <div className="flex items-center gap-3 mb-2">
+                              <span style={{ color: analysisType === type ? 'hsl(259 100% 65%)' : 'hsl(var(--foreground))' }}>
+                                {info.icon}
+                              </span>
+                              <span className="font-semibold text-base" style={{ color: 'hsl(var(--foreground))' }}>{info.title}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground">{info.desc}</p>
+                            <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{info.desc}</p>
                           </button>
                         );
                       })}
@@ -470,26 +484,48 @@ export default function EnhancedVideoUpload() {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full btn-primary" 
                 disabled={youtubeUploadMutation.isPending}
                 size="lg"
               >
-                {youtubeUploadMutation.isPending ? "Analyzing..." : "Analyze YouTube Video"}
+                {youtubeUploadMutation.isPending ? (
+                  <>
+                    <div className="loading-spinner mr-2" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5 mr-2" />
+                    Analyze YouTube Video
+                  </>
+                )}
               </Button>
             </form>
           </TabsContent>
         </Tabs>
 
-        <div className="bg-muted/50 rounded-lg p-4">
-          <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-primary" />
+        <div className="rounded-2xl p-6" style={{ backgroundColor: 'hsl(259 100% 65% / 0.05)', border: '1px solid hsl(259 100% 65% / 0.1)' }}>
+          <h4 className="font-semibold text-base mb-3 flex items-center gap-2">
+            <Zap className="w-5 h-5" style={{ color: 'hsl(259 100% 65%)' }} />
             Pro Tips for Better Analysis
           </h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Be specific in your analysis request for more targeted insights</li>
-            <li>• Include player numbers and positions when possible</li>
-            <li>• Higher quality video leads to more accurate analysis</li>
-            <li>• Analysis typically takes 2-3 minutes to complete</li>
+          <ul className="text-sm space-y-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+            <li className="flex items-start">
+              <span className="mr-2" style={{ color: 'hsl(259 100% 65%)' }}>•</span>
+              <span>Be specific in your analysis request for more targeted insights</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2" style={{ color: 'hsl(259 100% 65%)' }}>•</span>
+              <span>Include player numbers and positions when possible</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2" style={{ color: 'hsl(259 100% 65%)' }}>•</span>
+              <span>Higher quality video leads to more accurate analysis</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2" style={{ color: 'hsl(259 100% 65%)' }}>•</span>
+              <span>Analysis typically takes 2-3 minutes to complete</span>
+            </li>
           </ul>
         </div>
       </CardContent>

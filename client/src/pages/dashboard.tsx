@@ -87,67 +87,75 @@ export default function Dashboard() {
           {/* Stats Cards */}
           <div className="grid-stats mb-8">
             <Card className="card-modern hover:shadow-medium transition-all duration-300">
-              <CardContent className="content-padding">
+              <CardContent className="p-7">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Videos Analyzed</p>
-                    <p className="text-3xl font-semibold text-foreground">
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      Videos Analyzed
+                    </p>
+                    <p className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                       {statsLoading ? "--" : (stats as any)?.videosAnalyzed || 0}
                     </p>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}>
-                    <Video className="w-6 h-6 text-primary" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
+                    <Video className="w-7 h-7" style={{ color: 'hsl(259 100% 65%)' }} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="card-modern hover:shadow-medium transition-all duration-300">
-              <CardContent className="content-padding">
+              <CardContent className="p-7">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Teams Managed</p>
-                    <p className="text-3xl font-semibold text-foreground">
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      Teams Managed
+                    </p>
+                    <p className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                       {statsLoading ? "--" : (stats as any)?.totalTeams || 0}
                     </p>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--secondary) / 0.1)' }}>
-                    <Users className="w-6 h-6 text-secondary" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(142 76% 36% / 0.1)' }}>
+                    <Users className="w-7 h-7" style={{ color: 'hsl(142 76% 36%)' }} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="card-modern hover:shadow-medium transition-all duration-300">
-              <CardContent className="content-padding">
+              <CardContent className="p-7">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Avg. Confidence</p>
-                    <p className="text-3xl font-semibold text-foreground">
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      Avg. Confidence
+                    </p>
+                    <p className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                       {statsLoading ? "--" : 
                        (stats as any)?.analysisAccuracy > 0 ? 
                          `${Math.round((stats as any)?.analysisAccuracy)}%` : 
                          "N/A"}
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                    <Target className="w-6 h-6 text-emerald-600" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(217 91% 50% / 0.1)' }}>
+                    <Target className="w-7 h-7" style={{ color: 'hsl(217 91% 50%)' }} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="card-modern hover:shadow-medium transition-all duration-300">
-              <CardContent className="content-padding">
+              <CardContent className="p-7">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Processing</p>
-                    <p className="text-3xl font-semibold text-foreground">
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      Processing
+                    </p>
+                    <p className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                       {statsLoading ? "--" : (stats as any)?.videosProcessing || 0}
                     </p>
                   </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-orange-600" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'hsl(38 92% 50% / 0.1)' }}>
+                    <Clock className="w-7 h-7" style={{ color: 'hsl(38 92% 50%)' }} />
                   </div>
                 </div>
               </CardContent>
@@ -158,9 +166,9 @@ export default function Dashboard() {
             {/* Latest Analysis */}
             <div className="lg:col-span-2">
               <Card className="card-modern">
-                <div className="content-padding border-b border-border">
+                <div className="p-6 border-b" style={{ borderColor: 'hsl(var(--border))' }}>
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground">Latest Analysis</h2>
+                    <h2 className="text-2xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>Latest Analysis</h2>
                     {recentVideos.length > 0 && (
                       <Badge 
                         className={

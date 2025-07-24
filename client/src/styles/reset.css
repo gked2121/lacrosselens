@@ -1,0 +1,59 @@
+/* CSS Reset for color issues */
+* {
+  color: inherit;
+}
+
+body {
+  background-color: #fafafa !important;
+  color: #0a0e27 !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Card fixes */
+.card-modern,
+[class*="card"] {
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Text color fixes */
+.text-foreground {
+  color: #0a0e27 !important;
+}
+
+.text-muted-foreground {
+  color: #64748b !important;
+}
+
+/* Background fixes */
+.bg-background {
+  background-color: #fafafa !important;
+}
+
+.bg-muted {
+  background-color: #f5f5f7 !important;
+}
+
+.bg-card {
+  background-color: white !important;
+}
+
+/* Primary color */
+.text-primary {
+  color: #7c3aed !important;
+}
+
+.bg-primary {
+  background-color: #7c3aed !important;
+}
+
+/* Button fixes */
+button, .btn-primary {
+  background-color: #7c3aed !important;
+  color: white !important;
+}
+
+button:hover, .btn-primary:hover {
+  background-color: #6b21a8 !important;
+}

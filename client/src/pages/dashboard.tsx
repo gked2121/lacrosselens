@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import Sidebar from "@/components/sidebar";
-import VideoUpload from "@/components/video-upload";
+import EnhancedVideoUpload from "@/components/enhanced-video-upload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,13 +73,13 @@ export default function Dashboard() {
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
                 </Button>
-                <VideoUpload>
+                <Link href="/video-library">
                   <Button className="gradient-primary shadow-glow">
                     <Plus className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">New Analysis</span>
                     <span className="sm:hidden">Upload</span>
                   </Button>
-                </VideoUpload>
+                </Link>
               </div>
             </div>
           </div>
@@ -256,12 +256,12 @@ export default function Dashboard() {
                     <p className="text-muted-foreground mb-4">
                       Upload your first lacrosse video to get AI-powered analysis.
                     </p>
-                    <VideoUpload>
+                    <Link href="/video-library">
                       <Button>
                         <Plus className="w-4 h-4 mr-2" />
                         Upload Video
                       </Button>
-                    </VideoUpload>
+                    </Link>
                   </div>
                 )}
               </Card>
@@ -270,7 +270,7 @@ export default function Dashboard() {
             {/* Right Sidebar */}
             <div className="space-y-6">
               {/* Quick Upload */}
-              <VideoUpload>
+              <Link href="/video-library">
                 <Card className="border-2 border-dashed border-primary/50 hover:border-primary cursor-pointer">
                   <CardContent className="p-6 text-center">
                     <CloudUpload className="w-8 h-8 text-primary mx-auto mb-2" />
@@ -280,7 +280,7 @@ export default function Dashboard() {
                     </p>
                   </CardContent>
                 </Card>
-              </VideoUpload>
+              </Link>
 
               {/* Recent Analysis */}
               <Card>

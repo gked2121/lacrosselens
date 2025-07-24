@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import Navigation from "@/components/navigation";
 import Sidebar from "@/components/sidebar";
-import VideoUpload from "@/components/video-upload";
+import EnhancedVideoUpload from "@/components/enhanced-video-upload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -91,13 +91,11 @@ export default function VideoLibrary() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <VideoUpload>
-                  <Button className="gradient-primary shadow-glow">
-                    <Plus className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Upload Video</span>
-                    <span className="sm:hidden">Upload</span>
-                  </Button>
-                </VideoUpload>
+                <Button className="gradient-primary shadow-glow" onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Upload Video</span>
+                  <span className="sm:hidden">Upload</span>
+                </Button>
               </div>
             </div>
           </div>
@@ -231,14 +229,23 @@ export default function VideoLibrary() {
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 Upload your first lacrosse video to get started with AI-powered analysis.
               </p>
-              <VideoUpload>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Upload Your First Video
-                </Button>
-              </VideoUpload>
+              <Button onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Plus className="w-4 h-4 mr-2" />
+                Upload Your First Video
+              </Button>
             </div>
           )}
+
+          {/* Upload Section */}
+          <div id="upload-section" className="mt-8">
+            <div className="bg-primary/5 rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-2">Upload Video for Analysis</h2>
+              <p className="text-muted-foreground mb-4">
+                Upload or link a lacrosse video for comprehensive AI analysis and coaching insights.
+              </p>
+              <EnhancedVideoUpload />
+            </div>
+          </div>
         </main>
       </div>
     </div>

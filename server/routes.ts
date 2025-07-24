@@ -55,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/videos/upload', isAuthenticated, upload.single('video'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { title, description, teamId } = req.body;
+      const { title, description, teamId, userPrompt, playerNumber, teamName, position, level } = req.body;
       const file = req.file;
 
       if (!file) {
@@ -72,12 +72,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
         teamId: teamId ? parseInt(teamId) : null,
         status: "uploading",
+        userPrompt,
+        playerNumber,
+        teamName,
+        position,
+        level,
       };
 
       const video = await storage.createVideo(videoData);
 
-      // Process video asynchronously
-      processVideoUpload(video.id, file.path, video.title).catch(console.error);
+      // Process video asynchronously with custom options
+      const analysisOptions = { playerNumber, teamName, position, level };
+      processVideoUpload(video.id, file.path, video.title, userPrompt, analysisOptions).catch(console.error);
 
       res.json(video);
     } catch (error) {
@@ -89,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/videos/youtube', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { youtubeUrl, title, description, teamId } = req.body;
+      const { youtubeUrl, title, description, teamId, userPrompt, playerNumber, teamName, position, level } = req.body;
 
       if (!youtubeUrl) {
         return res.status(400).json({ message: "YouTube URL is required" });
@@ -105,12 +111,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
         teamId: teamId ? parseInt(teamId) : null,
         status: "uploading",
+        userPrompt,
+        playerNumber,
+        teamName,
+        position,
+        level,
       };
 
       const video = await storage.createVideo(videoData);
 
-      // Process YouTube video asynchronously
-      processYouTubeVideo(video.id, youtubeUrl, video.title).catch(console.error);
+      // Process YouTube video asynchronously with custom options
+      const analysisOptions = { playerNumber, teamName, position, level };
+      processYouTubeVideo(video.id, youtubeUrl, video.title, userPrompt, analysisOptions).catch(console.error);
 
       res.json(video);
     } catch (error) {

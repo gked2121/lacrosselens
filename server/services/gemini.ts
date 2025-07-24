@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import * as fs from "fs";
+import { PromptEngine, AnalysisType } from "./promptEngine";
 
 const ai = new GoogleGenAI({ 
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "" 
@@ -77,7 +78,17 @@ MAXIMUM DETAIL ANALYSIS REQUIREMENTS:
 - Use sophisticated lacrosse terminology and tactical analysis throughout
 - Include game situation context and how it affects technique and decision-making`;
 
-export async function analyzeLacrosseVideo(videoPath: string, title: string = ""): Promise<LacrosseAnalysis> {
+export async function analyzeLacrosseVideo(
+  videoPath: string, 
+  title: string = "", 
+  userPrompt?: string,
+  analysisOptions?: {
+    playerNumber?: string;
+    teamName?: string;
+    position?: string;
+    level?: 'youth' | 'high_school' | 'college' | 'professional';
+  }
+): Promise<LacrosseAnalysis> {
   try {
     console.log("Starting Gemini analysis for video:", videoPath);
     
@@ -90,52 +101,19 @@ export async function analyzeLacrosseVideo(videoPath: string, title: string = ""
     const videoBytes = fs.readFileSync(videoPath);
     console.log(`Video file read successfully, size: ${videoBytes.length} bytes`);
     
-    const prompt = `Break down this lacrosse footage like you're reviewing film with your coaching staff. Use authentic lacrosse terminology and provide detailed technical analysis.
-
-ANALYSIS CATEGORIES:
-
-1. OVERALL GAME BREAKDOWN: Assess team systems, ball movement patterns, defensive schemes, and overall lacrosse IQ displayed. Identify what's working and what needs adjustment.
-
-2. INDIVIDUAL PLAYER EVALUATIONS: Analyze specific players by jersey number when visible. Focus on:
-   - Stick work (cradle mechanics, catch/throw technique, check execution)
-   - Footwork and body positioning 
-   - Field vision and decision-making under pressure
-   - Communication and leadership qualities
-   - Effort level and coachability indicators
-
-3. FACE-OFF ANALYSIS: Evaluate FOGO technique including:
-   - Clamp execution and grip positioning
-   - Body leverage and footwork at the X
-   - Wing support and possession battles
-   - Counter-moves and adaptability
-   - Win percentage factors and improvement areas
-
-4. TRANSITION INTELLIGENCE: Break down fast break opportunities:
-   - Outlet pass timing and accuracy
-   - Field spacing during transition
-   - Numbers advantages recognition
-   - Clearing mechanics and ride pressure response
-   - Redefending and recovery positioning
-
-5. KEY MOMENTS & TEACHABLE SITUATIONS: Identify critical plays that demonstrate:
-   - High lacrosse IQ decisions vs missed opportunities
-   - Successful execution of fundamental skills
-   - Areas requiring immediate coaching attention
-   - Game-changing moments and their tactical significance
-
-EXHAUSTIVE ANALYSIS REQUIREMENTS:
-- Each observation must be 7-10 sentences minimum with complete technical dissection
-- Include full biomechanical breakdown: grip, body mechanics, stick positioning, footwork sequencing
-- Analyze tactical awareness: field vision, recognition patterns, decision-making under pressure
-- Reference elite coaching methodologies: what top college programs emphasize, professional techniques
-- Connect to advanced team concepts: system implementation, role responsibilities, situational adjustments
-- Provide comprehensive skill development roadmaps with specific drill progressions and practice scheduling
-- Use elite-level coaching vocabulary and sophisticated tactical analysis throughout
-- Include recruiting perspective: what college coaches evaluate, skill level comparisons, development potential
-
-For each observation, provide the exact timestamp, extensive technical breakdown using advanced lacrosse terminology, confidence level (1-100), and comprehensive coaching development plan.
-
-Video Title: ${title}
+    // Generate dynamic prompt based on user input and analysis type
+    const analysisType = PromptEngine.determineAnalysisType(userPrompt);
+    const promptRequest = {
+      analysisType,
+      userPrompt,
+      videoTitle: title,
+      playerNumber: analysisOptions?.playerNumber,
+      teamName: analysisOptions?.teamName,
+      position: analysisOptions?.position,
+      level: analysisOptions?.level || 'high_school'
+    };
+    
+    const prompt = PromptEngine.generatePrompt(promptRequest) + `
 
 Please structure your response as JSON with the following format:
 {
@@ -245,58 +223,33 @@ Please structure your response as JSON with the following format:
   }
 }
 
-export async function analyzeLacrosseVideoFromYouTube(youtubeUrl: string, title: string = ""): Promise<LacrosseAnalysis> {
+export async function analyzeLacrosseVideoFromYouTube(
+  youtubeUrl: string, 
+  title: string = "",
+  userPrompt?: string,
+  analysisOptions?: {
+    playerNumber?: string;
+    teamName?: string;
+    position?: string;
+    level?: 'youth' | 'high_school' | 'college' | 'professional';
+  }
+): Promise<LacrosseAnalysis> {
   try {
     console.log("Starting YouTube video analysis for:", youtubeUrl);
     
-    const prompt = `You're reviewing lacrosse film from YouTube. Break it down like you're in the coaches' room using authentic lax terminology and detailed technical analysis.
-
-FILM BREAKDOWN CATEGORIES:
-
-1. OVERALL GAME ASSESSMENT: Evaluate team systems, offensive/defensive schemes, ball movement patterns, and overall lacrosse IQ. Identify tactical strengths and areas needing work.
-
-2. INDIVIDUAL PLAYER ANALYSIS: Focus on specific players (note jersey numbers when visible):
-   - Stick fundamentals: cradle protection, catch/throw mechanics, check execution
-   - Footwork: change of direction, acceleration patterns, defensive stance
-   - Lacrosse IQ: field vision, decision-making speed, situational awareness
-   - Leadership: communication, effort level, coaching responsiveness
-   - Technical skills: dodging ability (split, face, roll, bull), shooting mechanics, defensive slides
-
-3. FACE-OFF BREAKDOWN: Analyze FOGO performance:
-   - Clamp technique and grip positioning at the X
-   - Body leverage, footwork, and counter-moves
-   - Wing control and possession battle outcomes  
-   - Adaptability to opponent's style
-   - Areas for technical improvement
-
-4. TRANSITION GAME ANALYSIS: Evaluate fast break execution:
-   - Outlet pass accuracy and timing from defensive end
-   - Field spacing and player positioning during clears
-   - Recognition of numbers advantages and scoring opportunities
-   - Ride pressure response and redefending principles
-   - Ball carrier decision-making (carry vs pass situations)
-
-5. CRITICAL MOMENTS & COACHING POINTS: Identify key plays showing:
-   - High-level lacrosse IQ vs missed opportunities
-   - Fundamental skill execution under pressure  
-   - Game-changing defensive stops or offensive creativity
-   - Areas requiring immediate coaching intervention
-   - Examples of proper technique to reinforce in practice
-
-MAXIMUM DEPTH ANALYSIS REQUIREMENTS:
-- Each evaluation must be 8-12 sentences minimum with complete technical and tactical breakdown
-- Include exhaustive biomechanical analysis: grip pressure, stick angle, body rotation, weight transfer, follow-through
-- Analyze complete decision-making process: pre-scan, recognition, option evaluation, execution timing
-- Reference elite coaching philosophies: what championship programs emphasize, Division I standards, professional techniques
-- Connect to sophisticated team concepts: system integration, positional responsibilities, game flow management
-- Provide detailed development pathways: specific drill sequences, practice periodization, skill milestone progressions
-- Use championship-level coaching vocabulary and advanced tactical terminology throughout
-- Include competitive analysis: how this compares to elite players, college recruiting standards, professional benchmarks
-
-For each observation, include exact timestamp, comprehensive technical breakdown using advanced coaching terminology, confidence assessment (1-100), and detailed development roadmap with specific practice applications.
-
-Video Title: ${title}
-YouTube URL: ${youtubeUrl}
+    // Generate dynamic prompt based on user input and analysis type
+    const analysisType = PromptEngine.determineAnalysisType(userPrompt);
+    const promptRequest = {
+      analysisType,
+      userPrompt,
+      videoTitle: title,
+      playerNumber: analysisOptions?.playerNumber,
+      teamName: analysisOptions?.teamName,
+      position: analysisOptions?.position,
+      level: analysisOptions?.level || 'high_school'
+    };
+    
+    const prompt = PromptEngine.generatePrompt(promptRequest) + `\nYouTube URL: ${youtubeUrl}
 
 Please structure your response as JSON with the same format as specified in the schema.`;
 

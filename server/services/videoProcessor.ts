@@ -43,7 +43,14 @@ export const upload = multer({
 async function processVideoUpload(
   videoId: number,
   filePath: string,
-  title: string
+  title: string,
+  userPrompt?: string,
+  analysisOptions?: {
+    playerNumber?: string;
+    teamName?: string;
+    position?: string;
+    level?: 'youth' | 'high_school' | 'college' | 'professional';
+  }
 ): Promise<void> {
   try {
     console.log(`Starting video processing for video ${videoId}: ${title}`);
@@ -70,9 +77,9 @@ async function processVideoUpload(
       // Continue processing even if thumbnail generation fails
     }
 
-    // Analyze video with Gemini
+    // Analyze video with Gemini using custom prompt
     console.log(`Starting Gemini analysis for video ${videoId}`);
-    const analysis = await analyzeLacrosseVideo(filePath, title);
+    const analysis = await analyzeLacrosseVideo(filePath, title, userPrompt, analysisOptions);
     console.log(`Gemini analysis completed for video ${videoId}`);
 
     // Store analysis results
@@ -163,7 +170,14 @@ async function processVideoUpload(
 async function processYouTubeVideo(
   videoId: number,
   youtubeUrl: string,
-  title: string
+  title: string,
+  userPrompt?: string,
+  analysisOptions?: {
+    playerNumber?: string;
+    teamName?: string;
+    position?: string;
+    level?: 'youth' | 'high_school' | 'college' | 'professional';
+  }
 ): Promise<void> {
   try {
     console.log(`Starting YouTube video processing for video ${videoId}: ${title}`);
@@ -182,8 +196,8 @@ async function processYouTubeVideo(
       // Continue processing even if thumbnail fails
     }
 
-    // Analyze YouTube video with Gemini
-    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title);
+    // Analyze YouTube video with Gemini using custom prompt
+    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title, userPrompt, analysisOptions);
 
     // Store analysis results (same pattern as file upload)
     await storage.createAnalysis({

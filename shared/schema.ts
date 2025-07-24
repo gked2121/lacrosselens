@@ -55,6 +55,11 @@ export const videos = pgTable("videos", {
   userId: varchar("user_id").notNull().references(() => users.id),
   teamId: integer("team_id").references(() => teams.id),
   status: varchar("status", { length: 50 }).notNull().default("uploading"), // uploading, processing, completed, failed
+  userPrompt: text("user_prompt"), // Custom analysis prompt
+  playerNumber: varchar("player_number", { length: 10 }),
+  teamName: varchar("team_name", { length: 100 }),
+  position: varchar("position", { length: 50 }),
+  level: varchar("level", { length: 20 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

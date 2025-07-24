@@ -4,17 +4,17 @@
 
 :root {
   /* Modern 2025 Color Palette - Clean & Professional */
-  --background: 0 0% 100%;
+  --background: 0 0% 98%;  /* Light gray background */
   --foreground: 222 47% 11%;
-  --muted: 210 40% 98%;
-  --muted-foreground: 215 25% 27%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 9% 46%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
-  --primary: 263 70% 50%;
+  --primary: 262 80% 50%;  /* Modern purple */
   --primary-foreground: 0 0% 100%;
   --secondary: 220 14% 96%;
   --secondary-foreground: 222 47% 11%;
@@ -24,7 +24,7 @@
   --destructive-foreground: 0 0% 100%;
   --success: 142 71% 45%;
   --warning: 38 92% 50%;
-  --ring: 263 70% 50%;
+  --ring: 262 80% 50%;
   --radius: 12px;
 }
 
@@ -55,6 +55,10 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
   }
 
   html {
@@ -117,7 +121,7 @@
 
   /* Modern Card System */
   .card-modern {
-    @apply bg-card border border-border rounded-2xl shadow-sm;
+    @apply bg-white border border-border rounded-2xl shadow-sm;
   }
 
   .card-interactive {
@@ -303,6 +307,23 @@
 
   .content-padding {
     @apply p-6 lg:p-8;
+  }
+  
+  /* Ensure proper backgrounds */
+  .bg-background {
+    background-color: hsl(0 0% 98%);
+  }
+  
+  .bg-card {
+    background-color: hsl(0 0% 100%);
+  }
+  
+  .text-foreground {
+    color: hsl(222 47% 11%);
+  }
+  
+  .text-muted-foreground {
+    color: hsl(220 9% 46%);
   }
 
   /* Mobile Optimizations */

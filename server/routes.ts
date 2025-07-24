@@ -346,6 +346,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to retry processing" });
     }
   });
+  
+  // Retry single failed video
+  app.post('/api/videos/:id/retry', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const videoId = parseInt(req.params.id);
+      
+      const video = await storage.getVideo(videoId);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      if (video.status !== 'failed') {
+        return res.status(400).json({ message: "Only failed videos can be retried" });
+      }
+      
+      // Update status to processing
+      await storage.updateVideoStatus(videoId, "processing");
+      
+      // Retry processing based on video type
+      if (video.youtubeUrl) {
+        console.log(`Retrying YouTube video processing for video ${videoId}`);
+        processYouTubeVideo(videoId, video.youtubeUrl, video.title).catch(error => {
+          console.error(`Failed to retry YouTube video ${videoId}:`, error);
+        });
+      } else if (video.filePath) {
+        console.log(`Retrying file video processing for video ${videoId}`);
+        processVideoUpload(videoId, video.filePath, video.title).catch(error => {
+          console.error(`Failed to retry file video ${videoId}:`, error);
+        });
+      }
+      
+      res.json({ message: "Video processing restarted", video });
+    } catch (error) {
+      console.error("Error retrying video:", error);
+      res.status(500).json({ message: "Failed to retry video processing" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import Navigation from "@/components/navigation";
 import Sidebar from "@/components/sidebar";
@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Video, Search, Filter, Plus, Play, LoaderPinwheel, Calendar, Clock } from "lucide-react";
+import { Video, Search, Filter, Plus, Play, LoaderPinwheel, Calendar, Clock, RefreshCw } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 
 export default function VideoLibrary() {
   const { toast } = useToast();
@@ -35,6 +37,28 @@ export default function VideoLibrary() {
   const { data: videos, isLoading: videosLoading } = useQuery({
     queryKey: ["/api/videos"],
     retry: false,
+  });
+  
+  const retryVideoMutation = useMutation({
+    mutationFn: async (videoId: number) => {
+      return await apiRequest(`/api/videos/${videoId}/retry`, {
+        method: "POST",
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Retry Started",
+        description: "Video processing has been restarted.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Retry Failed",
+        description: error.message || "Failed to retry video processing",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading || !isAuthenticated) {
@@ -171,21 +195,45 @@ export default function VideoLibrary() {
 
                     {/* Status badge */}
                     <div className="absolute top-3 right-3">
-                      <Badge 
-                        className={
-                          video.status === 'completed' ? 'status-completed' :
-                          video.status === 'processing' ? 'status-processing' :
-                          video.status === 'failed' ? 'status-failed' :
-                          'status-uploading'
-                        }
-                      >
-                        <div 
-                          className={`w-2 h-2 rounded-full ${getStatusColor(video.status)} ${
-                            video.status === 'processing' ? 'animate-pulse' : ''
-                          }`}
-                        />
-                        {getStatusText(video.status)}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          className={
+                            video.status === 'completed' ? 'status-completed' :
+                            video.status === 'processing' ? 'status-processing' :
+                            video.status === 'failed' ? 'status-failed' :
+                            'status-uploading'
+                          }
+                        >
+                          <div 
+                            className={`w-2 h-2 rounded-full ${getStatusColor(video.status)} ${
+                              video.status === 'processing' ? 'animate-pulse' : ''
+                            }`}
+                          />
+                          {getStatusText(video.status)}
+                        </Badge>
+                        {video.status === 'failed' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              retryVideoMutation.mutate(video.id);
+                            }}
+                            disabled={retryVideoMutation.isPending}
+                            className="h-6 px-2 text-xs"
+                          >
+                            {retryVideoMutation.isPending ? (
+                              <RefreshCw className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <>
+                                <RefreshCw className="w-3 h-3 mr-1" />
+                                Retry
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
 

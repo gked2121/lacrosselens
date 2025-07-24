@@ -7,6 +7,34 @@ import { insertVideoSchema, insertTeamSchema, insertPlayerSchema } from "@shared
 import * as path from "path";
 import * as fs from "fs";
 
+// Helper function to calculate average confidence from analyses
+async function calculateAverageConfidence(videoIds: number[]): Promise<number> {
+  if (videoIds.length === 0) return 0;
+  
+  try {
+    const allAnalyses = await Promise.all(
+      videoIds.map(id => storage.getVideoAnalyses(id))
+    );
+    
+    const allConfidences: number[] = [];
+    allAnalyses.forEach(analyses => {
+      analyses.forEach(analysis => {
+        if (analysis.confidence) {
+          allConfidences.push(analysis.confidence);
+        }
+      });
+    });
+    
+    if (allConfidences.length === 0) return 0;
+    
+    const sum = allConfidences.reduce((acc, conf) => acc + conf, 0);
+    return sum / allConfidences.length;
+  } catch (error) {
+    console.error("Error calculating average confidence:", error);
+    return 0;
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
@@ -237,14 +265,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const completedVideos = videos.filter(v => v.status === 'completed');
       const processingVideos = videos.filter(v => v.status === 'processing');
 
-      // Calculate basic stats
+      // Calculate real stats from user data
       const stats = {
         videosAnalyzed: completedVideos.length,
         videosProcessing: processingVideos.length,
         totalVideos: videos.length,
         totalTeams: teams.length,
-        analysisAccuracy: 92, // Static for now, could be calculated from confidence scores
-        hoursSaved: Math.floor(completedVideos.length * 0.75), // Rough estimate
+        // Calculate average confidence from completed analyses
+        analysisAccuracy: completedVideos.length > 0 ? 
+          await calculateAverageConfidence(completedVideos.map(v => v.id)) : 0,
+        // Each video saves approximately 45 minutes of manual analysis
+        hoursSaved: Math.floor(completedVideos.length * 0.75),
       };
 
       res.json(stats);

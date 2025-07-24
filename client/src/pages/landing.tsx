@@ -70,15 +70,15 @@ export default function Landing() {
           <div className="mt-12 flex items-center justify-center gap-8 text-sm text-slate-400">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              <span>1000+ Videos Analyzed</span>
+              <span>Professional Analysis</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              <span>Under 2min Processing</span>
+              <span>Fast Processing</span>
             </div>
             <div className="flex items-center gap-2 hidden sm:flex">
               <Target className="w-4 h-4" />
-              <span>95% Accuracy</span>
+              <span>AI-Powered Insights</span>
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function Landing() {
             Ready to <span className="text-gradient">Transform</span> Your Coaching?
           </h2>
           <p className="text-lg sm:text-xl text-slate-300 mb-8">
-            Join coaches who are already saving hours and improving their team's performance with AI-powered analysis.
+            Start using AI-powered analysis to improve your team's performance and save valuable coaching time.
           </p>
           <Button 
             size="lg" 

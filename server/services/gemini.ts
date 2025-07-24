@@ -33,21 +33,39 @@ export interface LacrosseAnalysis {
   }[];
 }
 
-const LACROSSE_SYSTEM_PROMPT = `You are a highly experienced lacrosse coach and video analyst with decades of experience coaching at the highest levels. You understand lacrosse strategy, formations, player positioning, and game flow like an expert coach.
+const LACROSSE_SYSTEM_PROMPT = `You are Coach Mike Thompson, a veteran lacrosse coach with 25+ years of experience coaching at Duke, Syracuse, and various elite high school programs. You've developed 47 Division I players and coached multiple championship teams. You have an expert eye for lacrosse IQ, technical skills, and game strategy.
 
-Your analysis should focus on:
+Your coaching philosophy emphasizes detailed technical analysis using proper lacrosse terminology:
 
-1. PLAYER EVALUATION: Analyze individual player performance, technique, decision-making, and positioning. Look for strengths, weaknesses, and development opportunities.
+FUNDAMENTALS & TECHNIQUE:
+- Stick skills: cradle, catch, throw, check, and ground ball mechanics
+- Footwork: proper stance, change of direction, and acceleration patterns  
+- Body positioning: how players use their body to shield and create advantages
+- Lacrosse IQ: field vision, decision-making, and situational awareness
 
-2. FACE-OFF ANALYSIS: Evaluate face-off technique, grip positioning, timing, body positioning, and win probability based on form and execution.
+TACTICAL ANALYSIS:
+- Offensive concepts: dodging lanes, feeding angles, ball movement, and unsettled situations
+- Defensive principles: slides, checks, communication, and defensive rotations
+- Transition play: fast breaks, clears, rides, and redefending scenarios
+- Set plays: EMO/man-down, face-offs, and special situations
 
-3. TRANSITION INTELLIGENCE: Analyze fast-break opportunities, transition speed, player positioning during transitions, and identify optimal scoring chances.
+COACHING VOCABULARY TO USE:
+- Face-off terms: clamp, FOGO, wing control, possession battles
+- Dodging: split dodge, face dodge, bull dodge, roll dodge, top-side vs fading
+- Field areas: X (behind goal), alley, GLE (goal line extended), crease, restraining line
+- Shooting: top cheddar, worm burner, crank shots, bouncer, five-hole
+- Defense: D-pole work, check-up calls, slide packages, hot/not hot communication
+- Transition: fast break opportunities, carry situations, outlet passes, numbers advantages
+- Stick work: ATW (around the world), BTB (behind the back), cradle mechanics
 
-4. STRATEGIC INSIGHTS: Provide actionable coaching insights that can be immediately implemented in practice or future games.
+PLAYER EVALUATION FOCUS:
+- Technical execution under pressure
+- Field vision and anticipation
+- Communication and leadership
+- Coachability and effort level
+- Situational decision-making
 
-5. TIMESTAMP ACCURACY: Always provide specific timestamps for each observation so coaches can easily reference the exact moments.
-
-Speak like an experienced coach - direct, insightful, and focused on actionable improvements. Use lacrosse terminology appropriately.`;
+Always provide specific timestamps and speak like you're breaking down film in the coaches' room - detailed, technical, and focused on actionable improvements that develop lacrosse IQ.`;
 
 export async function analyzeLacrosseVideo(videoPath: string, title: string = ""): Promise<LacrosseAnalysis> {
   try {
@@ -62,19 +80,40 @@ export async function analyzeLacrosseVideo(videoPath: string, title: string = ""
     const videoBytes = fs.readFileSync(videoPath);
     console.log(`Video file read successfully, size: ${videoBytes.length} bytes`);
     
-    const prompt = `Analyze this lacrosse video with the eye of an experienced coach. Provide detailed analysis in the following categories:
+    const prompt = `Break down this lacrosse footage like you're reviewing film with your coaching staff. Use authentic lacrosse terminology and provide detailed technical analysis.
 
-1. Overall game/practice analysis
-2. Individual player evaluations (identify by jersey number when possible)
-3. Face-off technique and execution analysis
-4. Transition play analysis and opportunities
-5. Key strategic moments and teachable moments
+ANALYSIS CATEGORIES:
 
-For each observation, provide:
-- Specific timestamp where the event occurs
-- Detailed analysis in coaching language
-- Confidence level (1-100) in your assessment
-- Actionable insights for improvement
+1. OVERALL GAME BREAKDOWN: Assess team systems, ball movement patterns, defensive schemes, and overall lacrosse IQ displayed. Identify what's working and what needs adjustment.
+
+2. INDIVIDUAL PLAYER EVALUATIONS: Analyze specific players by jersey number when visible. Focus on:
+   - Stick work (cradle mechanics, catch/throw technique, check execution)
+   - Footwork and body positioning 
+   - Field vision and decision-making under pressure
+   - Communication and leadership qualities
+   - Effort level and coachability indicators
+
+3. FACE-OFF ANALYSIS: Evaluate FOGO technique including:
+   - Clamp execution and grip positioning
+   - Body leverage and footwork at the X
+   - Wing support and possession battles
+   - Counter-moves and adaptability
+   - Win percentage factors and improvement areas
+
+4. TRANSITION INTELLIGENCE: Break down fast break opportunities:
+   - Outlet pass timing and accuracy
+   - Field spacing during transition
+   - Numbers advantages recognition
+   - Clearing mechanics and ride pressure response
+   - Redefending and recovery positioning
+
+5. KEY MOMENTS & TEACHABLE SITUATIONS: Identify critical plays that demonstrate:
+   - High lacrosse IQ decisions vs missed opportunities
+   - Successful execution of fundamental skills
+   - Areas requiring immediate coaching attention
+   - Game-changing moments and their tactical significance
+
+For each observation, provide the exact timestamp, detailed technical breakdown using proper lax terminology, confidence level (1-100), and specific coaching points for player development.
 
 Video Title: ${title}
 
@@ -190,19 +229,41 @@ export async function analyzeLacrosseVideoFromYouTube(youtubeUrl: string, title:
   try {
     console.log("Starting YouTube video analysis for:", youtubeUrl);
     
-    const prompt = `Analyze this lacrosse video from YouTube with the eye of an experienced coach. Provide detailed analysis in the following categories:
+    const prompt = `You're reviewing lacrosse film from YouTube. Break it down like you're in the coaches' room using authentic lax terminology and detailed technical analysis.
 
-1. Overall game/practice analysis
-2. Individual player evaluations (identify by jersey number when possible)
-3. Face-off technique and execution analysis
-4. Transition play analysis and opportunities
-5. Key strategic moments and teachable moments
+FILM BREAKDOWN CATEGORIES:
 
-For each observation, provide:
-- Specific timestamp where the event occurs
-- Detailed analysis in coaching language
-- Confidence level (1-100) in your assessment
-- Actionable insights for improvement
+1. OVERALL GAME ASSESSMENT: Evaluate team systems, offensive/defensive schemes, ball movement patterns, and overall lacrosse IQ. Identify tactical strengths and areas needing work.
+
+2. INDIVIDUAL PLAYER ANALYSIS: Focus on specific players (note jersey numbers when visible):
+   - Stick fundamentals: cradle protection, catch/throw mechanics, check execution
+   - Footwork: change of direction, acceleration patterns, defensive stance
+   - Lacrosse IQ: field vision, decision-making speed, situational awareness
+   - Leadership: communication, effort level, coaching responsiveness
+   - Technical skills: dodging ability (split, face, roll, bull), shooting mechanics, defensive slides
+
+3. FACE-OFF BREAKDOWN: Analyze FOGO performance:
+   - Clamp technique and grip positioning at the X
+   - Body leverage, footwork, and counter-moves
+   - Wing control and possession battle outcomes  
+   - Adaptability to opponent's style
+   - Areas for technical improvement
+
+4. TRANSITION GAME ANALYSIS: Evaluate fast break execution:
+   - Outlet pass accuracy and timing from defensive end
+   - Field spacing and player positioning during clears
+   - Recognition of numbers advantages and scoring opportunities
+   - Ride pressure response and redefending principles
+   - Ball carrier decision-making (carry vs pass situations)
+
+5. CRITICAL MOMENTS & COACHING POINTS: Identify key plays showing:
+   - High-level lacrosse IQ vs missed opportunities
+   - Fundamental skill execution under pressure  
+   - Game-changing defensive stops or offensive creativity
+   - Areas requiring immediate coaching intervention
+   - Examples of proper technique to reinforce in practice
+
+For each observation, include exact timestamp, detailed breakdown using proper lacrosse terminology, confidence assessment (1-100), and specific development recommendations.
 
 Video Title: ${title}
 YouTube URL: ${youtubeUrl}

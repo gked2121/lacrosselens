@@ -165,3 +165,16 @@ Preferred communication style: Simple, everyday language.
   - Fixed export/import issues in videoProcessor.ts causing server crashes
 - **Files Modified**: server/services/gemini.ts, server/storage.ts, server/services/videoProcessor.ts
 - **Status**: Gemini AI now successfully analyzes both file uploads and YouTube videos, generating real coaching insights
+
+### 2025-01-24 - Enhanced Lacrosse Analysis with Authentic Coaching Language
+- **Issue**: User requested much more detailed analysis with authentic lacrosse terminology and coaching expertise
+- **Changes Made**:
+  - Completely rewrote LACROSSE_SYSTEM_PROMPT with authentic coaching background (Coach Mike Thompson from Duke/Syracuse)
+  - Added comprehensive lacrosse terminology vocabulary: FOGO, clamp, X, roll dodge, top-side, wing play, etc.
+  - Enhanced analysis prompts with detailed technical categories and coaching evaluation criteria
+  - Integrated authentic lacrosse IQ concepts and coaching evaluation methods
+  - Analysis now includes tactical systems (2-2-2 offense, 1-4-1 set, slide packages)
+  - Added specific coaching recommendations with proper lax terminology
+- **Research Sources**: Compiled lacrosse coaching terminology from multiple coaching resources and lacrosse IQ development guides
+- **Files Modified**: server/services/gemini.ts (major prompt engineering improvements)
+- **Status**: AI now generates highly detailed, technical analysis using authentic lacrosse coaching language and terminology

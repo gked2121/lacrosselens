@@ -51,24 +51,24 @@ export default function Dashboard() {
   const recentVideos = Array.isArray(videos) ? videos.slice(0, 3) : [];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="flex">
         <Sidebar />
         
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 lg:p-6 mobile-full">
           {/* Dashboard Header */}
-          <div className="mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6 lg:mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-                <p className="text-muted-foreground mt-1">
-                  Welcome back, Coach! Here's your team's latest analysis.
+                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Dashboard</h1>
+                <p className="text-muted-foreground mt-1 text-sm lg:text-base">
+                  Welcome back, Coach! Here's your latest video analysis.
                 </p>
               </div>
-              <div className="mt-4 sm:mt-0 flex space-x-3">
-                <Button variant="outline">
+              <div className="flex space-x-2 lg:space-x-3">
+                <Button variant="outline" size="sm" className="hide-mobile">
                   <Download className="w-4 h-4 mr-2" />
                   Export Report
                 </Button>

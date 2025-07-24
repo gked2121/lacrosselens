@@ -33,8 +33,8 @@ export default function Sidebar() {
   const [location] = useLocation();
 
   return (
-    <aside className="w-64 bg-background shadow-sm border-r border-border hidden lg:block">
-      <div className="p-6">
+    <aside className="w-64 bg-card shadow-soft border-r border-border hidden lg:block">
+      <div className="p-4 lg:p-6">
         <div className="space-y-6">
           {navigation.map((section) => (
             <div key={section.name}>

@@ -36,23 +36,23 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container flex h-14 lg:h-16 items-center justify-between px-4 lg:px-6">
         {/* Logo and Brand */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-4 lg:space-x-6">
           <Link href="/">
             <div className="flex items-center space-x-2 cursor-pointer">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-primary-foreground" />
+              <div className="w-7 h-7 lg:w-8 lg:h-8 bg-primary rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 lg:w-5 lg:h-5 text-primary-foreground" />
               </div>
-              <span className="font-bold text-xl text-foreground">
+              <span className="font-bold text-lg lg:text-xl text-foreground">
                 LacrosseLens
               </span>
             </div>
           </Link>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Navigation Links - Desktop Only */}
+          <div className="hidden lg:flex items-center space-x-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -72,7 +72,7 @@ export default function Navigation() {
         </div>
 
         {/* Upload Button and User Menu */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 lg:space-x-4">
           {/* Upload Video Button */}
           <VideoUpload>
             <Button size="sm" className="hidden sm:flex items-center space-x-2">

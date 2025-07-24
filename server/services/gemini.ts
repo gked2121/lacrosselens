@@ -171,27 +171,34 @@ Please structure your response as JSON with the following format:
 
 export async function analyzeLacrosseVideoFromYouTube(youtubeUrl: string, title: string = ""): Promise<LacrosseAnalysis> {
   try {
-    // Note: Gemini cannot directly access YouTube videos
-    // For MVP, we'll provide a simulated analysis based on the title
-    const prompt = `As an experienced lacrosse coach, provide a comprehensive analysis for a lacrosse video titled "${title}".
-    
-Since this is a YouTube video that I cannot directly access, create a realistic and detailed analysis that would be typical for a lacrosse game or practice video. Include:
+    const prompt = `Analyze this lacrosse video from YouTube with the eye of an experienced coach. Provide detailed analysis in the following categories:
 
-1. Overall game/practice analysis - Provide insights about team performance, strategy, and areas for improvement
-2. Individual player evaluations - Create 3-4 player evaluations with realistic jersey numbers (#7, #23, #45, #12)
-3. Face-off technique analysis - Analyze 2-3 face-off scenarios with specific techniques
-4. Transition play analysis - Evaluate 2-3 transition opportunities 
-5. Key strategic moments - Identify 3-4 critical moments that would be teachable
+1. Overall game/practice analysis
+2. Individual player evaluations (identify by jersey number when possible)
+3. Face-off technique and execution analysis
+4. Transition play analysis and opportunities
+5. Key strategic moments and teachable moments
 
 For each observation, provide:
-- Realistic timestamps distributed throughout a typical game (0-3600 seconds)
-- Detailed analysis using proper lacrosse terminology
-- Confidence levels between 75-95
-- Specific, actionable coaching insights
+- Specific timestamp where the event occurs
+- Detailed analysis in coaching language
+- Confidence level (1-100) in your assessment
+- Actionable insights for improvement
 
 Video Title: ${title}
+YouTube URL: ${youtubeUrl}
 
-Please structure your response as JSON matching the exact schema format.`;
+Please structure your response as JSON with the same format as specified in the schema.`;
+
+    const contents = [
+      { text: prompt },
+      {
+        fileData: {
+          fileUri: youtubeUrl,
+          mimeType: "video/mp4"
+        }
+      }
+    ];
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-pro",
@@ -258,15 +265,7 @@ Please structure your response as JSON matching the exact schema format.`;
           required: ["overallAnalysis", "playerEvaluations", "faceOffAnalysis", "transitionAnalysis", "keyMoments"]
         },
       },
-      contents: [
-        {
-          fileData: {
-            fileUri: youtubeUrl,
-            mimeType: "video/*",
-          },
-        },
-        prompt,
-      ],
+      contents: contents,
     });
 
     const rawJson = response.text;

@@ -79,7 +79,20 @@ MAXIMUM DETAIL ANALYSIS REQUIREMENTS:
 - Provide comprehensive improvement plans: specific drills, practice focus, skill progression timeline
 - Connect to elite-level coaching: what Division I coaches would emphasize, recruiting evaluation criteria
 - Use sophisticated lacrosse terminology and tactical analysis throughout
-- Include game situation context and how it affects technique and decision-making`;
+- Include game situation context and how it affects technique and decision-making
+
+STATISTICAL TRACKING REQUIREMENTS:
+- Explicitly mention when players score goals, make assists, or hockey assists
+- Note ball touches, possession changes, and cradle mechanics
+- Identify turnovers (both committed and caused) with specific details
+- Track ground ball pickups and loose ball situations
+- Document shot attempts, saves, and goalie performance
+- Record face-off wins/losses and FOGO techniques
+- Note checks, defensive plays, and caused turnovers
+- Track clearing attempts and their success/failure
+- Document penalties and rule violations
+- Count transition opportunities and their outcomes
+- Use specific statistical terminology: "picks up the ground ball", "causes a turnover", "hockey assist", "ball touches", "clearing attempt"`;
 
 export async function analyzeLacrosseVideo(
   videoPath: string, 

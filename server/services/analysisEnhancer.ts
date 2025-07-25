@@ -12,17 +12,25 @@ import { eq, and, gte, lte } from "drizzle-orm";
 export interface PlayStatistics {
   goals: number;
   assists: number;
+  hockeyAssists: number;
+  ballTouches: number;
+  turnovers: number;
+  causedTurnovers: number;
+  groundBalls: number;
+  shots: number;
+  saves: number;
   faceOffWins: number;
   faceOffTotal: number;
   transitionSuccess: number;
   transitionTotal: number;
-  groundBalls: number;
-  causedTurnovers: number;
-  saves: number;
+  checks: number;
+  penalties: number;
+  clears: number;
+  clearSuccess: number;
 }
 
 export interface DetailedPlay {
-  type: 'goal' | 'assist' | 'faceoff' | 'transition' | 'turnover' | 'save';
+  type: 'goal' | 'assist' | 'hockey_assist' | 'faceoff' | 'transition' | 'turnover' | 'caused_turnover' | 'save' | 'shot' | 'ground_ball' | 'check' | 'penalty' | 'clear' | 'ball_touch';
   timestamp: number;
   playerNumber?: string;
   teamColor?: string;
@@ -105,16 +113,145 @@ export class AnalysisEnhancer {
     return match ? match[1] : undefined;
   }
   
-  // Identify play type from key moment content
-  static identifyPlayTypeFromContent(content: string): 'goal' | 'assist' | 'save' | undefined {
+  // Extract all play types from content (can have multiple per analysis)
+  static extractAllPlayTypesFromContent(content: string): Array<{type: DetailedPlay['type'], success: boolean}> {
+    const lowerContent = content.toLowerCase();
+    const plays: Array<{type: DetailedPlay['type'], success: boolean}> = [];
+    
+    // Goals
+    if (lowerContent.includes('goal') || lowerContent.includes('scores') || lowerContent.includes('finished') || lowerContent.includes('nets')) {
+      plays.push({type: 'goal', success: true});
+    }
+    
+    // Assists (direct)
+    if (lowerContent.includes('assist') || lowerContent.includes('feed') || lowerContent.includes('pass for') || lowerContent.includes('sets up')) {
+      plays.push({type: 'assist', success: true});
+    }
+    
+    // Hockey assists (secondary assists)
+    if (lowerContent.includes('hockey assist') || lowerContent.includes('secondary assist') || lowerContent.includes('pass before the assist')) {
+      plays.push({type: 'hockey_assist', success: true});
+    }
+    
+    // Saves
+    if (lowerContent.includes('save') || lowerContent.includes('stops') || lowerContent.includes('denied') || lowerContent.includes('keeper')) {
+      plays.push({type: 'save', success: true});
+    }
+    
+    // Shots (look for both successful and unsuccessful)
+    if (lowerContent.includes('shot') || lowerContent.includes('fires') || lowerContent.includes('rips') || lowerContent.includes('attempts')) {
+      const successful = !lowerContent.includes('missed') && !lowerContent.includes('wide') && !lowerContent.includes('saved');
+      plays.push({type: 'shot', success: successful});
+    }
+    
+    // Turnovers
+    if (lowerContent.includes('turnover') || lowerContent.includes('loses possession') || lowerContent.includes('stripped') || lowerContent.includes('dropped')) {
+      plays.push({type: 'turnover', success: false});
+    }
+    
+    // Caused turnovers
+    if (lowerContent.includes('caused turnover') || lowerContent.includes('forces turnover') || lowerContent.includes('strips') || lowerContent.includes('poke check')) {
+      plays.push({type: 'caused_turnover', success: true});
+    }
+    
+    // Ground balls
+    if (lowerContent.includes('ground ball') || lowerContent.includes('scoops') || lowerContent.includes('picks up') || lowerContent.includes('gb')) {
+      plays.push({type: 'ground_ball', success: true});
+    }
+    
+    // Checks
+    if (lowerContent.includes('check') || lowerContent.includes('body check') || lowerContent.includes('stick check') || lowerContent.includes('defensive play')) {
+      plays.push({type: 'check', success: true});
+    }
+    
+    // Penalties
+    if (lowerContent.includes('penalty') || lowerContent.includes('foul') || lowerContent.includes('flag') || lowerContent.includes('illegal')) {
+      plays.push({type: 'penalty', success: false});
+    }
+    
+    // Clears
+    if (lowerContent.includes('clear') || lowerContent.includes('clearing') || lowerContent.includes('outlet') || lowerContent.includes('brings it out')) {
+      const successful = !lowerContent.includes('failed clear') && !lowerContent.includes('turnover');
+      plays.push({type: 'clear', success: successful});
+    }
+    
+    // Ball touches (general possession) - count every possession mention
+    const touchWords = ['touches', 'possesses', 'handles', 'cradles', 'carries', 'controls', 'maintains possession'];
+    let touchCount = 0;
+    for (const word of touchWords) {
+      const matches = lowerContent.match(new RegExp(word, 'g'));
+      if (matches) touchCount += matches.length;
+    }
+    
+    for (let i = 0; i < touchCount; i++) {
+      plays.push({type: 'ball_touch', success: true});
+    }
+    
+    return plays;
+  }
+
+  // Legacy function for backward compatibility
+  static identifyPlayTypeFromContent(content: string): DetailedPlay['type'] | undefined {
     const lowerContent = content.toLowerCase();
     
-    if (lowerContent.includes('goal') || lowerContent.includes('scores') || lowerContent.includes('finished')) {
+    // Goals
+    if (lowerContent.includes('goal') || lowerContent.includes('scores') || lowerContent.includes('finished') || lowerContent.includes('nets')) {
       return 'goal';
-    } else if (lowerContent.includes('assist') || lowerContent.includes('feed') || lowerContent.includes('pass for')) {
+    }
+    
+    // Assists (direct)
+    if (lowerContent.includes('assist') || lowerContent.includes('feed') || lowerContent.includes('pass for') || lowerContent.includes('sets up')) {
       return 'assist';
-    } else if (lowerContent.includes('save') || lowerContent.includes('stops') || lowerContent.includes('denied')) {
+    }
+    
+    // Hockey assists (secondary assists)
+    if (lowerContent.includes('hockey assist') || lowerContent.includes('secondary assist') || lowerContent.includes('pass before the assist')) {
+      return 'hockey_assist';
+    }
+    
+    // Saves
+    if (lowerContent.includes('save') || lowerContent.includes('stops') || lowerContent.includes('denied') || lowerContent.includes('keeper')) {
       return 'save';
+    }
+    
+    // Shots
+    if (lowerContent.includes('shot') || lowerContent.includes('fires') || lowerContent.includes('rips') || lowerContent.includes('attempts')) {
+      return 'shot';
+    }
+    
+    // Turnovers
+    if (lowerContent.includes('turnover') || lowerContent.includes('loses possession') || lowerContent.includes('stripped') || lowerContent.includes('dropped')) {
+      return 'turnover';
+    }
+    
+    // Caused turnovers
+    if (lowerContent.includes('caused turnover') || lowerContent.includes('forces turnover') || lowerContent.includes('strips') || lowerContent.includes('poke check')) {
+      return 'caused_turnover';
+    }
+    
+    // Ground balls
+    if (lowerContent.includes('ground ball') || lowerContent.includes('scoops') || lowerContent.includes('picks up') || lowerContent.includes('gb')) {
+      return 'ground_ball';
+    }
+    
+    // Checks
+    if (lowerContent.includes('check') || lowerContent.includes('body check') || lowerContent.includes('stick check') || lowerContent.includes('defensive play')) {
+      return 'check';
+    }
+    
+    // Penalties
+    if (lowerContent.includes('penalty') || lowerContent.includes('foul') || lowerContent.includes('flag') || lowerContent.includes('illegal')) {
+      return 'penalty';
+    }
+    
+    // Clears
+    if (lowerContent.includes('clear') || lowerContent.includes('clearing') || lowerContent.includes('outlet') || lowerContent.includes('brings it out')) {
+      return 'clear';
+    }
+    
+    // Ball touches (general possession)
+    if (lowerContent.includes('touches') || lowerContent.includes('possesses') || lowerContent.includes('handles') || lowerContent.includes('cradles')) {
+      return 'ball_touch';
     }
     
     return undefined;
@@ -127,13 +264,21 @@ export class AnalysisEnhancer {
     const stats: PlayStatistics = {
       goals: 0,
       assists: 0,
+      hockeyAssists: 0,
+      ballTouches: 0,
+      turnovers: 0,
+      causedTurnovers: 0,
+      groundBalls: 0,
+      shots: 0,
+      saves: 0,
       faceOffWins: 0,
       faceOffTotal: 0,
       transitionSuccess: 0,
       transitionTotal: 0,
-      groundBalls: 0,
-      causedTurnovers: 0,
-      saves: 0
+      checks: 0,
+      penalties: 0,
+      clears: 0,
+      clearSuccess: 0
     };
     
     // Process all analyses for this video
@@ -148,8 +293,36 @@ export class AnalysisEnhancer {
           case 'assist':
             stats.assists++;
             break;
+          case 'hockey_assist':
+            stats.hockeyAssists++;
+            break;
+          case 'shot':
+            stats.shots++;
+            break;
           case 'save':
             stats.saves++;
+            break;
+          case 'turnover':
+            stats.turnovers++;
+            break;
+          case 'caused_turnover':
+            stats.causedTurnovers++;
+            break;
+          case 'ground_ball':
+            stats.groundBalls++;
+            break;
+          case 'check':
+            stats.checks++;
+            break;
+          case 'penalty':
+            stats.penalties++;
+            break;
+          case 'clear':
+            stats.clears++;
+            if (play.success) stats.clearSuccess++;
+            break;
+          case 'ball_touch':
+            stats.ballTouches++;
             break;
           case 'faceoff':
             stats.faceOffTotal++;

@@ -205,7 +205,8 @@ export default function AnalysisDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Primary Stats */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
                           {statistics?.goals || 0}
@@ -220,21 +221,95 @@ export default function AnalysisDetail() {
                       </div>
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                          {statistics?.faceOffTotal ? 
-                            `${Math.round((statistics.faceOffWins / statistics.faceOffTotal) * 100)}%` : 
-                            'N/A'
-                          }
+                          {statistics?.hockeyAssists || 0}
                         </div>
-                        <div className="text-sm text-muted-foreground">Face-off %</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {statistics?.faceOffWins || 0}/{statistics?.faceOffTotal || 0}
-                        </div>
+                        <div className="text-sm text-muted-foreground">Hockey Assists</div>
                       </div>
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                          {statistics?.saves || 0}
+                          {statistics?.shots || 0}
                         </div>
-                        <div className="text-sm text-muted-foreground">Saves</div>
+                        <div className="text-sm text-muted-foreground">Shots</div>
+                      </div>
+                    </div>
+
+                    {/* Advanced Stats */}
+                    <div className="border-t pt-4">
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-3">Advanced Statistics</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.ballTouches || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Ball Touches</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.turnovers || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Turnovers</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.causedTurnovers || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Caused TOs</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.groundBalls || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Ground Balls</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.checks || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Checks</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Specialty Stats */}
+                    <div className="border-t pt-4 mt-4">
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-3">Specialty Statistics</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.faceOffTotal ? 
+                              `${Math.round((statistics.faceOffWins / statistics.faceOffTotal) * 100)}%` : 
+                              'N/A'
+                            }
+                          </div>
+                          <div className="text-xs text-muted-foreground">Face-off %</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {statistics?.faceOffWins || 0}/{statistics?.faceOffTotal || 0}
+                          </div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.clears ? 
+                              `${Math.round((statistics.clearSuccess / statistics.clears) * 100)}%` : 
+                              'N/A'
+                            }
+                          </div>
+                          <div className="text-xs text-muted-foreground">Clear %</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {statistics?.clearSuccess || 0}/{statistics?.clears || 0}
+                          </div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.saves || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Saves</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                          <div className="text-lg font-bold text-primary">
+                            {statistics?.penalties || 0}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Penalties</div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>

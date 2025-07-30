@@ -78,11 +78,31 @@ COACHING VOCABULARY TO USE:
 - Stick work: ATW (around the world), BTB (behind the back), cradle mechanics
 
 PLAYER EVALUATION FOCUS:
+- EVALUATE EVERY PLAYER VISIBLE: Analyze ALL players who appear on screen, not just 1-2
+- Include both teams - attackers, defenders, midfielders, goalies, FOGOs
+- Even brief appearances warrant evaluation if technique is visible
 - Technical execution under pressure
 - Field vision and anticipation
 - Communication and leadership
 - Coachability and effort level
 - Situational decision-making
+
+PLAYER IDENTIFICATION PRIORITY:
+1. Players with visible jersey numbers - always include the number
+2. Players without visible numbers - describe by position/location (e.g., "left wing midfielder in white")
+3. Brief appearances - if a player makes a notable play, include them
+4. Background players - if they demonstrate good/poor positioning, include them
+5. Goalies - always evaluate both goalies if visible
+6. Face-off specialists - evaluate all players involved in face-offs
+
+MINIMUM PLAYER COUNT: Aim to evaluate at least 10-15 different players per video analysis
+
+PLAYER EVALUATION DISTRIBUTION:
+- First, scan the ENTIRE video to identify ALL visible players
+- Don't just focus on the first few plays - watch the whole video
+- Evaluate players from BOTH teams equally
+- Include players who appear later in the video
+- Even 5-10 second appearances deserve evaluation if technique is visible
 
 Always provide specific timestamps and speak like you're breaking down film in the coaches' room - detailed, technical, and focused on actionable improvements that develop lacrosse IQ.
 
@@ -161,6 +181,16 @@ export async function analyzeLacrosseVideo(
     };
     
     const prompt = PromptEngine.generatePrompt(promptRequest) + `
+
+CRITICAL REQUIREMENT: You MUST provide at least 10-15 player evaluations. Scan the ENTIRE video and evaluate EVERY visible player from BOTH teams. Include:
+- All offensive players (attackmen, midfielders)
+- All defensive players (defensemen, LSMs)
+- Both goalies
+- Face-off specialists and wing players
+- Players who appear briefly but demonstrate technique
+- Players identified by position if number not visible (e.g., "far-side defenseman in white")
+
+Remember: Evaluating only 2-3 players is INSUFFICIENT. You must analyze at least 10+ different players throughout the video.
 
 Please structure your response as JSON with the following format:
 {
@@ -301,6 +331,16 @@ export async function analyzeLacrosseVideoFromYouTube(
     const prompt = PromptEngine.generatePrompt(promptRequest) + `\nYouTube URL: ${youtubeUrl}
 
 IMPORTANT: Pay extremely close attention to the actual jersey colors you see in this video. Do not assume or guess team colors. Look carefully at what each team is actually wearing and use only those exact colors throughout your analysis.
+
+CRITICAL REQUIREMENT: You MUST provide at least 10-15 player evaluations. Scan the ENTIRE video and evaluate EVERY visible player from BOTH teams. Include:
+- All offensive players (attackmen, midfielders)
+- All defensive players (defensemen, LSMs)
+- Both goalies
+- Face-off specialists and wing players
+- Players who appear briefly but demonstrate technique
+- Players identified by position if number not visible (e.g., "far-side defenseman in white")
+
+Remember: Evaluating only 2-3 players is INSUFFICIENT. You must analyze at least 10+ different players throughout the video.
 
 Please structure your response as JSON with the same format as specified in the schema.`;
 

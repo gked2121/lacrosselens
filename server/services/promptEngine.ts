@@ -284,19 +284,28 @@ Provide a detailed analysis covering all aspects of lacrosse performance. Focus 
 
 1. OVERALL GAME BREAKDOWN: Assess team systems, ball movement patterns, defensive schemes, and overall lacrosse IQ displayed.
 
-2. INDIVIDUAL PLAYER EVALUATIONS: Analyze specific players focusing on technique, decision-making, and tactical awareness.
+2. INDIVIDUAL PLAYER EVALUATIONS - EVALUATE AT LEAST 10-15 PLAYERS:
+   - Analyze EVERY player who appears on screen, even briefly
+   - Include players from BOTH teams (offense AND defense)
+   - Evaluate goalies, face-off specialists, midfielders, attackmen, defensemen
+   - For players without visible numbers, describe by position/color (e.g., "right-side defender in blue")
+   - Each evaluation must be 8-12 sentences with complete technical breakdown
+   - Include specific timestamp for when each player is most visible
 
-3. FACE-OFF ANALYSIS: Evaluate FOGO technique, wing coordination, and possession battle outcomes.
+3. FACE-OFF ANALYSIS: Evaluate ALL face-off specialists and wing players involved, not just the primary FOGO.
 
-4. TRANSITION INTELLIGENCE: Break down fast break opportunities, clearing mechanics, and transition timing.
+4. TRANSITION INTELLIGENCE: Analyze all players involved in transitions - ball carriers, support players, and defenders.
 
-5. KEY MOMENTS & TEACHABLE SITUATIONS: Identify critical plays and coaching opportunities.
+5. KEY MOMENTS & TEACHABLE SITUATIONS: Identify critical plays involving multiple players.
 
-Provide championship-level analysis with detailed technical breakdowns and comprehensive improvement recommendations.`;
+CRITICAL: You must evaluate a MINIMUM of 10 different players. Look for players throughout the entire video, not just the first few minutes.`;
   }
   
   private static getAnalysisRequirements(analysisType: AnalysisType): string {
     const baseRequirements = `\n\nANALYSIS DEPTH REQUIREMENTS:
+- CRITICAL: You must evaluate a MINIMUM of 10-15 different players throughout the video
+- Look for players in EVERY play, not just the primary action
+- Include ALL visible players: ball carriers, defenders, off-ball players, goalies
 - Each observation must be 8-12 sentences minimum with exhaustive technical detail
 - Include complete biomechanical analysis: grip pressure, stick angle, body rotation, weight transfer
 - Analyze complete decision-making process: pre-scan, recognition, option evaluation, execution timing
@@ -306,7 +315,9 @@ Provide championship-level analysis with detailed technical breakdowns and compr
 - Use championship-level coaching vocabulary and advanced tactical terminology throughout
 - Include competitive benchmarking against elite players and college/professional standards
 
-For each observation, provide exact timestamp, comprehensive technical breakdown, confidence assessment (1-100), and detailed development roadmap.`;
+For each observation, provide exact timestamp, comprehensive technical breakdown, confidence assessment (1-100), and detailed development roadmap.
+
+PLAYER COUNT REQUIREMENT: Your analysis MUST include at least 10 different player evaluations. Scan the ENTIRE video duration, not just the first few minutes.`;
 
     // Add specific requirements based on analysis type
     switch (analysisType) {

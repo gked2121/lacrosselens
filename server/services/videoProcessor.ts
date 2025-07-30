@@ -202,6 +202,14 @@ async function processVideoUpload(
     };
     const analysis = await analyzeLacrosseVideo(filePath, title, userPrompt, standardAnalysisOptions);
     console.log(`Standard analysis completed for video ${videoId}`);
+    
+    // Log analysis details for debugging
+    console.log(`Analysis contains:
+    - Overall Analysis: ${analysis.overallAnalysis.length} characters
+    - Player Evaluations: ${analysis.playerEvaluations.length} players
+    - Face-off Analyses: ${analysis.faceOffAnalysis.length} analyses
+    - Transition Analyses: ${analysis.transitionAnalysis.length} analyses
+    - Key Moments: ${analysis.keyMoments.length} moments`);
 
     // Store standard analysis results
     await storage.createAnalysis({
@@ -330,6 +338,15 @@ async function processYouTubeVideo(
       videoType: analysisOptions?.videoType
     };
     const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title, userPrompt, youtubeAnalysisOptions);
+    console.log(`YouTube analysis completed for video ${videoId}`);
+    
+    // Log analysis details for debugging
+    console.log(`YouTube Analysis contains:
+    - Overall Analysis: ${analysis.overallAnalysis.length} characters
+    - Player Evaluations: ${analysis.playerEvaluations.length} players
+    - Face-off Analyses: ${analysis.faceOffAnalysis.length} analyses
+    - Transition Analyses: ${analysis.transitionAnalysis.length} analyses
+    - Key Moments: ${analysis.keyMoments.length} moments`);
 
     // Store analysis results from YouTube video
     await storage.createAnalysis({

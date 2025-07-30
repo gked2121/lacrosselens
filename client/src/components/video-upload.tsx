@@ -54,14 +54,17 @@ export default function VideoUpload({ children }: VideoUploadProps) {
 
   const fileUploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
+      console.log("Starting file upload to /api/videos/upload");
       const response = await fetch("/api/videos/upload", {
         method: "POST",
         body: formData,
         credentials: "include",
       });
 
+      console.log("Upload response status:", response.status);
       if (!response.ok) {
         const error = await response.text();
+        console.error("Upload failed with error:", error);
         throw new Error(error || "Upload failed");
       }
 
@@ -312,10 +315,29 @@ export default function VideoUpload({ children }: VideoUploadProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild onClick={(e: any) => {
+          console.log("DialogTrigger clicked!");
+          console.log("Event target:", e.target);
+          console.log("Current pathname:", window.location.pathname);
+          console.log("Dialog open state before click:", open);
+          
+          // Check if we're inside a Link or anchor
+          let element = e.target;
+          while (element && element !== document.body) {
+            console.log("Checking element:", element.tagName, element.href);
+            if (element.tagName === 'A' || element.href) {
+              console.error("Found parent anchor/link! This is causing navigation!");
+              e.preventDefault();
+              e.stopPropagation();
+              break;
+            }
+            element = element.parentElement;
+          }
+        }}>
+          {children}
+        </DialogTrigger>
       
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-0">
@@ -527,5 +549,6 @@ export default function VideoUpload({ children }: VideoUploadProps) {
         </Tabs>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

@@ -186,21 +186,19 @@ export default function Navigation() {
 
           {/* Upload Button and User Menu */}
           <div className="flex items-center gap-3">
-            {/* Direct Test Button */}
+            {/* Simple Test Button */}
             <Button 
-              className="hidden sm:flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+              className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
               type="button"
-              onClick={() => {
-                console.log("Direct button clicked - trying to open dialog");
-                if ((window as any).openUploadDialog) {
-                  (window as any).openUploadDialog();
-                } else {
-                  console.error("openUploadDialog function not found");
-                }
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Test button clicked!");
+                alert("Test button works - no navigation!");
               }}
             >
               <Upload className="w-4 h-4" />
-              <span>Direct</span>
+              <span>Test</span>
             </Button>
 
             {/* Upload Video Button */}
@@ -208,6 +206,11 @@ export default function Navigation() {
               <Button 
                 className="hidden sm:flex items-center gap-2"
                 type="button"
+                onClick={(e) => {
+                  console.log("Upload button onClick fired");
+                  console.log("Current URL:", window.location.href);
+                  console.log("Event:", e);
+                }}
               >
                 <Upload className="w-4 h-4" />
                 <span>Upload</span>
@@ -215,7 +218,16 @@ export default function Navigation() {
             </VideoUpload>
 
             <VideoUpload>
-              <Button size="icon" className="sm:hidden">
+              <Button 
+                size="icon" 
+                className="sm:hidden"
+                type="button"
+                onClick={(e) => {
+                  console.log("Mobile upload button clicked");
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
                 <Upload className="w-4 h-4" />
               </Button>
             </VideoUpload>

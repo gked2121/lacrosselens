@@ -29,22 +29,21 @@ import {
 
 export default function FaceoffAnalysis() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  // Redirect to home if not authenticated
+  // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        title: "Authentication Required",
+        description: "Please log in to view face-off analysis.",
         variant: "destructive",
       });
       setTimeout(() => {
         window.location.href = "/api/login";
-      }, 500);
-      return;
+      }, 1000);
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [isAuthenticated, authLoading, toast]);
 
   // Fetch all videos with face-off analyses
   const { data: videos, isLoading: videosLoading } = useQuery({
@@ -52,12 +51,16 @@ export default function FaceoffAnalysis() {
     retry: false,
   });
 
-  if (isLoading || !isAuthenticated || videosLoading) {
+  if (authLoading || videosLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoaderPinwheel className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect via useEffect
   }
 
   // Filter videos that have face-off analyses

@@ -389,26 +389,26 @@ The database schema is well-designed for detailed play tracking:
   - server/services/videoProcessor.ts
 - **Status**: Video type context successfully integrated, AI now adjusts analysis based on content type
 
-### 2025-01-24 - Redesigned Enhanced Video Upload Component for Better Readability
-- **Issue**: User reported that CardContent in enhanced-video-upload.tsx was poorly designed and hard to read
-- **Changes Made**:
-  - Reduced padding and improved responsive spacing (p-4 sm:p-6 lg:p-8)
-  - Created clear section headers with borders for better visual separation
-  - Improved form field hierarchy with consistent spacing (space-y-2, space-y-5)
-  - Enhanced tab design with bordered container and active state styling
-  - Redesigned analysis type buttons with cleaner hover states and better contrast
-  - Updated all form inputs to consistent height (h-11) for better alignment
-  - Improved label typography with text-sm font-medium for better readability
-  - Reorganized form layout into logical sections: Video Details, Analysis Focus, Game Information
-  - Enhanced Advanced Analysis toggle with cleaner design and better visual prominence
-  - Redesigned Pro Tips section with improved contrast and spacing
-  - Added responsive grid layouts (sm:grid-cols-2) for better mobile experience
-  - Improved textarea sizing with min-h-[100px] and proper resize controls
-- **Design Principles Applied**:
-  - Clear visual hierarchy with section headers
-  - Consistent spacing throughout
-  - Better contrast between elements
-  - Reduced visual clutter
-  - Improved mobile responsiveness
-- **Files Modified**: client/src/components/enhanced-video-upload.tsx
-- **Status**: Enhanced video upload form now has significantly improved readability and usability
+### 2025-01-24 - Multiple Redesigns of Enhanced Video Upload Component
+- **Issue**: User repeatedly reported upload form was "awful", "confusing and hard to use" despite multiple redesign attempts
+- **Multiple Redesign Attempts**:
+  - Attempt 1: Added section headers with borders, improved spacing (user still unsatisfied)
+  - Attempt 2: Complete overhaul with simplified single-column layout
+- **Final Redesign (Current)**:
+  - Drastically simplified the form to 3 main steps
+  - Removed all section headers and borders
+  - Used simple labels and single-column layout
+  - Converted analysis type selection from cards to radio buttons
+  - Moved non-essential fields into collapsible "Add more details" section
+  - Reduced required fields to absolute minimum
+  - Removed pro tips section to reduce clutter
+  - Used conversational language ("Choose your video", "Give it a title")
+  - Made advanced analysis toggle more subtle
+- **Key Simplifications**:
+  - Only 3 visible steps initially: Upload, Analysis Type, Basic Context
+  - All optional fields hidden by default
+  - Much cleaner visual hierarchy without borders
+  - Simpler tab design
+  - Reduced cognitive load significantly
+- **Files Modified**: client/src/components/enhanced-video-upload.tsx, client/src/components/ui/radio-group.tsx (created)
+- **Status**: Complete redesign with focus on extreme simplicity and ease of use

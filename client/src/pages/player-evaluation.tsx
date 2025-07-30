@@ -39,22 +39,21 @@ interface PlayerEvaluation {
 
 export default function PlayerEvaluation() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  // Redirect to home if not authenticated
+  // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        title: "Authentication Required",
+        description: "Please log in to view player evaluations.",
         variant: "destructive",
       });
       setTimeout(() => {
         window.location.href = "/api/login";
-      }, 500);
-      return;
+      }, 1000);
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [isAuthenticated, authLoading, toast]);
 
   // Fetch all videos
   const { data: videos, isLoading: videosLoading } = useQuery({
@@ -83,12 +82,16 @@ export default function PlayerEvaluation() {
     }
   });
 
-  if (isLoading || !isAuthenticated || videosLoading || evaluationsLoading) {
+  if (authLoading || videosLoading || evaluationsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoaderPinwheel className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect via useEffect
   }
 
   // Group evaluations by player

@@ -51,11 +51,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analysis settings routes
+  app.get("/api/settings/analysis", isAuthenticated, async (req: any, res) => {
+    try {
+      // For now, return default settings
+      // In production, this would be stored per user
+      res.json({
+        useAdvancedAnalysis: true,
+        analysisDepth: "maximum",
+        preferredStrategy: "comprehensive"
+      });
+    } catch (error) {
+      console.error("Error fetching analysis settings:", error);
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.post("/api/settings/analysis", isAuthenticated, async (req: any, res) => {
+    try {
+      const { useAdvancedAnalysis, analysisDepth, preferredStrategy } = req.body;
+      // In production, save to user preferences
+      res.json({ 
+        message: "Settings updated successfully",
+        settings: { useAdvancedAnalysis, analysisDepth, preferredStrategy }
+      });
+    } catch (error) {
+      console.error("Error updating analysis settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
   // Video routes
   app.post('/api/videos/upload', isAuthenticated, upload.single('video'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { title, description, teamId, userPrompt, playerNumber, teamName, position, level } = req.body;
+      const { title, description, teamId, userPrompt, playerNumber, teamName, position, level, useAdvancedAnalysis } = req.body;
       const file = req.file;
 
       if (!file) {
@@ -82,7 +112,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const video = await storage.createVideo(videoData);
 
       // Process video asynchronously with custom options
-      const analysisOptions = { playerNumber, teamName, position, level };
+      const analysisOptions = { 
+        playerNumber, 
+        teamName, 
+        position, 
+        level,
+        useAdvancedAnalysis: useAdvancedAnalysis === 'true' || useAdvancedAnalysis === true
+      };
       processVideoUpload(video.id, file.path, video.title, userPrompt, analysisOptions).catch(console.error);
 
       res.json(video);
@@ -95,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/videos/youtube', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { youtubeUrl, title, description, teamId, userPrompt, playerNumber, teamName, position, level } = req.body;
+      const { youtubeUrl, title, description, teamId, userPrompt, playerNumber, teamName, position, level, useAdvancedAnalysis } = req.body;
 
       if (!youtubeUrl) {
         return res.status(400).json({ message: "YouTube URL is required" });
@@ -121,7 +157,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const video = await storage.createVideo(videoData);
 
       // Process YouTube video asynchronously with custom options
-      const analysisOptions = { playerNumber, teamName, position, level };
+      const analysisOptions = { 
+        playerNumber, 
+        teamName, 
+        position, 
+        level,
+        useAdvancedAnalysis: useAdvancedAnalysis === true
+      };
       processYouTubeVideo(video.id, youtubeUrl, video.title, userPrompt, analysisOptions).catch(console.error);
 
       res.json(video);

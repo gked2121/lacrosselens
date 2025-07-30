@@ -220,7 +220,7 @@ Provide detailed analysis of every ${situation} instance with:
       case "Individual Player Analysis":
         // Create player-specific prompts
         const players = videoContext.identifiedPlayers || ["12", "23", "7", "15"];
-        players.forEach(player => {
+        players.forEach((player: string) => {
           prompts.push(this.getPlayerTrackingPrompt(player));
         });
         break;

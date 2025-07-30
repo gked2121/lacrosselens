@@ -4,6 +4,8 @@ import fs from "fs";
 import { storage } from "../storage";
 import { analyzeLacrosseVideo, analyzeLacrosseVideoFromYouTube } from "./gemini";
 import { generateVideoThumbnail, getVideoMetadata, getYouTubeThumbnail } from "./thumbnailGenerator";
+import { AdvancedVideoAnalyzer } from "./advancedVideoAnalysis";
+import { EnhancedPromptSystem } from "./enhancedPromptSystem";
 
 // Configure multer for video uploads
 const uploadDir = "uploads/videos";
@@ -50,6 +52,7 @@ async function processVideoUpload(
     teamName?: string;
     position?: string;
     level?: 'youth' | 'high_school' | 'college' | 'professional';
+    useAdvancedAnalysis?: boolean;
   }
 ): Promise<void> {
   try {
@@ -77,12 +80,122 @@ async function processVideoUpload(
       // Continue processing even if thumbnail generation fails
     }
 
-    // Analyze video with Gemini using custom prompt
-    console.log(`Starting Gemini analysis for video ${videoId}`);
+    // Determine analysis mode based on user preference
+    const useAdvancedAnalysis = analysisOptions?.useAdvancedAnalysis !== false; // Default to true if not specified
+    
+    if (useAdvancedAnalysis) {
+      console.log(`Starting ADVANCED multi-pass analysis for video ${videoId}`);
+      
+      try {
+        // Perform comprehensive multi-pass analysis
+        const detailedAnalysis = await AdvancedVideoAnalyzer.performComprehensiveAnalysis(filePath);
+        
+        // Convert detailed analysis to storage format
+        console.log(`Processing ${detailedAnalysis.segments.length} segments, ${detailedAnalysis.technicalBreakdowns.length} technical breakdowns, ${detailedAnalysis.statisticalData.length} statistical events`);
+        
+        // Store segments as key moments
+        for (const segment of detailedAnalysis.segments) {
+          if (segment.importance === 'high') {
+            await storage.createAnalysis({
+              videoId,
+              type: "key_moment",
+              title: `${segment.playType} - ${segment.players.join(', ')}`,
+              content: segment.description,
+              timestamp: Math.round(segment.startTime),
+              confidence: 95,
+              metadata: {
+                players: segment.players,
+                playType: segment.playType,
+                duration: segment.endTime - segment.startTime
+              }
+            });
+          }
+        }
+        
+        // Store technical breakdowns as player evaluations
+        for (const breakdown of detailedAnalysis.technicalBreakdowns) {
+          await storage.createAnalysis({
+            videoId,
+            type: "player_evaluation",
+            title: `Player ${breakdown.playerNumber || 'Unknown'} - ${breakdown.skillArea}`,
+            content: `BIOMECHANICS: ${breakdown.biomechanics}\n\nDECISION MAKING: ${breakdown.decisionMaking}\n\nIMPROVEMENT: ${breakdown.improvement}`,
+            timestamp: Math.round(breakdown.timestamp),
+            confidence: breakdown.confidence,
+            metadata: {
+              playerNumber: breakdown.playerNumber,
+              skillArea: breakdown.skillArea
+            }
+          });
+        }
+        
+        // Store tactical insights
+        for (const insight of detailedAnalysis.tacticalInsights) {
+          await storage.createAnalysis({
+            videoId,
+            type: "overall",
+            title: `Tactical Analysis - ${insight.situation}`,
+            content: `FORMATION: ${insight.formation}\n\nEXECUTION: ${insight.execution}\n\nALTERNATIVES: ${insight.alternatives}\n\nCOACHING: ${insight.coaching}`,
+            timestamp: Math.round(insight.timestamp),
+            confidence: insight.confidence,
+            metadata: {
+              formation: insight.formation,
+              situation: insight.situation
+            }
+          });
+        }
+        
+        // Process statistical data
+        const statsMap = new Map();
+        for (const stat of detailedAnalysis.statisticalData) {
+          const key = `${stat.playType}-${stat.timestamp}`;
+          if (!statsMap.has(key)) {
+            await storage.createAnalysis({
+              videoId,
+              type: "key_moment",
+              title: `${stat.playType} - ${stat.playerInvolved}`,
+              content: stat.outcome,
+              timestamp: Math.round(stat.timestamp),
+              confidence: 90,
+              metadata: stat.metrics
+            });
+          }
+        }
+        
+        // Create comprehensive overall analysis
+        const overallContent = `COMPREHENSIVE VIDEO ANALYSIS SUMMARY\n\nTotal Segments Analyzed: ${detailedAnalysis.segments.length}\nHigh-Importance Plays: ${detailedAnalysis.segments.filter(s => s.importance === 'high').length}\nTechnical Breakdowns: ${detailedAnalysis.technicalBreakdowns.length}\nTactical Insights: ${detailedAnalysis.tacticalInsights.length}\nStatistical Events: ${detailedAnalysis.statisticalData.length}\n\nThis advanced analysis used multiple AI passes to extract maximum detail from the video, including biomechanical breakdowns, tactical evaluations, and comprehensive statistical tracking.`;
+        
+        await storage.createAnalysis({
+          videoId,
+          type: "overall",
+          title: "Comprehensive Multi-Pass Analysis Summary",
+          content: overallContent,
+          timestamp: 0,
+          confidence: 95,
+          metadata: {
+            totalSegments: detailedAnalysis.segments.length,
+            analysisMethod: "advanced_multi_pass"
+          }
+        });
+        
+        console.log(`Advanced analysis completed successfully for video ${videoId}`);
+        
+        // Update video status to completed after successful advanced analysis
+        await storage.updateVideoStatus(videoId, "completed");
+        console.log(`Video ${videoId} processing completed with advanced analysis`);
+        return; // Exit after successful advanced analysis
+        
+      } catch (advancedError) {
+        console.error("Advanced analysis failed, falling back to standard analysis:", advancedError);
+        // Continue with standard analysis below
+      }
+    }
+    
+    // Standard single-pass analysis (or fallback from advanced)
+    console.log(`Starting standard Gemini analysis for video ${videoId}`);
     const analysis = await analyzeLacrosseVideo(filePath, title, userPrompt, analysisOptions);
-    console.log(`Gemini analysis completed for video ${videoId}`);
+    console.log(`Standard analysis completed for video ${videoId}`);
 
-    // Store analysis results
+    // Store standard analysis results
     await storage.createAnalysis({
       videoId,
       type: "overall",
@@ -179,6 +292,7 @@ async function processYouTubeVideo(
     teamName?: string;
     position?: string;
     level?: 'youth' | 'high_school' | 'college' | 'professional';
+    useAdvancedAnalysis?: boolean;
   }
 ): Promise<void> {
   try {

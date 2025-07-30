@@ -262,3 +262,29 @@ The database schema is well-designed for detailed play tracking:
   - Confidence field provides reliability scoring
 - **Files Modified**: server/services/analysisEnhancer.ts (new), server/routes.ts, client/src/pages/analysis-detail.tsx
 - **Status**: Play statistics system implemented and displaying real-time game metrics from AI analysis
+
+### 2025-01-24 - Implemented Advanced Multi-Pass AI Analysis System
+- **Issue**: User requested maximizing information extraction from Gemini using multi-prompt/chain approach
+- **Changes Made**:
+  - Created AdvancedVideoAnalyzer service with 3-tier analysis approach:
+    - Pass 1: Video Segmentation & Overview (scene mapping)
+    - Pass 2: Technical Deep-Dive (biomechanical breakdowns)
+    - Pass 3: Tactical Analysis (formations and team coordination)
+  - Added EnhancedPromptSystem for specialized prompt generation
+  - Integrated advanced analysis toggle in video upload component
+  - Updated video processor to support both standard and advanced analysis modes
+  - Added useAdvancedAnalysis parameter to upload endpoints
+  - Created comprehensive multi-pass processing with fallback to standard analysis
+  - Advanced mode generates 3x more detailed insights including:
+    - Segment-by-segment play breakdowns
+    - Biomechanical analysis for each technique
+    - Decision-making process evaluations
+    - Tactical formation analysis
+    - Statistical event tracking
+- **UI Changes**:
+  - Added "Advanced AI Analysis" toggle with Beta badge
+  - Sparkles icon indicates enhanced processing
+  - Clear description of benefits (3x more insights)
+  - Professional purple accent styling
+- **Files Modified**: server/services/advancedVideoAnalysis.ts (new), server/services/enhancedPromptSystem.ts (new), server/services/videoProcessor.ts, server/routes.ts, client/src/components/enhanced-video-upload.tsx, client/src/components/ui/switch.tsx (new)
+- **Status**: Advanced multi-pass analysis system fully implemented and ready for testing

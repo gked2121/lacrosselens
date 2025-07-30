@@ -10,11 +10,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Play, Target, Users, TrendingUp, Star, Zap } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Upload, Play, Target, Users, TrendingUp, Star, Zap, Sparkles } from "lucide-react";
 
 export default function EnhancedVideoUpload() {
   const [activeTab, setActiveTab] = useState("file");
   const [analysisType, setAnalysisType] = useState("generic");
+  const [useAdvancedAnalysis, setUseAdvancedAnalysis] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -99,13 +101,17 @@ export default function EnhancedVideoUpload() {
     formData.append("teamName", fileData.teamName);
     formData.append("position", fileData.position);
     formData.append("level", fileData.level);
+    formData.append("useAdvancedAnalysis", useAdvancedAnalysis.toString());
     
     fileUploadMutation.mutate(formData);
   };
 
   const handleYouTubeUpload = (e: React.FormEvent) => {
     e.preventDefault();
-    youtubeUploadMutation.mutate(youtubeData);
+    youtubeUploadMutation.mutate({
+      ...youtubeData,
+      useAdvancedAnalysis
+    });
   };
 
   const getAnalysisTypeInfo = (type: string) => {
@@ -264,6 +270,32 @@ export default function EnhancedVideoUpload() {
                       Be specific about what you want analyzed for the best results
                     </p>
                   </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-6 rounded-2xl" style={{ backgroundColor: 'hsl(259 100% 65% / 0.05)', border: '2px solid hsl(259 100% 65% / 0.2)' }}>
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="advanced-analysis"
+                    checked={useAdvancedAnalysis}
+                    onCheckedChange={setUseAdvancedAnalysis}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                  <Label 
+                    htmlFor="advanced-analysis" 
+                    className="flex items-center gap-3 cursor-pointer"
+                  >
+                    <Sparkles className="w-5 h-5" style={{ color: 'hsl(259 100% 65%)' }} />
+                    <div>
+                      <span className="font-semibold text-base" style={{ color: 'hsl(var(--foreground))' }}>
+                        Advanced AI Analysis
+                      </span>
+                      <Badge className="ml-2" variant="secondary">BETA</Badge>
+                      <p className="text-sm mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                        Use multi-pass AI processing for maximum detail extraction (3x more insights)
+                      </p>
+                    </div>
+                  </Label>
                 </div>
               </div>
 

@@ -10,6 +10,7 @@ import VideoLibrary from "@/pages/video-library";
 import AnalysisDetail from "@/pages/analysis-detail";
 import FaceoffAnalysis from "@/pages/faceoff-analysis";
 import TransitionAnalysis from "@/pages/transition-analysis";
+import PlayerEvaluation from "@/pages/player-evaluation";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,9 +24,10 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/videos" component={VideoLibrary} />
-          <Route path="/analysis/:id" component={AnalysisDetail} />
+          <Route path="/analysis/players" component={PlayerEvaluation} />
           <Route path="/analysis/faceoffs" component={FaceoffAnalysis} />
           <Route path="/analysis/transitions" component={TransitionAnalysis} />
+          <Route path="/analysis/:id" component={AnalysisDetail} />
         </>
       )}
       <Route component={NotFound} />

@@ -186,9 +186,29 @@ export default function Navigation() {
 
           {/* Upload Button and User Menu */}
           <div className="flex items-center gap-3">
+            {/* Direct Test Button */}
+            <Button 
+              className="hidden sm:flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+              type="button"
+              onClick={() => {
+                console.log("Direct button clicked - trying to open dialog");
+                if ((window as any).openUploadDialog) {
+                  (window as any).openUploadDialog();
+                } else {
+                  console.error("openUploadDialog function not found");
+                }
+              }}
+            >
+              <Upload className="w-4 h-4" />
+              <span>Direct</span>
+            </Button>
+
             {/* Upload Video Button */}
             <VideoUpload>
-              <Button className="hidden sm:flex items-center gap-2">
+              <Button 
+                className="hidden sm:flex items-center gap-2"
+                type="button"
+              >
                 <Upload className="w-4 h-4" />
                 <span>Upload</span>
               </Button>

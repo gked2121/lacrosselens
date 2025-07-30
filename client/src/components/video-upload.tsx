@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -36,17 +36,19 @@ export default function VideoUpload({ children }: VideoUploadProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Expose openDialog function globally for debugging
+  useEffect(() => {
+    (window as any).openUploadDialog = () => {
+      console.log("Opening upload dialog programmatically");
+      setOpen(true);
+    };
+  }, []);
+
   const handleOpenChange = (newOpen: boolean) => {
-    try {
-      console.log("Dialog open state changing to:", newOpen);
-      setOpen(newOpen);
-    } catch (error) {
-      console.error("Error opening upload dialog:", error);
-      toast({
-        title: "Error",
-        description: "Failed to open upload dialog. Please try again.",
-        variant: "destructive",
-      });
+    console.log("Dialog open state changing to:", newOpen);
+    setOpen(newOpen);
+    if (!newOpen) {
+      resetForm();
     }
   };
 

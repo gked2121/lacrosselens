@@ -215,20 +215,38 @@ export default function EnhancedVideoUpload() {
 
               {/* Step 2: What to analyze */}
               <div className="space-y-4">
-                <Label>What type of analysis do you need?</Label>
+                <Label className="text-base font-semibold">What type of analysis do you need?</Label>
                 <RadioGroup value={fileData.analysisType} onValueChange={(value) => setFileData({ ...fileData, analysisType: value })}>
-                  {["generic", "team_scout", "player_scout", "personal_feedback", "recruiting"].map((type) => {
-                    const info = getAnalysisTypeInfo(type);
-                    return (
-                      <div key={type} className="flex items-start space-x-3 space-y-0">
-                        <RadioGroupItem value={type} id={type} className="mt-1" />
-                        <Label htmlFor={type} className="font-normal cursor-pointer">
-                          <div className="font-medium">{info.title}</div>
-                          <div className="text-sm text-muted-foreground">{info.desc}</div>
-                        </Label>
-                      </div>
-                    );
-                  })}
+                  <div className="space-y-3">
+                    {["generic", "team_scout", "player_scout", "personal_feedback", "recruiting"].map((type) => {
+                      const info = getAnalysisTypeInfo(type);
+                      const isSelected = fileData.analysisType === type;
+                      return (
+                        <label
+                          key={type}
+                          htmlFor={type}
+                          className={`relative flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:border-primary/50 ${
+                            isSelected 
+                              ? 'border-primary bg-primary/5' 
+                              : 'border-border bg-background hover:bg-accent/50'
+                          }`}
+                        >
+                          <RadioGroupItem 
+                            value={type} 
+                            id={type} 
+                            className="mt-0.5 h-5 w-5 border-2" 
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-primary">{info.icon}</span>
+                              <span className="font-semibold">{info.title}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1">{info.desc}</p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </RadioGroup>
               </div>
 
@@ -414,20 +432,38 @@ export default function EnhancedVideoUpload() {
 
               {/* Step 2: What to analyze */}
               <div className="space-y-4">
-                <Label>What type of analysis do you need?</Label>
+                <Label className="text-base font-semibold">What type of analysis do you need?</Label>
                 <RadioGroup value={youtubeData.analysisType} onValueChange={(value) => setYoutubeData({ ...youtubeData, analysisType: value })}>
-                  {["generic", "team_scout", "player_scout", "personal_feedback", "recruiting"].map((type) => {
-                    const info = getAnalysisTypeInfo(type);
-                    return (
-                      <div key={type} className="flex items-start space-x-3 space-y-0">
-                        <RadioGroupItem value={type} id={`yt-${type}`} className="mt-1" />
-                        <Label htmlFor={`yt-${type}`} className="font-normal cursor-pointer">
-                          <div className="font-medium">{info.title}</div>
-                          <div className="text-sm text-muted-foreground">{info.desc}</div>
-                        </Label>
-                      </div>
-                    );
-                  })}
+                  <div className="space-y-3">
+                    {["generic", "team_scout", "player_scout", "personal_feedback", "recruiting"].map((type) => {
+                      const info = getAnalysisTypeInfo(type);
+                      const isSelected = youtubeData.analysisType === type;
+                      return (
+                        <label
+                          key={type}
+                          htmlFor={`yt-${type}`}
+                          className={`relative flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:border-primary/50 ${
+                            isSelected 
+                              ? 'border-primary bg-primary/5' 
+                              : 'border-border bg-background hover:bg-accent/50'
+                          }`}
+                        >
+                          <RadioGroupItem 
+                            value={type} 
+                            id={`yt-${type}`} 
+                            className="mt-0.5 h-5 w-5 border-2" 
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-primary">{info.icon}</span>
+                              <span className="font-semibold">{info.title}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1">{info.desc}</p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </RadioGroup>
               </div>
 

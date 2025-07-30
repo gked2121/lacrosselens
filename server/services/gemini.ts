@@ -305,15 +305,6 @@ IMPORTANT: Pay extremely close attention to the actual jersey colors you see in 
 Please structure your response as JSON with the same format as specified in the schema.`;
 
     // Gemini supports direct YouTube URL analysis using fileData
-    const contents = [
-      {
-        fileData: {
-          fileUri: youtubeUrl
-        }
-      },
-      { text: prompt }
-    ];
-
     const response = await ai.models.generateContent({
       model: "gemini-2.5-pro",
       config: {
@@ -379,7 +370,15 @@ Please structure your response as JSON with the same format as specified in the 
           required: ["overallAnalysis", "playerEvaluations", "faceOffAnalysis", "transitionAnalysis", "keyMoments"]
         },
       },
-      contents: contents,
+      contents: [
+        prompt,
+        {
+          fileData: {
+            fileUri: youtubeUrl,
+            mimeType: "video/mp4"
+          }
+        }
+      ],
     });
 
     const rawJson = response.text;

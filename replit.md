@@ -448,3 +448,20 @@ The database schema is well-designed for detailed play tracking:
   - Reduced cognitive load significantly
 - **Files Modified**: client/src/components/enhanced-video-upload.tsx, client/src/components/ui/radio-group.tsx (created)
 - **Status**: Complete redesign with focus on extreme simplicity and ease of use
+
+### 2025-01-30 - Enhanced Player Evaluation Page with Team Grouping
+- **Issue**: User reported player evaluation page was confusing about team identification
+- **Changes Made**:
+  - Grouped players by team automatically based on jersey color mentions in AI analysis
+  - White Team section: Shows all players identified with white jerseys
+  - Dark Team section: Shows all players identified with dark/colored jerseys (blue, red, navy, maroon, etc.)
+  - Other Players section: Shows players where team couldn't be determined from analysis
+  - Added visual team separators with player counts for each team
+  - Added position extraction and display for each player evaluation
+  - Added helpful note explaining how to identify teams through jersey colors and position descriptions
+- **Detection Logic**:
+  - Scans AI analysis content for jersey color mentions (white jersey, dark uniform, blue team, etc.)
+  - Groups players into three categories: White Team, Dark Team, and Other Players
+  - Maintains all existing analysis details while adding clear team organization
+- **Files Modified**: client/src/pages/analysis-detail.tsx
+- **Status**: Player evaluations now clearly organized by team affiliation

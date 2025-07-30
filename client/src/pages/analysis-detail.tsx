@@ -362,7 +362,7 @@ export default function AnalysisDetail() {
                               {playerEvaluations.length} Players Evaluated
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              Comprehensive technical analysis for each player
+                              Analysis includes players from both teams visible in the video
                             </p>
                           </div>
                         </div>
@@ -371,70 +371,330 @@ export default function AnalysisDetail() {
                   </Card>
                 )}
                 
+                {/* Team identification helper */}
+                <Card className="shadow-soft bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                  <CardContent className="py-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <span className="font-semibold">How to identify teams:</span> Look for jersey colors, 
+                      player numbers, and position descriptions in each evaluation. The AI analyzes all visible 
+                      players from both teams to provide comprehensive insights.
+                    </p>
+                  </CardContent>
+                </Card>
+                
                 {playerEvaluations.length > 0 ? (
-                  playerEvaluations.map((evaluation: any) => (
-                    <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center justify-between">
-                          <span className="flex items-center gap-2">
-                            <Users className="w-5 h-5 text-primary" />
-                            {evaluation.title}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            {evaluation.metadata?.playerNumber && (
-                              <Badge className="bg-primary/10 text-primary border-primary/20">
-                                #{evaluation.metadata.playerNumber}
+                  (() => {
+                    // Group players by team
+                    const whiteTeamPlayers: any[] = [];
+                    const darkTeamPlayers: any[] = [];
+                    const unknownTeamPlayers: any[] = [];
+                    
+                    playerEvaluations.forEach((evaluation: any) => {
+                      const contentLower = evaluation.content.toLowerCase();
+                      const title = evaluation.title.toLowerCase();
+                      const isWhiteJersey = contentLower.includes('white jersey') || contentLower.includes('white uniform') || 
+                                           contentLower.includes('white team') || title.includes('white');
+                      const isDarkJersey = contentLower.includes('dark jersey') || contentLower.includes('dark uniform') || 
+                                          contentLower.includes('dark team') || contentLower.includes('black jersey') ||
+                                          contentLower.includes('blue jersey') || contentLower.includes('red jersey') ||
+                                          contentLower.includes('navy') || contentLower.includes('maroon') ||
+                                          title.includes('dark') || title.includes('blue') || title.includes('red');
+                      
+                      if (isWhiteJersey) {
+                        whiteTeamPlayers.push(evaluation);
+                      } else if (isDarkJersey) {
+                        darkTeamPlayers.push(evaluation);
+                      } else {
+                        unknownTeamPlayers.push(evaluation);
+                      }
+                    });
+                    
+                    return (
+                      <>
+                        {/* White Team Players */}
+                        {whiteTeamPlayers.length > 0 && (
+                          <>
+                            <div className="flex items-center gap-2 mt-4 mb-2">
+                              <div className="h-px bg-gray-300 flex-grow"></div>
+                              <Badge className="bg-white text-gray-800 border-gray-300">
+                                White Team ({whiteTeamPlayers.length} players)
                               </Badge>
-                            )}
-                            {evaluation.timestamp && (
-                              <Badge variant="secondary" className="text-xs">
-                                {formatTimestamp(evaluation.timestamp)}
+                              <div className="h-px bg-gray-300 flex-grow"></div>
+                            </div>
+                            {whiteTeamPlayers.map((evaluation: any) => (
+                              <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
+                                <CardHeader>
+                                  <CardTitle className="text-lg flex items-center justify-between">
+                                    <span className="flex items-center gap-2">
+                                      <Users className="w-5 h-5 text-primary" />
+                                      {evaluation.title}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      {evaluation.metadata?.playerNumber && (
+                                        <Badge className="bg-primary/10 text-primary border-primary/20">
+                                          #{evaluation.metadata.playerNumber}
+                                        </Badge>
+                                      )}
+                                      {evaluation.timestamp && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          {formatTimestamp(evaluation.timestamp)}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  {/* Parse and format player evaluation content */}
+                                  <div className="space-y-4">
+                                    {(() => {
+                                      // Extract position from content
+                                      const positionMatch = evaluation.content.match(/(?:plays?\s+)?(?:as\s+)?(?:a\s+)?(\b(?:attack|attackman|midfield|midfielder|defense|defenseman|goalie|goalkeeper|FOGO|face-?off\s+specialist|LSM|long\s+stick\s+middie)\b)/i);
+                                      const position = positionMatch ? positionMatch[1] : null;
+                                      
+                                      return (
+                                        <>
+                                          {position && (
+                                            <div className="mb-3 flex items-center gap-2">
+                                              <span className="text-sm font-medium text-muted-foreground">Position:</span>
+                                              <Badge variant="secondary" className="text-xs">
+                                                {position.charAt(0).toUpperCase() + position.slice(1)}
+                                              </Badge>
+                                            </div>
+                                          )}
+                                          {evaluation.content.split('\n\n').map((section: string, idx: number) => {
+                                            if (section.includes('BIOMECHANICS:') || 
+                                                section.includes('DECISION MAKING:') || 
+                                                section.includes('IMPROVEMENT:') ||
+                                                section.includes('TECHNIQUE:') ||
+                                                section.includes('TACTICAL:')) {
+                                              const [label, ...content] = section.split(':');
+                                              return (
+                                                <div key={idx} className="space-y-2">
+                                                  <h4 className="font-semibold text-sm text-primary uppercase tracking-wide">
+                                                    {label.trim()}
+                                                  </h4>
+                                                  <p className="text-muted-foreground pl-4">
+                                                    {content.join(':').trim()}
+                                                  </p>
+                                                </div>
+                                              );
+                                            }
+                                            return (
+                                              <p key={idx} className="text-muted-foreground">
+                                                {section}
+                                              </p>
+                                            );
+                                          })}
+                                        </>
+                                      );
+                                    })()}
+                                  </div>
+                                  <div className="mt-4 pt-4 border-t flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      Confidence: {evaluation.confidence}%
+                                    </Badge>
+                                    {evaluation.metadata?.skillArea && (
+                                      <Badge variant="outline" className="text-xs">
+                                        Focus: {evaluation.metadata.skillArea}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </>
+                        )}
+                        
+                        {/* Dark Team Players */}
+                        {darkTeamPlayers.length > 0 && (
+                          <>
+                            <div className="flex items-center gap-2 mt-4 mb-2">
+                              <div className="h-px bg-gray-600 flex-grow"></div>
+                              <Badge className="bg-gray-800 text-white border-gray-600">
+                                Dark Team ({darkTeamPlayers.length} players)
                               </Badge>
-                            )}
-                          </div>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        {/* Parse and format player evaluation content */}
-                        <div className="space-y-4">
-                          {evaluation.content.split('\n\n').map((section: string, idx: number) => {
-                            if (section.includes('BIOMECHANICS:') || 
-                                section.includes('DECISION MAKING:') || 
-                                section.includes('IMPROVEMENT:') ||
-                                section.includes('TECHNIQUE:') ||
-                                section.includes('TACTICAL:')) {
-                              const [label, ...content] = section.split(':');
-                              return (
-                                <div key={idx} className="space-y-2">
-                                  <h4 className="font-semibold text-sm text-primary uppercase tracking-wide">
-                                    {label.trim()}
-                                  </h4>
-                                  <p className="text-muted-foreground pl-4">
-                                    {content.join(':').trim()}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return (
-                              <p key={idx} className="text-muted-foreground">
-                                {section}
-                              </p>
-                            );
-                          })}
-                        </div>
-                        <div className="mt-4 pt-4 border-t flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            Confidence: {evaluation.confidence}%
-                          </Badge>
-                          {evaluation.metadata?.skillArea && (
-                            <Badge variant="outline" className="text-xs">
-                              Focus: {evaluation.metadata.skillArea}
-                            </Badge>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                              <div className="h-px bg-gray-600 flex-grow"></div>
+                            </div>
+                            {darkTeamPlayers.map((evaluation: any) => (
+                              <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
+                                <CardHeader>
+                                  <CardTitle className="text-lg flex items-center justify-between">
+                                    <span className="flex items-center gap-2">
+                                      <Users className="w-5 h-5 text-primary" />
+                                      {evaluation.title}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      {evaluation.metadata?.playerNumber && (
+                                        <Badge className="bg-primary/10 text-primary border-primary/20">
+                                          #{evaluation.metadata.playerNumber}
+                                        </Badge>
+                                      )}
+                                      {evaluation.timestamp && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          {formatTimestamp(evaluation.timestamp)}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  {/* Parse and format player evaluation content */}
+                                  <div className="space-y-4">
+                                    {(() => {
+                                      // Extract position from content
+                                      const positionMatch = evaluation.content.match(/(?:plays?\s+)?(?:as\s+)?(?:a\s+)?(\b(?:attack|attackman|midfield|midfielder|defense|defenseman|goalie|goalkeeper|FOGO|face-?off\s+specialist|LSM|long\s+stick\s+middie)\b)/i);
+                                      const position = positionMatch ? positionMatch[1] : null;
+                                      
+                                      return (
+                                        <>
+                                          {position && (
+                                            <div className="mb-3 flex items-center gap-2">
+                                              <span className="text-sm font-medium text-muted-foreground">Position:</span>
+                                              <Badge variant="secondary" className="text-xs">
+                                                {position.charAt(0).toUpperCase() + position.slice(1)}
+                                              </Badge>
+                                            </div>
+                                          )}
+                                          {evaluation.content.split('\n\n').map((section: string, idx: number) => {
+                                            if (section.includes('BIOMECHANICS:') || 
+                                                section.includes('DECISION MAKING:') || 
+                                                section.includes('IMPROVEMENT:') ||
+                                                section.includes('TECHNIQUE:') ||
+                                                section.includes('TACTICAL:')) {
+                                              const [label, ...content] = section.split(':');
+                                              return (
+                                                <div key={idx} className="space-y-2">
+                                                  <h4 className="font-semibold text-sm text-primary uppercase tracking-wide">
+                                                    {label.trim()}
+                                                  </h4>
+                                                  <p className="text-muted-foreground pl-4">
+                                                    {content.join(':').trim()}
+                                                  </p>
+                                                </div>
+                                              );
+                                            }
+                                            return (
+                                              <p key={idx} className="text-muted-foreground">
+                                                {section}
+                                              </p>
+                                            );
+                                          })}
+                                        </>
+                                      );
+                                    })()}
+                                  </div>
+                                  <div className="mt-4 pt-4 border-t flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      Confidence: {evaluation.confidence}%
+                                    </Badge>
+                                    {evaluation.metadata?.skillArea && (
+                                      <Badge variant="outline" className="text-xs">
+                                        Focus: {evaluation.metadata.skillArea}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </>
+                        )}
+                        
+                        {/* Unknown Team Players */}
+                        {unknownTeamPlayers.length > 0 && (
+                          <>
+                            <div className="flex items-center gap-2 mt-4 mb-2">
+                              <div className="h-px bg-gray-400 flex-grow"></div>
+                              <Badge variant="secondary">
+                                Other Players ({unknownTeamPlayers.length})
+                              </Badge>
+                              <div className="h-px bg-gray-400 flex-grow"></div>
+                            </div>
+                            {unknownTeamPlayers.map((evaluation: any) => (
+                              <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
+                                <CardHeader>
+                                  <CardTitle className="text-lg flex items-center justify-between">
+                                    <span className="flex items-center gap-2">
+                                      <Users className="w-5 h-5 text-primary" />
+                                      {evaluation.title}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      {evaluation.metadata?.playerNumber && (
+                                        <Badge className="bg-primary/10 text-primary border-primary/20">
+                                          #{evaluation.metadata.playerNumber}
+                                        </Badge>
+                                      )}
+                                      {evaluation.timestamp && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          {formatTimestamp(evaluation.timestamp)}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  {/* Parse and format player evaluation content */}
+                                  <div className="space-y-4">
+                                    {(() => {
+                                      // Extract position from content
+                                      const positionMatch = evaluation.content.match(/(?:plays?\s+)?(?:as\s+)?(?:a\s+)?(\b(?:attack|attackman|midfield|midfielder|defense|defenseman|goalie|goalkeeper|FOGO|face-?off\s+specialist|LSM|long\s+stick\s+middie)\b)/i);
+                                      const position = positionMatch ? positionMatch[1] : null;
+                                      
+                                      return (
+                                        <>
+                                          {position && (
+                                            <div className="mb-3 flex items-center gap-2">
+                                              <span className="text-sm font-medium text-muted-foreground">Position:</span>
+                                              <Badge variant="secondary" className="text-xs">
+                                                {position.charAt(0).toUpperCase() + position.slice(1)}
+                                              </Badge>
+                                            </div>
+                                          )}
+                                          {evaluation.content.split('\n\n').map((section: string, idx: number) => {
+                                            if (section.includes('BIOMECHANICS:') || 
+                                                section.includes('DECISION MAKING:') || 
+                                                section.includes('IMPROVEMENT:') ||
+                                                section.includes('TECHNIQUE:') ||
+                                                section.includes('TACTICAL:')) {
+                                              const [label, ...content] = section.split(':');
+                                              return (
+                                                <div key={idx} className="space-y-2">
+                                                  <h4 className="font-semibold text-sm text-primary uppercase tracking-wide">
+                                                    {label.trim()}
+                                                  </h4>
+                                                  <p className="text-muted-foreground pl-4">
+                                                    {content.join(':').trim()}
+                                                  </p>
+                                                </div>
+                                              );
+                                            }
+                                            return (
+                                              <p key={idx} className="text-muted-foreground">
+                                                {section}
+                                              </p>
+                                            );
+                                          })}
+                                        </>
+                                      );
+                                    })()}
+                                  </div>
+                                  <div className="mt-4 pt-4 border-t flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      Confidence: {evaluation.confidence}%
+                                    </Badge>
+                                    {evaluation.metadata?.skillArea && (
+                                      <Badge variant="outline" className="text-xs">
+                                        Focus: {evaluation.metadata.skillArea}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </>
+                        )}
+                      </>
+                    );
+                  })()
                 ) : (
                   <Card className="shadow-soft">
                     <CardContent className="py-12 text-center">

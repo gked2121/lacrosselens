@@ -317,25 +317,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogTrigger asChild onClick={(e: any) => {
-          console.log("DialogTrigger clicked!");
-          console.log("Event target:", e.target);
-          console.log("Current pathname:", window.location.pathname);
-          console.log("Dialog open state before click:", open);
-          
-          // Check if we're inside a Link or anchor
-          let element = e.target;
-          while (element && element !== document.body) {
-            console.log("Checking element:", element.tagName, element.href);
-            if (element.tagName === 'A' || element.href) {
-              console.error("Found parent anchor/link! This is causing navigation!");
-              e.preventDefault();
-              e.stopPropagation();
-              break;
-            }
-            element = element.parentElement;
-          }
-        }}>
+        <DialogTrigger asChild>
           {children}
         </DialogTrigger>
       

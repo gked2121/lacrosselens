@@ -186,30 +186,15 @@ export default function Navigation() {
 
           {/* Upload Button and User Menu */}
           <div className="flex items-center gap-3">
-            {/* Simple Test Button */}
-            <Button 
-              className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log("Test button clicked!");
-                alert("Test button works - no navigation!");
-              }}
-            >
-              <Upload className="w-4 h-4" />
-              <span>Test</span>
-            </Button>
-
             {/* Upload Video Button */}
             <VideoUpload>
               <Button 
                 className="hidden sm:flex items-center gap-2"
                 type="button"
                 onClick={(e) => {
-                  console.log("Upload button onClick fired");
-                  console.log("Current URL:", window.location.href);
-                  console.log("Event:", e);
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // The click will be handled by VideoUpload component
                 }}
               >
                 <Upload className="w-4 h-4" />
@@ -222,11 +207,6 @@ export default function Navigation() {
                 size="icon" 
                 className="sm:hidden"
                 type="button"
-                onClick={(e) => {
-                  console.log("Mobile upload button clicked");
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
               >
                 <Upload className="w-4 h-4" />
               </Button>

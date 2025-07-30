@@ -69,7 +69,7 @@ export default function Dashboard() {
                 <Download className="w-4 h-4 mr-2" />
                 Export Report
               </Button>
-                <Link href="/video-library">
+                <Link href="/videos">
                   <Button className="btn-primary">
                     <Plus className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">New Analysis</span>
@@ -315,7 +315,7 @@ export default function Dashboard() {
             {/* Right Sidebar */}
             <div className="space-y-6">
               {/* Quick Upload */}
-              <Link href="/video-library">
+              <Link href="/videos">
                 <Card className="card-modern overflow-hidden group cursor-pointer" style={{ 
                   background: 'linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--primary) / 0.05) 100%)',
                   border: '2px dashed hsl(var(--primary) / 0.3)'

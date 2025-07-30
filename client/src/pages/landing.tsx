@@ -56,8 +56,8 @@ export default function Landing() {
             <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Championship Insights</span>
           </h1>
           <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Elite lacrosse programs use AI to analyze every play. Join 500+ coaches who save 
-            <span className="font-semibold"> 15+ hours weekly</span> while discovering game-changing patterns.
+            Elite programs use AI for player development, opponent scouting, and recruiting. Join 500+ coaches who save 
+            <span className="font-semibold"> 15+ hours weekly</span> while winning more games.
           </p>
           
           {/* Trust Indicators */}
@@ -289,6 +289,132 @@ export default function Landing() {
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Instant player reels</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="mb-4" variant="outline">
+              <Users className="w-3 h-3 mr-1" />
+              Built for Every Level of the Game
+            </Badge>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-4">
+              One Platform.
+              <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Unlimited Possibilities.</span>
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Player Development */}
+            <Card className="bg-card border-border/50 hover:shadow-xl transition-all">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
+                  <Award className="w-8 h-8" style={{ color: 'hsl(259 100% 65%)' }} />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">For Players: Level Up Your Game</h3>
+                <p className="text-muted-foreground mb-6 text-lg">
+                  Get personalized feedback on every rep. See exactly what elite players do differently and build muscle memory faster.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Personal Film Breakdown</p>
+                      <p className="text-sm text-muted-foreground">Upload practice footage, get pro-level analysis</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Technique Comparison</p>
+                      <p className="text-sm text-muted-foreground">Compare your form to D1 athletes side-by-side</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Progress Tracking</p>
+                      <p className="text-sm text-muted-foreground">See improvement metrics week over week</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Opponent Scouting */}
+            <Card className="bg-card border-border/50 hover:shadow-xl transition-all">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
+                  <Target className="w-8 h-8" style={{ color: 'hsl(259 100% 65%)' }} />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">For Coaches: Scout Like the Pros</h3>
+                <p className="text-muted-foreground mb-6 text-lg">
+                  Upload opponent game film and get a complete scouting report in minutes. Know their tendencies before they do.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Full Team Analysis</p>
+                      <p className="text-sm text-muted-foreground">Offensive sets, defensive schemes, substitution patterns</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Player Tendencies</p>
+                      <p className="text-sm text-muted-foreground">Dodging preferences, shooting spots, defensive habits</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Weakness Identification</p>
+                      <p className="text-sm text-muted-foreground">Find exploitable patterns in rides, clears, and EMO</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recruiting */}
+            <Card className="bg-card border-border/50 hover:shadow-xl transition-all">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
+                  <Star className="w-8 h-8" style={{ color: 'hsl(259 100% 65%)' }} />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">For Recruiting: Find Hidden Gems</h3>
+                <p className="text-muted-foreground mb-6 text-lg">
+                  Evaluate prospects objectively with AI that spots potential your competitors miss. Build a championship roster.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Recruit Comparison</p>
+                      <p className="text-sm text-muted-foreground">Stack recruits against your current roster</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Projection Reports</p>
+                      <p className="text-sm text-muted-foreground">AI predicts college-ready timeline and ceiling</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Position Versatility</p>
+                      <p className="text-sm text-muted-foreground">Identify multi-position athletes others overlook</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>

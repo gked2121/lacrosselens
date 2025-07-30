@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
-import Sidebar from "@/components/sidebar";
 import EnhancedVideoUpload from "@/components/enhanced-video-upload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,24 +54,21 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 container-padding mobile-full">
-          {/* Dashboard Header */}
-          <div className="page-header">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div className="space-y-1">
-                <h1 className="page-title">Dashboard</h1>
-                <p className="page-description">
-                  Your AI-powered lacrosse analytics command center
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button variant="outline" className="btn-outline mobile-hide">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Report
-                </Button>
+      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+        {/* Dashboard Header */}
+        <div className="page-header">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="space-y-1">
+              <h1 className="page-title">Dashboard</h1>
+              <p className="page-description">
+                Your AI-powered lacrosse analytics command center
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button variant="outline" className="btn-outline mobile-hide">
+                <Download className="w-4 h-4 mr-2" />
+                Export Report
+              </Button>
                 <Link href="/video-library">
                   <Button className="btn-primary">
                     <Plus className="w-4 h-4 mr-2" />
@@ -452,7 +448,6 @@ export default function Dashboard() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

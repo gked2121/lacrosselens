@@ -5,7 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
-import Sidebar from "@/components/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -109,10 +108,7 @@ export default function AnalysisDetail() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 p-4 lg:p-6 mobile-full">
+      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-4 mb-4">
@@ -514,7 +510,6 @@ export default function AnalysisDetail() {
             </Card>
           )}
         </main>
-      </div>
     </div>
   );
 }

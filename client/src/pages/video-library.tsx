@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import Navigation from "@/components/navigation";
-import Sidebar from "@/components/sidebar";
 import EnhancedVideoUpload from "@/components/enhanced-video-upload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -101,28 +100,25 @@ export default function VideoLibrary() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 container-padding mobile-full">
-          {/* Page Header */}
-          <div className="page-header">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div className="space-y-1">
-                <h1 className="page-title">Video Library</h1>
-                <p className="page-description">
-                  Your AI-powered lacrosse video analysis hub
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button className="btn-primary" onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Upload Video</span>
-                  <span className="sm:hidden">Upload</span>
-                </Button>
-              </div>
+      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+        {/* Page Header */}
+        <div className="page-header">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="space-y-1">
+              <h1 className="page-title">Video Library</h1>
+              <p className="page-description">
+                Your AI-powered lacrosse video analysis hub
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button className="btn-primary" onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Upload Video</span>
+                <span className="sm:hidden">Upload</span>
+              </Button>
             </div>
           </div>
+        </div>
 
           {/* Filters */}
           <div className="mb-8 flex flex-col sm:flex-row gap-4">
@@ -301,7 +297,6 @@ export default function VideoLibrary() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

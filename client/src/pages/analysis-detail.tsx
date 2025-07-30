@@ -24,7 +24,10 @@ import {
   LoaderPinwheel,
   BarChart3,
   Activity,
-  CheckCircle2
+  CheckCircle2,
+  Shield,
+  AlertTriangle,
+  ArrowLeftRight
 } from "lucide-react";
 
 export default function AnalysisDetail() {
@@ -118,6 +121,46 @@ export default function AnalysisDetail() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Helper function to extract and format sections from analysis content
+  const formatAnalysisContent = (content: string) => {
+    const sections = content.split('\n\n').filter(s => s.trim());
+    return sections.map((section, idx) => {
+      // Check for labeled sections
+      const labelPatterns = [
+        /^(BIOMECHANICS|TECHNIQUE|TACTICAL|DECISION MAKING|IMPROVEMENT|ANALYSIS|OBSERVATION):/i,
+        /^(Clearing|Ride|Fast Break|Wing Play|Clamp|Rake):/i,
+        /^(Goal|Save|Penalty|Turnover|Ground Ball):/i
+      ];
+      
+      for (const pattern of labelPatterns) {
+        const match = section.match(pattern);
+        if (match) {
+          const [label, ...contentParts] = section.split(':');
+          return {
+            type: 'labeled',
+            label: label.trim(),
+            content: contentParts.join(':').trim()
+          };
+        }
+      }
+      
+      // Check for bullet points
+      if (section.includes('•') || section.includes('-')) {
+        const lines = section.split('\n');
+        return {
+          type: 'bulleted',
+          items: lines.filter(line => line.trim())
+        };
+      }
+      
+      // Default paragraph
+      return {
+        type: 'paragraph',
+        content: section
+      };
+    });
   };
 
   return (
@@ -335,13 +378,39 @@ export default function AnalysisDetail() {
                         Overall Game Analysis
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground whitespace-pre-wrap">
-                        {overallAnalysis.content}
-                      </p>
-                      <div className="mt-4 flex items-center gap-4">
+                    <CardContent className="space-y-4">
+                      {/* Parse and format the overall analysis content */}
+                      {overallAnalysis.content.split('\n\n').map((section: string, idx: number) => {
+                        const [title, ...contentLines] = section.split('\n');
+                        return (
+                          <div key={idx} className="space-y-2">
+                            {title && title.includes(':') ? (
+                              <>
+                                <h3 className="font-semibold text-foreground">
+                                  {title.replace(':', '')}
+                                </h3>
+                                <div className="pl-4 space-y-1">
+                                  {contentLines.map((line: string, lineIdx: number) => (
+                                    <p key={lineIdx} className="text-muted-foreground">
+                                      {line}
+                                    </p>
+                                  ))}
+                                </div>
+                              </>
+                            ) : (
+                              <p className="text-muted-foreground">
+                                {section}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                      <div className="mt-6 pt-4 border-t flex items-center gap-4">
                         <Badge variant="outline" className="text-xs">
                           Confidence: {overallAnalysis.confidence}%
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Analysis Method: {overallAnalysis.metadata?.analysisMethod || 'Standard'}
                         </Badge>
                       </div>
                     </CardContent>
@@ -350,6 +419,27 @@ export default function AnalysisDetail() {
               </TabsContent>
 
               <TabsContent value="players" className="space-y-4">
+                {/* Player Count Summary */}
+                {playerEvaluations.length > 0 && (
+                  <Card className="shadow-soft bg-primary/5 border-primary/20">
+                    <CardContent className="py-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Users className="w-6 h-6 text-primary" />
+                          <div>
+                            <p className="font-semibold text-foreground">
+                              {playerEvaluations.length} Players Evaluated
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Comprehensive technical analysis for each player
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
                 {playerEvaluations.length > 0 ? (
                   playerEvaluations.map((evaluation: any) => (
                     <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
@@ -359,21 +449,57 @@ export default function AnalysisDetail() {
                             <Users className="w-5 h-5 text-primary" />
                             {evaluation.title}
                           </span>
-                          {evaluation.timestamp && (
-                            <Badge variant="secondary" className="text-xs">
-                              {formatTimestamp(evaluation.timestamp)}
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {evaluation.metadata?.playerNumber && (
+                              <Badge className="bg-primary/10 text-primary border-primary/20">
+                                #{evaluation.metadata.playerNumber}
+                              </Badge>
+                            )}
+                            {evaluation.timestamp && (
+                              <Badge variant="secondary" className="text-xs">
+                                {formatTimestamp(evaluation.timestamp)}
+                              </Badge>
+                            )}
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground whitespace-pre-wrap">
-                          {evaluation.content}
-                        </p>
-                        <div className="mt-4 flex items-center gap-2">
+                        {/* Parse and format player evaluation content */}
+                        <div className="space-y-4">
+                          {evaluation.content.split('\n\n').map((section: string, idx: number) => {
+                            if (section.includes('BIOMECHANICS:') || 
+                                section.includes('DECISION MAKING:') || 
+                                section.includes('IMPROVEMENT:') ||
+                                section.includes('TECHNIQUE:') ||
+                                section.includes('TACTICAL:')) {
+                              const [label, ...content] = section.split(':');
+                              return (
+                                <div key={idx} className="space-y-2">
+                                  <h4 className="font-semibold text-sm text-primary uppercase tracking-wide">
+                                    {label.trim()}
+                                  </h4>
+                                  <p className="text-muted-foreground pl-4">
+                                    {content.join(':').trim()}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return (
+                              <p key={idx} className="text-muted-foreground">
+                                {section}
+                              </p>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-4 pt-4 border-t flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">
                             Confidence: {evaluation.confidence}%
                           </Badge>
+                          {evaluation.metadata?.skillArea && (
+                            <Badge variant="outline" className="text-xs">
+                              Focus: {evaluation.metadata.skillArea}
+                            </Badge>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -389,33 +515,116 @@ export default function AnalysisDetail() {
               </TabsContent>
 
               <TabsContent value="faceoffs" className="space-y-4">
+                {/* Face-off Summary Stats */}
+                {faceOffAnalyses.length > 0 && (
+                  <Card className="shadow-soft bg-primary/5 border-primary/20">
+                    <CardContent className="py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">
+                            {faceOffAnalyses.length}
+                          </p>
+                          <p className="text-sm text-muted-foreground">Face-offs Analyzed</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">
+                            {Math.round(
+                              faceOffAnalyses.reduce((sum: number, fo: any) => 
+                                sum + (fo.metadata?.winProbability || 0), 0
+                              ) / faceOffAnalyses.length
+                            )}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">Avg Win Probability</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">
+                            {Math.round(
+                              faceOffAnalyses.reduce((sum: number, fo: any) => 
+                                sum + fo.confidence, 0
+                              ) / faceOffAnalyses.length
+                            )}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">Avg Confidence</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
                 {faceOffAnalyses.length > 0 ? (
-                  faceOffAnalyses.map((faceoff: any) => (
+                  faceOffAnalyses.map((faceoff: any, index: number) => (
                     <Card key={faceoff.id} className="shadow-soft hover:shadow-glow transition-all">
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center justify-between">
                           <span className="flex items-center gap-2">
                             <Target className="w-5 h-5 text-primary" />
-                            Face-off Analysis
+                            Face-off #{index + 1}
                           </span>
-                          {faceoff.timestamp && (
-                            <Badge variant="secondary" className="text-xs">
-                              {formatTimestamp(faceoff.timestamp)}
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {faceoff.metadata?.winProbability && (
+                              <Badge 
+                                className={`${
+                                  faceoff.metadata.winProbability >= 70 
+                                    ? 'bg-green-500/10 text-green-600 border-green-500/20' 
+                                    : faceoff.metadata.winProbability >= 50
+                                    ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                                    : 'bg-red-500/10 text-red-600 border-red-500/20'
+                                }`}
+                              >
+                                {faceoff.metadata.winProbability}% Win
+                              </Badge>
+                            )}
+                            {faceoff.timestamp && (
+                              <Badge variant="secondary" className="text-xs">
+                                {formatTimestamp(faceoff.timestamp)}
+                              </Badge>
+                            )}
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground whitespace-pre-wrap">
-                          {faceoff.content}
-                        </p>
-                        <div className="mt-4 flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            Win Probability: {faceoff.metadata?.winProbability || 'N/A'}%
-                          </Badge>
+                        <div className="space-y-4">
+                          {/* Format face-off analysis with sections */}
+                          {faceoff.content.split('\n').map((line: string, idx: number) => {
+                            // Check for technique indicators
+                            if (line.includes('clamp') || line.includes('rake') || 
+                                line.includes('plunger') || line.includes('jam')) {
+                              return (
+                                <div key={idx} className="pl-4 border-l-2 border-primary/30">
+                                  <p className="text-muted-foreground">
+                                    <span className="font-semibold text-primary">Technique: </span>
+                                    {line}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            // Check for wing play
+                            if (line.toLowerCase().includes('wing')) {
+                              return (
+                                <div key={idx} className="pl-4 border-l-2 border-blue-500/30">
+                                  <p className="text-muted-foreground">
+                                    <span className="font-semibold text-blue-600">Wing Play: </span>
+                                    {line}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return (
+                              <p key={idx} className="text-muted-foreground">
+                                {line}
+                              </p>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-4 pt-4 border-t flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">
                             Confidence: {faceoff.confidence}%
                           </Badge>
+                          {faceoff.metadata?.technique && (
+                            <Badge variant="outline" className="text-xs">
+                              Technique: {faceoff.metadata.technique}
+                            </Badge>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -431,33 +640,128 @@ export default function AnalysisDetail() {
               </TabsContent>
 
               <TabsContent value="transitions" className="space-y-4">
+                {/* Transition Summary */}
+                {transitionAnalyses.length > 0 && (
+                  <Card className="shadow-soft bg-primary/5 border-primary/20">
+                    <CardContent className="py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">
+                            {transitionAnalyses.length}
+                          </p>
+                          <p className="text-sm text-muted-foreground">Transitions Analyzed</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-green-600">
+                            {transitionAnalyses.filter((t: any) => 
+                              (t.metadata?.successProbability || 0) >= 70
+                            ).length}
+                          </p>
+                          <p className="text-sm text-muted-foreground">High Success (70%+)</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-primary">
+                            {Math.round(
+                              transitionAnalyses.reduce((sum: number, t: any) => 
+                                sum + (t.metadata?.successProbability || 0), 0
+                              ) / transitionAnalyses.length
+                            )}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">Avg Success Rate</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
                 {transitionAnalyses.length > 0 ? (
-                  transitionAnalyses.map((transition: any) => (
+                  transitionAnalyses.map((transition: any, index: number) => (
                     <Card key={transition.id} className="shadow-soft hover:shadow-glow transition-all">
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center justify-between">
                           <span className="flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-primary" />
-                            Transition Intelligence
+                            Transition #{index + 1}
                           </span>
-                          {transition.timestamp && (
-                            <Badge variant="secondary" className="text-xs">
-                              {formatTimestamp(transition.timestamp)}
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {transition.metadata?.successProbability && (
+                              <Badge 
+                                className={`${
+                                  transition.metadata.successProbability >= 70 
+                                    ? 'bg-green-500/10 text-green-600 border-green-500/20' 
+                                    : transition.metadata.successProbability >= 50
+                                    ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                                    : 'bg-red-500/10 text-red-600 border-red-500/20'
+                                }`}
+                              >
+                                {transition.metadata.successProbability}% Success
+                              </Badge>
+                            )}
+                            {transition.timestamp && (
+                              <Badge variant="secondary" className="text-xs">
+                                {formatTimestamp(transition.timestamp)}
+                              </Badge>
+                            )}
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground whitespace-pre-wrap">
-                          {transition.content}
-                        </p>
-                        <div className="mt-4 flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            Success Rate: {transition.metadata?.successProbability || 'N/A'}%
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            Confidence: {transition.confidence}%
-                          </Badge>
+                        <div className="space-y-4">
+                          {/* Parse transition content for key elements */}
+                          {transition.content.split('\n').map((line: string, idx: number) => {
+                            // Highlight clearing elements
+                            if (line.toLowerCase().includes('clear') || line.toLowerCase().includes('outlet')) {
+                              return (
+                                <div key={idx} className="pl-4 border-l-2 border-green-500/30">
+                                  <p className="text-muted-foreground">
+                                    <span className="font-semibold text-green-600">Clearing: </span>
+                                    {line}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            // Highlight ride elements
+                            if (line.toLowerCase().includes('ride') || line.toLowerCase().includes('pressure')) {
+                              return (
+                                <div key={idx} className="pl-4 border-l-2 border-red-500/30">
+                                  <p className="text-muted-foreground">
+                                    <span className="font-semibold text-red-600">Ride: </span>
+                                    {line}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            // Highlight fast break
+                            if (line.toLowerCase().includes('fast break') || line.toLowerCase().includes('numbers')) {
+                              return (
+                                <div key={idx} className="pl-4 border-l-2 border-blue-500/30">
+                                  <p className="text-muted-foreground">
+                                    <span className="font-semibold text-blue-600">Fast Break: </span>
+                                    {line}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return (
+                              <p key={idx} className="text-muted-foreground">
+                                {line}
+                              </p>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-muted-foreground">Type</p>
+                            <Badge variant="outline" className="text-xs mt-1">
+                              {transition.metadata?.transitionType || 'General Transition'}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Confidence</p>
+                            <Badge variant="outline" className="text-xs mt-1">
+                              {transition.confidence}%
+                            </Badge>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -473,37 +777,138 @@ export default function AnalysisDetail() {
               </TabsContent>
 
               <TabsContent value="moments" className="space-y-4">
-                {keyMoments.length > 0 ? (
-                  keyMoments.map((moment: any) => (
-                    <Card key={moment.id} className="shadow-soft hover:shadow-glow transition-all">
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center justify-between">
-                          <span className="flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-primary" />
-                            {moment.title}
-                          </span>
-                          {moment.timestamp && (
-                            <Badge variant="secondary" className="text-xs">
-                              {formatTimestamp(moment.timestamp)}
-                            </Badge>
-                          )}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground whitespace-pre-wrap">
-                          {moment.content}
-                        </p>
-                        <div className="mt-4 flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            Type: {moment.metadata?.momentType || 'General'}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            Confidence: {moment.confidence}%
-                          </Badge>
+                {/* Key Moments Timeline */}
+                {keyMoments.length > 0 && (
+                  <Card className="shadow-soft bg-primary/5 border-primary/20">
+                    <CardContent className="py-4">
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-6 h-6 text-primary" />
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {keyMoments.length} Key Moments Identified
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Critical plays and game-changing situations
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {keyMoments.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Sort moments by timestamp */}
+                    {keyMoments
+                      .sort((a: any, b: any) => (a.timestamp || 0) - (b.timestamp || 0))
+                      .map((moment: any, index: number) => {
+                        // Determine moment type icon and color
+                        const momentType = moment.metadata?.momentType || moment.metadata?.playType || 'general';
+                        const isGoal = momentType.toLowerCase().includes('goal');
+                        const isSave = momentType.toLowerCase().includes('save');
+                        const isPenalty = momentType.toLowerCase().includes('penalty');
+                        const isTurnover = momentType.toLowerCase().includes('turnover');
+                        
+                        return (
+                          <Card key={moment.id} className="shadow-soft hover:shadow-glow transition-all">
+                            <CardHeader>
+                              <CardTitle className="text-lg flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                  {isGoal ? (
+                                    <Trophy className="w-5 h-5 text-green-600" />
+                                  ) : isSave ? (
+                                    <Shield className="w-5 h-5 text-blue-600" />
+                                  ) : isPenalty ? (
+                                    <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                                  ) : isTurnover ? (
+                                    <ArrowLeftRight className="w-5 h-5 text-red-600" />
+                                  ) : (
+                                    <Clock className="w-5 h-5 text-primary" />
+                                  )}
+                                  {moment.title}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  {isGoal && (
+                                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                                      GOAL
+                                    </Badge>
+                                  )}
+                                  {isSave && (
+                                    <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">
+                                      SAVE
+                                    </Badge>
+                                  )}
+                                  {isPenalty && (
+                                    <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+                                      PENALTY
+                                    </Badge>
+                                  )}
+                                  {moment.timestamp !== null && moment.timestamp !== undefined && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      {formatTimestamp(moment.timestamp)}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                {/* Format moment content with rich details */}
+                                {moment.content.split('\n').map((line: string, idx: number) => {
+                                  // Highlight player references
+                                  if (line.includes('#') || line.includes('Player')) {
+                                    return (
+                                      <p key={idx} className="text-muted-foreground">
+                                        {line.split(/(\#\d+|Player \d+)/).map((part, partIdx) => 
+                                          /\#\d+|Player \d+/.test(part) ? (
+                                            <span key={partIdx} className="font-semibold text-primary">
+                                              {part}
+                                            </span>
+                                          ) : part
+                                        )}
+                                      </p>
+                                    );
+                                  }
+                                  return (
+                                    <p key={idx} className="text-muted-foreground">
+                                      {line}
+                                    </p>
+                                  );
+                                })}
+                              </div>
+                              
+                              {/* Metadata display */}
+                              <div className="mt-4 pt-4 border-t">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                  <div>
+                                    <p className="text-xs text-muted-foreground">Type</p>
+                                    <Badge variant="outline" className="text-xs mt-1">
+                                      {moment.metadata?.momentType || moment.metadata?.playType || 'Key Moment'}
+                                    </Badge>
+                                  </div>
+                                  {moment.metadata?.players && (
+                                    <div>
+                                      <p className="text-xs text-muted-foreground">Players Involved</p>
+                                      <Badge variant="outline" className="text-xs mt-1">
+                                        {Array.isArray(moment.metadata.players) 
+                                          ? moment.metadata.players.join(', ')
+                                          : moment.metadata.players}
+                                      </Badge>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <p className="text-xs text-muted-foreground">Confidence</p>
+                                    <Badge variant="outline" className="text-xs mt-1">
+                                      {moment.confidence}%
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                  </div>
                 ) : (
                   <Card className="shadow-soft">
                     <CardContent className="py-12 text-center">

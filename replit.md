@@ -489,3 +489,25 @@ The database schema is well-designed for detailed play tracking:
   - Better hierarchy with enhanced headers and spacing
 - **Files Modified**: client/src/pages/analysis-detail.tsx
 - **Status**: Team sections now have dramatically improved visual separation
+
+### 2025-01-30 - Implemented Multiple Clips Per Player Display
+- **Issue**: Previous implementation showed only one evaluation per player, but AI now captures multiple clips/moments per player
+- **Changes Made**:
+  - Created new `PlayerEvaluationsGrouped` component to handle complex grouping logic
+  - Refactored player evaluation display to group multiple clips under each player
+  - Added player-level headers showing player number and total clips count
+  - Each clip now shows as a separate card with:
+    - Clip number (Clip 1, Clip 2, etc.)
+    - Timestamp for when it occurred in the video
+    - Confidence percentage for that specific evaluation
+  - Maintained team grouping functionality (White Team, Dark Team, Other Players)
+  - Fixed syntax errors in the original implementation that were causing build failures
+- **Technical Details**:
+  - Component groups evaluations by player key (number or title)
+  - Then groups players by team based on jersey color mentions
+  - Sorts clips by timestamp within each player
+  - Handles edge cases where team affiliation can't be determined
+- **Files Modified**: 
+  - client/src/components/player-evaluations-grouped.tsx (new component)
+  - client/src/pages/analysis-detail.tsx (refactored to use new component)
+- **Status**: Multiple clips per player now display correctly with proper grouping and visual hierarchy

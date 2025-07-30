@@ -182,15 +182,28 @@ export async function analyzeLacrosseVideo(
     
     const prompt = PromptEngine.generatePrompt(promptRequest) + `
 
-CRITICAL REQUIREMENT: You MUST provide at least 10-15 player evaluations. Scan the ENTIRE video and evaluate EVERY visible player from BOTH teams. Include:
-- All offensive players (attackmen, midfielders)
-- All defensive players (defensemen, LSMs)
-- Both goalies
-- Face-off specialists and wing players
-- Players who appear briefly but demonstrate technique
-- Players identified by position if number not visible (e.g., "far-side defenseman in white")
+CRITICAL REQUIREMENTS: 
+1. You MUST provide at least 30-50 total player evaluation entries across the video
+2. For EACH player, capture MULTIPLE moments (3-5 different plays minimum)
+3. Scan the ENTIRE video and evaluate EVERY visible player from BOTH teams
+4. Include timestamp-specific analysis for each play/moment
 
-Remember: Evaluating only 2-3 players is INSUFFICIENT. You must analyze at least 10+ different players throughout the video.
+Example: If #23 appears in the video, provide entries like:
+- #23 at 0:45 - "Excellent dodge from X, beats defender with roll dodge..."
+- #23 at 2:15 - "Strong defensive positioning on crease slide..."
+- #23 at 4:30 - "Creates scoring opportunity with skip pass..."
+- #23 at 6:00 - "Wins ground ball in traffic using proper technique..."
+
+Include evaluations for:
+- All offensive players (attackmen, midfielders) - multiple plays each
+- All defensive players (defensemen, LSMs) - multiple plays each
+- Both goalies - multiple saves/clears each
+- Face-off specialists - multiple face-offs each
+- Players identified by position if number not visible
+
+Remember: ONE evaluation per player is INSUFFICIENT. Capture their performance throughout the game.
+
+IMPORTANT: For each player, provide MULTIPLE clips and evaluations throughout the video. Don't just analyze one moment per player - capture 3-5 different plays/moments for each player when they demonstrate different skills or make notable plays.
 
 Please structure your response as JSON with the following format:
 {
@@ -199,7 +212,9 @@ Please structure your response as JSON with the following format:
   "faceOffAnalysis": [{"analysis": "string", "timestamp": number, "winProbability": number, "confidence": number}],
   "transitionAnalysis": [{"analysis": "string", "timestamp": number, "successProbability": number, "confidence": number}],
   "keyMoments": [{"description": "string", "timestamp": number, "type": "string", "confidence": number}]
-}`;
+}
+
+Note: The playerEvaluations array should contain MULTIPLE entries per player number. For example, if #23 makes 4 notable plays, include 4 separate evaluation entries for #23 with different timestamps and analyses.`;
 
     const contents = [
       {
@@ -332,17 +347,32 @@ export async function analyzeLacrosseVideoFromYouTube(
 
 IMPORTANT: Pay extremely close attention to the actual jersey colors you see in this video. Do not assume or guess team colors. Look carefully at what each team is actually wearing and use only those exact colors throughout your analysis.
 
-CRITICAL REQUIREMENT: You MUST provide at least 10-15 player evaluations. Scan the ENTIRE video and evaluate EVERY visible player from BOTH teams. Include:
-- All offensive players (attackmen, midfielders)
-- All defensive players (defensemen, LSMs)
-- Both goalies
-- Face-off specialists and wing players
-- Players who appear briefly but demonstrate technique
-- Players identified by position if number not visible (e.g., "far-side defenseman in white")
+CRITICAL REQUIREMENTS: 
+1. You MUST provide at least 30-50 total player evaluation entries across the video
+2. For EACH player, capture MULTIPLE moments (3-5 different plays minimum)
+3. Scan the ENTIRE video and evaluate EVERY visible player from BOTH teams
+4. Include timestamp-specific analysis for each play/moment
 
-Remember: Evaluating only 2-3 players is INSUFFICIENT. You must analyze at least 10+ different players throughout the video.
+Example: If #23 appears in the video, provide entries like:
+- #23 at 0:45 - "Excellent dodge from X, beats defender with roll dodge..."
+- #23 at 2:15 - "Strong defensive positioning on crease slide..."
+- #23 at 4:30 - "Creates scoring opportunity with skip pass..."
+- #23 at 6:00 - "Wins ground ball in traffic using proper technique..."
 
-Please structure your response as JSON with the same format as specified in the schema.`;
+Include evaluations for:
+- All offensive players (attackmen, midfielders) - multiple plays each
+- All defensive players (defensemen, LSMs) - multiple plays each
+- Both goalies - multiple saves/clears each
+- Face-off specialists - multiple face-offs each
+- Players identified by position if number not visible
+
+Remember: ONE evaluation per player is INSUFFICIENT. Capture their performance throughout the game.
+
+IMPORTANT: For each player, provide MULTIPLE clips and evaluations throughout the video. Don't just analyze one moment per player - capture 3-5 different plays/moments for each player when they demonstrate different skills or make notable plays.
+
+Please structure your response as JSON with the same format as specified in the schema.
+
+Note: The playerEvaluations array should contain MULTIPLE entries per player number. For example, if #23 makes 4 notable plays, include 4 separate evaluation entries for #23 with different timestamps and analyses.`;
 
     // Gemini supports direct YouTube URL analysis using fileData
     const response = await ai.models.generateContent({

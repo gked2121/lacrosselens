@@ -19,6 +19,7 @@ export interface PromptRequest {
   teamName?: string;
   position?: string;
   level?: 'youth' | 'high_school' | 'college' | 'professional';
+  videoType?: 'game' | 'practice' | 'highlight' | 'drill' | 'scrimmage' | 'recruiting';
 }
 
 const BASE_COACH_PERSONA = `You are Coach Mike Thompson, a veteran lacrosse coach with 25+ years of experience coaching at Duke, Syracuse, and various elite high school programs. You've developed 47 Division I players and coached multiple championship teams. You have an expert eye for lacrosse IQ, technical skills, and game strategy.
@@ -41,7 +42,7 @@ COACHING VOCABULARY TO USE:
 export class PromptEngine {
   
   static generatePrompt(request: PromptRequest): string {
-    const { analysisType, userPrompt, videoTitle, focus, playerNumber, teamName, position, level } = request;
+    const { analysisType, userPrompt, videoTitle, focus, playerNumber, teamName, position, level, videoType } = request;
     
     let customizedPrompt = BASE_COACH_PERSONA + ADVANCED_TERMINOLOGY;
     
@@ -71,6 +72,7 @@ export class PromptEngine {
     }
     
     customizedPrompt += this.getAnalysisRequirements(analysisType);
+    customizedPrompt += this.getVideoTypeContext(videoType);
     customizedPrompt += `\n\nVideo Title: ${videoTitle}`;
     
     if (userPrompt) {
@@ -338,5 +340,62 @@ For each observation, provide exact timestamp, comprehensive technical breakdown
     }
     
     return AnalysisType.GENERIC_ANALYSIS;
+  }
+  
+  private static getVideoTypeContext(videoType?: string): string {
+    if (!videoType) return '';
+    
+    switch (videoType) {
+      case 'game':
+        return `\n\nVIDEO CONTEXT - FULL GAME:
+- Focus on team tactics, strategy execution, and in-game adjustments
+- Analyze both settled and unsettled situations throughout the contest
+- Track momentum shifts and key scoring runs
+- Evaluate coaching decisions and substitution patterns
+- Identify critical moments that changed the game's outcome`;
+        
+      case 'practice':
+        return `\n\nVIDEO CONTEXT - PRACTICE SESSION:
+- Evaluate skill development and technique refinement
+- Focus on coachability, effort level, and work ethic
+- Analyze drill execution and practice habits
+- Identify areas for improvement in controlled setting
+- Assess player communication and leadership during drills`;
+        
+      case 'highlight':
+        return `\n\nVIDEO CONTEXT - HIGHLIGHT TAPE:
+- Understand this shows best plays, not complete performance
+- Look for consistency in technique across different highlights
+- Evaluate ceiling/potential based on peak performance shown
+- Identify what makes these plays special or elite
+- Note any gaps or weaknesses not shown in highlights`;
+        
+      case 'drill':
+        return `\n\nVIDEO CONTEXT - DRILL/TRAINING:
+- Focus on fundamental technique and mechanics
+- Analyze repetition quality and consistency
+- Evaluate muscle memory development
+- Look for progressive improvement throughout drill
+- Assess attention to detail and coaching points`;
+        
+      case 'scrimmage':
+        return `\n\nVIDEO CONTEXT - SCRIMMAGE:
+- More controlled than game but more competitive than practice
+- Focus on decision-making under moderate pressure
+- Evaluate how skills transfer to game-like situations
+- Look for chemistry and communication development
+- Assess competitive instincts and battle level`;
+        
+      case 'recruiting':
+        return `\n\nVIDEO CONTEXT - RECRUITING TAPE:
+- Comprehensive evaluation for college potential
+- Focus on both strengths and areas for development
+- Compare to current college players at target level
+- Project development timeline and ceiling
+- Identify character traits and intangibles shown`;
+        
+      default:
+        return '';
+    }
   }
 }

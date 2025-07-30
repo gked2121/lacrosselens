@@ -103,6 +103,7 @@ export async function analyzeLacrosseVideo(
     teamName?: string;
     position?: string;
     level?: 'youth' | 'high_school' | 'college' | 'professional';
+    videoType?: 'game' | 'practice' | 'highlight' | 'drill' | 'scrimmage' | 'recruiting';
   }
 ): Promise<LacrosseAnalysis> {
   try {
@@ -248,6 +249,7 @@ export async function analyzeLacrosseVideoFromYouTube(
     teamName?: string;
     position?: string;
     level?: 'youth' | 'high_school' | 'college' | 'professional';
+    videoType?: 'game' | 'practice' | 'highlight' | 'drill' | 'scrimmage' | 'recruiting';
   }
 ): Promise<LacrosseAnalysis> {
   try {
@@ -262,7 +264,8 @@ export async function analyzeLacrosseVideoFromYouTube(
       playerNumber: analysisOptions?.playerNumber,
       teamName: analysisOptions?.teamName,
       position: analysisOptions?.position,
-      level: analysisOptions?.level || 'high_school'
+      level: analysisOptions?.level || 'high_school',
+      videoType: analysisOptions?.videoType || 'game'
     };
     
     const prompt = PromptEngine.generatePrompt(promptRequest) + `\nYouTube URL: ${youtubeUrl}

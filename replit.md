@@ -361,3 +361,30 @@ The database schema is well-designed for detailed play tracking:
   - server/services/analysisConfig.ts
   - server/services/analysisExtensions/README.md
 - **Status**: Extensible architecture implemented, ready for continuous growth
+
+### 2025-01-24 - Added Video Type Context for AI Analysis Flexibility
+- **Issue**: User requested AI flexibility to understand different types of lacrosse content (game footage, practice footage, highlight tape, drill recording)
+- **Changes Made**:
+  - Added video type selection to both file upload and YouTube upload forms
+  - Video type options: Full Game, Practice Session, Highlight Tape, Drill/Training, Scrimmage, Recruiting Tape
+  - Updated backend routes to accept videoType parameter
+  - Enhanced Gemini service to pass videoType to analysis functions
+  - Created getVideoTypeContext method in PromptEngine with context-specific instructions:
+    - Full Game: Focus on tactics, strategy, momentum shifts
+    - Practice: Evaluate skill development, coachability, work ethic
+    - Highlight Tape: Assess ceiling/potential, consistency across highlights
+    - Drill/Training: Focus on fundamentals, repetition quality
+    - Scrimmage: Evaluate game-like decision-making, chemistry
+    - Recruiting Tape: Comprehensive college potential evaluation
+  - Updated video processor to pass videoType through entire analysis pipeline
+- **UI Implementation**:
+  - Added dropdown selectors in upload forms with clear labels
+  - Positioned video type as primary field alongside level selection
+  - Consistent styling with modern UI design system
+- **Files Modified**: 
+  - client/src/components/enhanced-video-upload.tsx
+  - server/routes.ts
+  - server/services/gemini.ts
+  - server/services/promptEngine.ts
+  - server/services/videoProcessor.ts
+- **Status**: Video type context successfully integrated, AI now adjusts analysis based on content type

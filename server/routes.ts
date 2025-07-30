@@ -85,7 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/videos/upload', isAuthenticated, upload.single('video'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { title, description, teamId, userPrompt, playerNumber, teamName, position, level, useAdvancedAnalysis } = req.body;
+      const { title, description, teamId, userPrompt, playerNumber, teamName, position, level, useAdvancedAnalysis, videoType } = req.body;
       const file = req.file;
 
       if (!file) {
@@ -117,6 +117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         teamName, 
         position, 
         level,
+        videoType: videoType || 'game',
         useAdvancedAnalysis: useAdvancedAnalysis === 'true' || useAdvancedAnalysis === true
       };
       processVideoUpload(video.id, file.path, video.title, userPrompt, analysisOptions).catch(console.error);
@@ -131,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/videos/youtube', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { youtubeUrl, title, description, teamId, userPrompt, playerNumber, teamName, position, level, useAdvancedAnalysis } = req.body;
+      const { youtubeUrl, title, description, teamId, userPrompt, playerNumber, teamName, position, level, useAdvancedAnalysis, videoType } = req.body;
 
       if (!youtubeUrl) {
         return res.status(400).json({ message: "YouTube URL is required" });
@@ -162,6 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         teamName, 
         position, 
         level,
+        videoType: videoType || 'game',
         useAdvancedAnalysis: useAdvancedAnalysis === true
       };
       processYouTubeVideo(video.id, youtubeUrl, video.title, userPrompt, analysisOptions).catch(console.error);

@@ -52,6 +52,7 @@ async function processVideoUpload(
     teamName?: string;
     position?: string;
     level?: 'youth' | 'high_school' | 'college' | 'professional';
+    videoType?: 'game' | 'practice' | 'highlight' | 'drill' | 'scrimmage' | 'recruiting';
     useAdvancedAnalysis?: boolean;
   }
 ): Promise<void> {
@@ -192,7 +193,14 @@ async function processVideoUpload(
     
     // Standard single-pass analysis (or fallback from advanced)
     console.log(`Starting standard Gemini analysis for video ${videoId}`);
-    const analysis = await analyzeLacrosseVideo(filePath, title, userPrompt, analysisOptions);
+    const standardAnalysisOptions = {
+      playerNumber: analysisOptions?.playerNumber,
+      teamName: analysisOptions?.teamName,
+      position: analysisOptions?.position,
+      level: analysisOptions?.level,
+      videoType: analysisOptions?.videoType
+    };
+    const analysis = await analyzeLacrosseVideo(filePath, title, userPrompt, standardAnalysisOptions);
     console.log(`Standard analysis completed for video ${videoId}`);
 
     // Store standard analysis results
@@ -292,6 +300,7 @@ async function processYouTubeVideo(
     teamName?: string;
     position?: string;
     level?: 'youth' | 'high_school' | 'college' | 'professional';
+    videoType?: 'game' | 'practice' | 'highlight' | 'drill' | 'scrimmage' | 'recruiting';
     useAdvancedAnalysis?: boolean;
   }
 ): Promise<void> {
@@ -313,7 +322,14 @@ async function processYouTubeVideo(
     }
 
     // Analyze YouTube video with Gemini using custom prompt
-    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title, userPrompt, analysisOptions);
+    const youtubeAnalysisOptions = {
+      playerNumber: analysisOptions?.playerNumber,
+      teamName: analysisOptions?.teamName,
+      position: analysisOptions?.position,
+      level: analysisOptions?.level,
+      videoType: analysisOptions?.videoType
+    };
+    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title, userPrompt, youtubeAnalysisOptions);
 
     // Store analysis results (same pattern as file upload)
     await storage.createAnalysis({

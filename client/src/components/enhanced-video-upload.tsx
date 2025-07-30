@@ -29,6 +29,7 @@ export default function EnhancedVideoUpload() {
     teamName: "",
     position: "",
     level: "high_school",
+    videoType: "game",
   });
 
   // YouTube upload state  
@@ -41,6 +42,7 @@ export default function EnhancedVideoUpload() {
     teamName: "",
     position: "",
     level: "high_school",
+    videoType: "game",
   });
 
   const fileUploadMutation = useMutation({
@@ -301,6 +303,38 @@ export default function EnhancedVideoUpload() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
+                  <Label htmlFor="videoType">Video Type</Label>
+                  <Select value={fileData.videoType} onValueChange={(value) => setFileData({ ...fileData, videoType: value })}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="game">Full Game</SelectItem>
+                      <SelectItem value="practice">Practice Session</SelectItem>
+                      <SelectItem value="highlight">Highlight Tape</SelectItem>
+                      <SelectItem value="drill">Drill/Training</SelectItem>
+                      <SelectItem value="scrimmage">Scrimmage</SelectItem>
+                      <SelectItem value="recruiting">Recruiting Tape</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="level">Level</Label>
+                  <Select value={fileData.level} onValueChange={(value) => setFileData({ ...fileData, level: value })}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="youth">Youth</SelectItem>
+                      <SelectItem value="high_school">High School</SelectItem>
+                      <SelectItem value="college">College</SelectItem>
+                      <SelectItem value="professional">Professional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <Label htmlFor="playerNumber">Player # (Optional)</Label>
                   <Input
                     id="playerNumber"
@@ -326,32 +360,17 @@ export default function EnhancedVideoUpload() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
 
-                <div>
-                  <Label htmlFor="level">Level</Label>
-                  <Select value={fileData.level} onValueChange={(value) => setFileData({ ...fileData, level: value })}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="youth">Youth</SelectItem>
-                      <SelectItem value="high_school">High School</SelectItem>
-                      <SelectItem value="college">College</SelectItem>
-                      <SelectItem value="professional">Professional</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="teamName">Team Name (Optional)</Label>
-                  <Input
-                    id="teamName"
-                    placeholder="e.g., Eagles"
-                    value={fileData.teamName}
-                    onChange={(e) => setFileData({ ...fileData, teamName: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="teamName">Team Name (Optional)</Label>
+                <Input
+                  id="teamName"
+                  placeholder="e.g., Eagles"
+                  value={fileData.teamName}
+                  onChange={(e) => setFileData({ ...fileData, teamName: e.target.value })}
+                  className="mt-1"
+                />
               </div>
 
               <Button 
@@ -461,6 +480,38 @@ export default function EnhancedVideoUpload() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
+                  <Label htmlFor="ytVideoType">Video Type</Label>
+                  <Select value={youtubeData.videoType} onValueChange={(value) => setYoutubeData({ ...youtubeData, videoType: value })}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="game">Full Game</SelectItem>
+                      <SelectItem value="practice">Practice Session</SelectItem>
+                      <SelectItem value="highlight">Highlight Tape</SelectItem>
+                      <SelectItem value="drill">Drill/Training</SelectItem>
+                      <SelectItem value="scrimmage">Scrimmage</SelectItem>
+                      <SelectItem value="recruiting">Recruiting Tape</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="ytLevel">Level</Label>
+                  <Select value={youtubeData.level} onValueChange={(value) => setYoutubeData({ ...youtubeData, level: value })}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="youth">Youth</SelectItem>
+                      <SelectItem value="high_school">High School</SelectItem>
+                      <SelectItem value="college">College</SelectItem>
+                      <SelectItem value="professional">Professional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <Label htmlFor="ytPlayerNumber">Player # (Optional)</Label>
                   <Input
                     id="ytPlayerNumber"
@@ -486,32 +537,17 @@ export default function EnhancedVideoUpload() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
 
-                <div>
-                  <Label htmlFor="ytLevel">Level</Label>
-                  <Select value={youtubeData.level} onValueChange={(value) => setYoutubeData({ ...youtubeData, level: value })}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="youth">Youth</SelectItem>
-                      <SelectItem value="high_school">High School</SelectItem>
-                      <SelectItem value="college">College</SelectItem>
-                      <SelectItem value="professional">Professional</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="ytTeamName">Team Name (Optional)</Label>
-                  <Input
-                    id="ytTeamName"
-                    placeholder="e.g., Eagles"
-                    value={youtubeData.teamName}
-                    onChange={(e) => setYoutubeData({ ...youtubeData, teamName: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="ytTeamName">Team Name (Optional)</Label>
+                <Input
+                  id="ytTeamName"
+                  placeholder="e.g., Eagles"
+                  value={youtubeData.teamName}
+                  onChange={(e) => setYoutubeData({ ...youtubeData, teamName: e.target.value })}
+                  className="mt-1"
+                />
               </div>
 
               <Button 

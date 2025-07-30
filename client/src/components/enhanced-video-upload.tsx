@@ -16,7 +16,6 @@ import { Upload, Play, Target, Users, TrendingUp, Star, Zap, Sparkles, AlertCirc
 
 export default function EnhancedVideoUpload() {
   const [activeTab, setActiveTab] = useState("file");
-  const [analysisType, setAnalysisType] = useState("generic");
   const [useAdvancedAnalysis, setUseAdvancedAnalysis] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -31,6 +30,7 @@ export default function EnhancedVideoUpload() {
     position: "",
     level: "high_school",
     videoType: "game",
+    analysisType: "generic",
   });
 
   // YouTube upload state  
@@ -44,6 +44,7 @@ export default function EnhancedVideoUpload() {
     position: "",
     level: "high_school",
     videoType: "game",
+    analysisType: "generic",
   });
 
   const fileUploadMutation = useMutation({
@@ -104,6 +105,8 @@ export default function EnhancedVideoUpload() {
     formData.append("teamName", fileData.teamName);
     formData.append("position", fileData.position);
     formData.append("level", fileData.level);
+    formData.append("analysisType", fileData.analysisType);
+    formData.append("videoType", fileData.videoType);
     formData.append("useAdvancedAnalysis", useAdvancedAnalysis.toString());
     
     fileUploadMutation.mutate(formData);
@@ -213,7 +216,7 @@ export default function EnhancedVideoUpload() {
               {/* Step 2: What to analyze */}
               <div className="space-y-4">
                 <Label>What type of analysis do you need?</Label>
-                <RadioGroup value={analysisType} onValueChange={setAnalysisType}>
+                <RadioGroup value={fileData.analysisType} onValueChange={(value) => setFileData({ ...fileData, analysisType: value })}>
                   {["generic", "team_scout", "player_scout", "personal_feedback", "recruiting"].map((type) => {
                     const info = getAnalysisTypeInfo(type);
                     return (
@@ -315,7 +318,7 @@ export default function EnhancedVideoUpload() {
                     <Label htmlFor="userPrompt">Special instructions for AI</Label>
                     <Textarea
                       id="userPrompt"
-                      placeholder={promptExamples[analysisType as keyof typeof promptExamples] || "What should the AI focus on?"}
+                      placeholder={promptExamples[fileData.analysisType as keyof typeof promptExamples] || "What should the AI focus on?"}
                       value={fileData.userPrompt}
                       onChange={(e) => setFileData({ ...fileData, userPrompt: e.target.value })}
                       className="mt-2"
@@ -412,7 +415,7 @@ export default function EnhancedVideoUpload() {
               {/* Step 2: What to analyze */}
               <div className="space-y-4">
                 <Label>What type of analysis do you need?</Label>
-                <RadioGroup value={analysisType} onValueChange={setAnalysisType}>
+                <RadioGroup value={youtubeData.analysisType} onValueChange={(value) => setYoutubeData({ ...youtubeData, analysisType: value })}>
                   {["generic", "team_scout", "player_scout", "personal_feedback", "recruiting"].map((type) => {
                     const info = getAnalysisTypeInfo(type);
                     return (
@@ -514,7 +517,7 @@ export default function EnhancedVideoUpload() {
                     <Label htmlFor="ytUserPrompt">Special instructions for AI</Label>
                     <Textarea
                       id="ytUserPrompt"
-                      placeholder={promptExamples[analysisType as keyof typeof promptExamples] || "What should the AI focus on?"}
+                      placeholder={promptExamples[youtubeData.analysisType as keyof typeof promptExamples] || "What should the AI focus on?"}
                       value={youtubeData.userPrompt}
                       onChange={(e) => setYoutubeData({ ...youtubeData, userPrompt: e.target.value })}
                       className="mt-2"

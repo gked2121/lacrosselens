@@ -38,6 +38,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
 
   const handleOpenChange = (newOpen: boolean) => {
     try {
+      console.log("Dialog open state changing to:", newOpen);
       setOpen(newOpen);
     } catch (error) {
       console.error("Error opening upload dialog:", error);
@@ -154,8 +155,24 @@ export default function VideoUpload({ children }: VideoUploadProps) {
   };
 
   const handleFileUpload = (file: File) => {
-    const allowedTypes = ["video/mp4", "video/mov", "video/avi", "video/quicktime"];
-    if (!allowedTypes.includes(file.type)) {
+    console.log("handleFileUpload called with file:", file.name, file.type, file.size);
+    
+    const allowedTypes = [
+      "video/mp4", 
+      "video/mov", 
+      "video/avi", 
+      "video/quicktime",
+      "video/x-msvideo", // AVI alternative MIME type
+      "video/x-m4v", // MP4 alternative
+      "application/octet-stream" // Some browsers report this for video files
+    ];
+    
+    // Also check file extension if MIME type is generic
+    const fileExtension = file.name.toLowerCase().split('.').pop();
+    const allowedExtensions = ['mp4', 'mov', 'avi', 'qt'];
+    
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension || '')) {
+      console.log("Invalid file type:", file.type, "Extension:", fileExtension);
       toast({
         title: "Invalid File Type",
         description: "Please upload MP4, MOV, or AVI files only.",
@@ -165,6 +182,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
     }
 
     if (file.size > 2 * 1024 * 1024 * 1024) { // 2GB limit
+      console.log("File too large:", file.size);
       toast({
         title: "File Too Large",
         description: "Please upload files smaller than 2GB.",
@@ -173,15 +191,18 @@ export default function VideoUpload({ children }: VideoUploadProps) {
       return;
     }
 
+    const videoTitle = title || file.name.replace(/\.[^/.]+$/, "");
     if (!title) {
-      setTitle(file.name.replace(/\.[^/.]+$/, "")); // Remove extension
+      setTitle(videoTitle);
     }
 
+    console.log("Creating FormData with title:", videoTitle);
     const formData = new FormData();
     formData.append("video", file);
-    formData.append("title", title || file.name);
+    formData.append("title", videoTitle);
     formData.append("description", description);
 
+    console.log("Calling fileUploadMutation.mutate");
     fileUploadMutation.mutate(formData);
   };
 

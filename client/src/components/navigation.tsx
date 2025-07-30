@@ -108,22 +108,14 @@ export default function Navigation() {
         <div className="flex items-center gap-3">
           {/* Upload Video Button */}
           <VideoUpload>
-            <Button className="hidden sm:flex items-center gap-2 h-9 px-4 rounded-lg font-medium transition-all hover:shadow-md" style={{
-              backgroundColor: 'hsl(259 100% 65%)',
-              color: 'white',
-              boxShadow: '0 2px 8px hsl(259 100% 65% / 0.25)'
-            }}>
+            <Button className="hidden sm:flex items-center gap-2">
               <Upload className="w-4 h-4" />
               <span>Upload</span>
             </Button>
           </VideoUpload>
 
           <VideoUpload>
-            <Button className="sm:hidden h-9 w-9 p-0 rounded-lg" style={{
-              backgroundColor: 'hsl(259 100% 65%)',
-              color: 'white',
-              boxShadow: '0 2px 8px hsl(259 100% 65% / 0.25)'
-            }}>
+            <Button size="icon" className="sm:hidden">
               <Upload className="w-4 h-4" />
             </Button>
           </VideoUpload>

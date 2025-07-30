@@ -294,19 +294,19 @@ export default function VideoUpload({ children }: VideoUploadProps) {
         {children}
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Upload Video for Analysis</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="text-2xl font-bold">Upload Video for Analysis</DialogTitle>
+          <DialogDescription className="text-base mt-2">
             Upload a lacrosse video file, provide a YouTube URL, or record directly from your camera for AI-powered analysis.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="file" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="file">Upload File</TabsTrigger>
-            <TabsTrigger value="youtube">YouTube URL</TabsTrigger>
-            <TabsTrigger value="record">Record Video</TabsTrigger>
+        <Tabs defaultValue="file" className="w-full p-6">
+          <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+            <TabsTrigger value="file" className="data-[state=active]:bg-background">Upload File</TabsTrigger>
+            <TabsTrigger value="youtube" className="data-[state=active]:bg-background">YouTube URL</TabsTrigger>
+            <TabsTrigger value="record" className="data-[state=active]:bg-background">Record Video</TabsTrigger>
           </TabsList>
 
           <TabsContent value="file" className="space-y-4">
@@ -407,7 +407,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full bg-foreground text-background hover:opacity-90" 
                 disabled={isLoading || !youtubeUrl}
               >
                 {youtubeUploadMutation.isPending ? (
@@ -439,7 +439,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
                   
                   <div className="flex justify-center gap-2 mt-4">
                     {!isRecording && !recordedBlob && (
-                      <Button onClick={startRecording}>
+                      <Button onClick={startRecording} className="bg-foreground text-background hover:opacity-90">
                         <Camera className="w-4 h-4 mr-2" />
                         Start Recording
                       </Button>
@@ -457,7 +457,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
                         <Button onClick={() => setRecordedBlob(null)} variant="outline">
                           Record Again
                         </Button>
-                        <Button onClick={uploadRecording} disabled={isLoading}>
+                        <Button onClick={uploadRecording} disabled={isLoading} className="bg-foreground text-background hover:opacity-90">
                           {fileUploadMutation.isPending ? (
                             <>
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

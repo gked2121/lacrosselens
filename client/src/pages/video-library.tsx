@@ -98,7 +98,7 @@ export default function VideoLibrary() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'hsl(0 0% 98%)' }}>
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="flex">

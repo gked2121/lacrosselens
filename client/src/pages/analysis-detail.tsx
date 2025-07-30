@@ -63,27 +63,7 @@ export default function AnalysisDetail() {
   });
 
   // Fetch video statistics
-  const { data: statistics } = useQuery<{
-    goals: number;
-    assists: number;
-    hockeyAssists: number;
-    shots: number;
-    ballTouches: number;
-    turnovers: number;
-    causedTurnovers: number;
-    groundBalls: number;
-    checks: number;
-    faceOffWins: number;
-    faceOffTotal: number;
-    clears: number;
-    clearSuccess: number;
-    saves: number;
-    penalties: number;
-  }>({
-    queryKey: [`/api/videos/${id}/statistics`],
-    enabled: !!id && !!video && (video as any).status === 'completed',
-    retry: false,
-  });
+  // Removed statistics query as it was showing misleading aggregated data
 
   if (isLoading || !isAuthenticated || videoLoading || analysesLoading) {
     return (
@@ -251,121 +231,72 @@ export default function AnalysisDetail() {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
-                {/* Game Statistics Card */}
+                {/* Analysis Summary Card */}
                 <Card className="card-modern">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-primary" />
-                      Game Statistics
+                      Analysis Summary
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {/* Primary Stats */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                          {statistics?.goals || 0}
+                          {playerEvaluations.length}
                         </div>
-                        <div className="text-sm text-muted-foreground">Goals</div>
+                        <div className="text-sm text-muted-foreground">Players Analyzed</div>
                       </div>
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                          {statistics?.assists || 0}
+                          {faceOffAnalyses.length}
                         </div>
-                        <div className="text-sm text-muted-foreground">Assists</div>
+                        <div className="text-sm text-muted-foreground">Face-offs Analyzed</div>
                       </div>
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                          {statistics?.hockeyAssists || 0}
+                          {transitionAnalyses.length}
                         </div>
-                        <div className="text-sm text-muted-foreground">Hockey Assists</div>
+                        <div className="text-sm text-muted-foreground">Transitions Analyzed</div>
                       </div>
                       <div className="text-center p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}>
                         <div className="text-2xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                          {statistics?.shots || 0}
+                          {keyMoments.length}
                         </div>
-                        <div className="text-sm text-muted-foreground">Shots</div>
+                        <div className="text-sm text-muted-foreground">Key Moments</div>
                       </div>
                     </div>
-
-                    {/* Advanced Stats */}
-                    <div className="border-t pt-4">
-                      <h4 className="text-sm font-semibold text-muted-foreground mb-3">Advanced Statistics</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.ballTouches || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Ball Touches</div>
+                    
+                    {/* Analysis Coverage */}
+                    <div className="mt-6 p-4 rounded-xl" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-3">Analysis Coverage</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Player Evaluations</span>
+                          <Badge variant={playerEvaluations.length >= 10 ? "default" : "secondary"}>
+                            {playerEvaluations.length >= 10 ? "Comprehensive" : "Limited"}
+                          </Badge>
                         </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.turnovers || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Turnovers</div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Technical Detail</span>
+                          <Badge variant="default">High</Badge>
                         </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.causedTurnovers || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Caused TOs</div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.groundBalls || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Ground Balls</div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.checks || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Checks</div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Analysis Type</span>
+                          <Badge variant="outline">
+                            {(video as any).metadata?.analysisType || 'Standard'}
+                          </Badge>
                         </div>
                       </div>
                     </div>
-
-                    {/* Specialty Stats */}
-                    <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-semibold text-muted-foreground mb-3">Specialty Statistics</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.faceOffTotal ? 
-                              `${Math.round((statistics.faceOffWins / statistics.faceOffTotal) * 100)}%` : 
-                              'N/A'
-                            }
-                          </div>
-                          <div className="text-xs text-muted-foreground">Face-off %</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {statistics?.faceOffWins || 0}/{statistics?.faceOffTotal || 0}
-                          </div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.clears ? 
-                              `${Math.round((statistics.clearSuccess / statistics.clears) * 100)}%` : 
-                              'N/A'
-                            }
-                          </div>
-                          <div className="text-xs text-muted-foreground">Clear %</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {statistics?.clearSuccess || 0}/{statistics?.clears || 0}
-                          </div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.saves || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Saves</div>
-                        </div>
-                        <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-                          <div className="text-lg font-bold text-primary">
-                            {statistics?.penalties || 0}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Penalties</div>
-                        </div>
-                      </div>
+                    
+                    {/* Note about statistics */}
+                    <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                      <p className="text-sm text-blue-800 dark:text-blue-200">
+                        <span className="font-semibold">Note:</span> For accurate team-specific statistics, 
+                        please specify your team name when uploading videos. This analysis includes observations 
+                        from all visible plays and players.
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

@@ -280,6 +280,18 @@ The database schema is well-designed for detailed play tracking:
 - **Files Modified**: server/services/analysisEnhancer.ts (new), server/routes.ts, client/src/pages/analysis-detail.tsx
 - **Status**: Play statistics system implemented and displaying real-time game metrics from AI analysis
 
+### 2025-01-24 - Removed Misleading Game Statistics Display
+- **Issue**: User reported statistics were wrong and one-sided - stats were aggregated from both teams making them confusing
+- **Problem**: The statistics endpoint was extracting and summing all goals, assists, etc. from the AI analysis without differentiating between teams
+- **Changes Made**:
+  - Removed the misleading "Game Statistics" card that showed aggregated stats
+  - Replaced with "Analysis Summary" showing counts of different analysis types
+  - Added "Analysis Coverage" section showing quality indicators
+  - Added explanatory note about team-specific statistics requiring team name specification
+  - Removed the statistics query from the component
+- **Files Modified**: client/src/pages/analysis-detail.tsx
+- **Status**: Fixed - now shows meaningful analysis metrics instead of confusing aggregated game stats
+
 ### 2025-01-24 - Implemented Advanced Multi-Pass AI Analysis System
 - **Issue**: User requested maximizing information extraction from Gemini using multi-prompt/chain approach
 - **Changes Made**:

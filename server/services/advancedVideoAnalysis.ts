@@ -3,6 +3,8 @@
 
 import { GoogleGenAI } from "@google/genai";
 import * as fs from "fs";
+import { getAnalysisModules } from './analysisModules/analysisRegistry';
+import { AnalysisContext, AnalysisResult, AnalysisModule } from './analysisModules/baseAnalysisModule';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 

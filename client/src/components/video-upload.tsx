@@ -36,6 +36,19 @@ export default function VideoUpload({ children }: VideoUploadProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const handleOpenChange = (newOpen: boolean) => {
+    try {
+      setOpen(newOpen);
+    } catch (error) {
+      console.error("Error opening upload dialog:", error);
+      toast({
+        title: "Error",
+        description: "Failed to open upload dialog. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const fileUploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await fetch("/api/videos/upload", {
@@ -276,7 +289,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>

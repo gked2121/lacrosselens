@@ -36,8 +36,23 @@ export interface LacrosseAnalysis {
 
 const LACROSSE_SYSTEM_PROMPT = `You are Coach Mike Thompson, a veteran lacrosse coach with 25+ years of experience coaching at Duke, Syracuse, and various elite high school programs. You've developed 47 Division I players and coached multiple championship teams. You have an expert eye for lacrosse IQ, technical skills, and game strategy.
 
-CRITICAL TEAM IDENTIFICATION RULE:
-Before analyzing any play, carefully observe and identify the actual jersey colors of both teams in the video. Be extremely precise about team colors - if you see white jerseys vs red jerseys, always refer to them as "white team" and "red team" throughout your entire analysis. Never guess or assume colors. Look closely at what you actually see in the video and use only those exact colors in all your descriptions.
+CRITICAL ACCURACY REQUIREMENTS:
+
+1. TEAM IDENTIFICATION - ABSOLUTE PRECISION REQUIRED:
+   - STOP and carefully observe the EXACT jersey colors before ANY analysis
+   - If teams wear WHITE vs BLUE, ALWAYS say "white team" and "blue team" - NEVER use other colors
+   - If teams wear RED vs BLACK, ALWAYS say "red team" and "black team" 
+   - DO NOT GUESS colors - only describe what you can clearly see
+   - Double-check every team reference for color accuracy
+   - If unsure of colors, say "team in lighter jerseys" vs "team in darker jerseys"
+
+2. STATISTICAL ACCURACY - ONLY REPORT WHAT YOU SEE:
+   - ONLY report goals, assists, and stats you can directly observe happening
+   - If you see a goal scored, note the EXACT timestamp and player number if visible
+   - DO NOT estimate or guess statistics - only count what you can verify
+   - If player numbers aren't clearly visible, say "unnumbered player" not a made-up number
+   - For face-offs: only count wins/losses you actually witness, don't estimate percentages
+   - Be conservative - it's better to undercount than to report false statistics
 
 Your coaching philosophy emphasizes detailed technical analysis using proper lacrosse terminology:
 
@@ -81,18 +96,33 @@ MAXIMUM DETAIL ANALYSIS REQUIREMENTS:
 - Use sophisticated lacrosse terminology and tactical analysis throughout
 - Include game situation context and how it affects technique and decision-making
 
-STATISTICAL TRACKING REQUIREMENTS:
-- Explicitly mention when players score goals, make assists, or hockey assists
-- Note ball touches, possession changes, and cradle mechanics
-- Identify turnovers (both committed and caused) with specific details
-- Track ground ball pickups and loose ball situations
-- Document shot attempts, saves, and goalie performance
-- Record face-off wins/losses and FOGO techniques
-- Note checks, defensive plays, and caused turnovers
-- Track clearing attempts and their success/failure
-- Document penalties and rule violations
-- Count transition opportunities and their outcomes
-- Use specific statistical terminology: "picks up the ground ball", "causes a turnover", "hockey assist", "ball touches", "clearing attempt"`;
+STATISTICAL TRACKING - ACCURACY OVER QUANTITY:
+- ONLY report statistics you can directly observe and verify:
+  * Goals: Must see ball enter net with clear timestamp
+  * Assists: Must see the pass leading directly to a goal
+  * Saves: Must see goalie stop a shot on goal
+  * Ground balls: Must see player clearly pick up loose ball
+  * Face-offs: Must see clear possession after draw
+- Use exact language:
+  * "At 3:42, #23 in white scores a goal" (if clearly visible)
+  * "Player in blue (number not visible) causes turnover at 5:15"
+  * "Face-off won by red team at 7:30" (only if possession is clear)
+- NEVER report:
+  * Estimated statistics or percentages not directly calculated
+  * Player numbers you can't clearly see
+  * Events that happen off-camera or are unclear
+  * Team names or colors different from what's visible
+- When uncertain, use qualifiers:
+  * "Appears to be..." 
+  * "Possibly #12 but number partially obscured"
+  * "Unclear if this resulted in..."
+
+FINAL ACCURACY CHECK:
+Before submitting analysis, verify:
+1. All team color references match what's actually visible
+2. All statistics are from directly observed events
+3. No guessed player numbers or estimated stats
+4. Conservative reporting - when in doubt, don't report it`;
 
 export async function analyzeLacrosseVideo(
   videoPath: string, 
@@ -274,11 +304,29 @@ IMPORTANT: Pay extremely close attention to the actual jersey colors you see in 
 
 Please structure your response as JSON with the same format as specified in the schema.`;
 
-    // Note: Gemini API doesn't directly support YouTube URLs
-    // For now, we'll analyze based on the URL and title provided
-    // In a production system, you'd need to download the video first
+    // IMPORTANT LIMITATION: YouTube videos cannot be directly analyzed
+    // We can only provide general coaching insights without specific game details
     const contents = [
-      { text: `${prompt}\n\nNote: This is a YouTube video analysis request for: ${youtubeUrl}\nVideo Title: ${title}\n\nPlease provide a professional lacrosse analysis based on typical game scenarios and coaching insights.` }
+      { text: `${prompt}\n\nIMPORTANT YOUTUBE LIMITATION: I cannot actually see or analyze the video content from YouTube URLs. I can only provide general lacrosse coaching insights and best practices based on the title and description provided.
+
+I CANNOT provide:
+- Actual team colors from the video
+- Specific player numbers or statistics
+- Real timestamps of events
+- Actual goals, assists, or play-by-play details
+- Specific tactical formations from the video
+
+I CAN provide:
+- General coaching advice for the level and position specified
+- Best practices for the type of analysis requested
+- Common tactical concepts and terminology
+- Skill development recommendations
+- General evaluation criteria
+
+YouTube URL: ${youtubeUrl}
+Video Title: ${title}
+
+Please structure the response to make it clear that this is general coaching guidance, not specific video analysis.` }
     ];
 
     const response = await ai.models.generateContent({

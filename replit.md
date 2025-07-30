@@ -389,6 +389,23 @@ The database schema is well-designed for detailed play tracking:
   - server/services/videoProcessor.ts
 - **Status**: Video type context successfully integrated, AI now adjusts analysis based on content type
 
+### 2025-01-24 - Fixed AI Analysis Accuracy Issue for YouTube Videos
+- **Issue**: AI analysis getting team colors and stats wrong, especially for YouTube videos
+- **Root Cause Identified**: YouTube videos aren't actually being analyzed - the system just sends text prompts without video data
+- **Changes Made**:
+  - Updated Gemini prompts to explicitly state YouTube limitations (cannot see video content)
+  - Added clear disclaimers to YouTube analysis results warning about lack of actual video analysis
+  - Reduced confidence scores from 95 to 50 for YouTube analyses
+  - Added prominent warning banner in YouTube upload form explaining limitations
+  - Made it clear AI can only provide general coaching insights, not specific team colors or stats for YouTube
+- **Technical Details**:
+  - YouTube URLs cannot be directly analyzed by Gemini API
+  - System would need to download videos first for accurate analysis
+  - Current implementation only sends text prompts without video data
+- **User Communication**: Now clearly communicates that for accurate team colors, player numbers, and statistics, users must upload video files directly
+- **Files Modified**: server/services/gemini.ts, server/services/videoProcessor.ts, client/src/components/enhanced-video-upload.tsx
+- **Status**: YouTube limitation clearly communicated, preventing misleading analysis results
+
 ### 2025-01-24 - Multiple Redesigns of Enhanced Video Upload Component
 - **Issue**: User repeatedly reported upload form was "awful", "confusing and hard to use" despite multiple redesign attempts
 - **Multiple Redesign Attempts**:

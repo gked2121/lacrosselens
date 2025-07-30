@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Upload, Play, Target, Users, TrendingUp, Star, Zap, Sparkles } from "lucide-react";
+import { Upload, Play, Target, Users, TrendingUp, Star, Zap, Sparkles, AlertCircle } from "lucide-react";
 
 export default function EnhancedVideoUpload() {
   const [activeTab, setActiveTab] = useState("file");
@@ -367,6 +367,19 @@ export default function EnhancedVideoUpload() {
 
           <TabsContent value="youtube" className="space-y-6">
             <form onSubmit={handleYouTubeUpload} className="space-y-6">
+              {/* YouTube Limitation Warning */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className="flex gap-2">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-yellow-800 dark:text-yellow-200 mb-1">YouTube Analysis Limitation</p>
+                    <p className="text-yellow-700 dark:text-yellow-300">
+                      YouTube videos cannot be directly analyzed. The AI will provide general coaching insights based on your description, but cannot see actual team colors, player numbers, or game statistics. For accurate analysis, please upload the video file directly.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               {/* Step 1: YouTube URL */}
               <div className="space-y-4">
                 <div>

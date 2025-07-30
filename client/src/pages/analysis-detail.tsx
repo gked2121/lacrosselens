@@ -413,15 +413,25 @@ export default function AnalysisDetail() {
                       <>
                         {/* White Team Players */}
                         {whiteTeamPlayers.length > 0 && (
-                          <>
-                            <div className="flex items-center gap-2 mt-4 mb-2">
-                              <div className="h-px bg-gray-300 flex-grow"></div>
-                              <Badge className="bg-white text-gray-800 border-gray-300">
-                                White Team ({whiteTeamPlayers.length} players)
-                              </Badge>
-                              <div className="h-px bg-gray-300 flex-grow"></div>
-                            </div>
-                            {whiteTeamPlayers.map((evaluation: any) => (
+                          <div className="mt-6 p-6 rounded-2xl bg-gray-50/30 dark:bg-gray-900/10 border border-gray-200 dark:border-gray-800">
+                            <Card className="border-2 border-gray-300 bg-white dark:bg-gray-900/40 mb-6 shadow-lg">
+                              <CardHeader className="pb-4 bg-gray-50 dark:bg-gray-800/50 rounded-t-xl">
+                                <CardTitle className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-white border-3 border-gray-500 rounded-full shadow-md"></div>
+                                    <div>
+                                      <span className="text-2xl font-bold">White Team</span>
+                                      <p className="text-sm text-muted-foreground">Light colored jerseys</p>
+                                    </div>
+                                  </div>
+                                  <Badge variant="secondary" className="text-sm px-3 py-1">
+                                    {whiteTeamPlayers.length} Players Analyzed
+                                  </Badge>
+                                </CardTitle>
+                              </CardHeader>
+                            </Card>
+                            <div className="pl-6 border-l-4 border-gray-300 space-y-4">
+                              {whiteTeamPlayers.map((evaluation: any) => (
                               <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
                                 <CardHeader>
                                   <CardTitle className="text-lg flex items-center justify-between">
@@ -501,21 +511,32 @@ export default function AnalysisDetail() {
                                   </div>
                                 </CardContent>
                               </Card>
-                            ))}
-                          </>
+                              ))}
+                            </div>
+                          </div>
                         )}
                         
                         {/* Dark Team Players */}
                         {darkTeamPlayers.length > 0 && (
-                          <>
-                            <div className="flex items-center gap-2 mt-4 mb-2">
-                              <div className="h-px bg-gray-600 flex-grow"></div>
-                              <Badge className="bg-gray-800 text-white border-gray-600">
-                                Dark Team ({darkTeamPlayers.length} players)
-                              </Badge>
-                              <div className="h-px bg-gray-600 flex-grow"></div>
-                            </div>
-                            {darkTeamPlayers.map((evaluation: any) => (
+                          <div className="mt-8 p-6 rounded-2xl bg-gray-800/10 dark:bg-gray-800/20 border border-gray-700 dark:border-gray-600">
+                            <Card className="border-2 border-gray-700 bg-gray-800/30 dark:bg-gray-900 mb-6 shadow-lg">
+                              <CardHeader className="pb-4 bg-gray-800/50 dark:bg-gray-800 rounded-t-xl">
+                                <CardTitle className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gray-800 dark:bg-gray-700 border-3 border-gray-500 rounded-full shadow-md"></div>
+                                    <div>
+                                      <span className="text-2xl font-bold text-white dark:text-gray-100">Dark Team</span>
+                                      <p className="text-sm text-gray-300 dark:text-gray-400">Dark colored jerseys</p>
+                                    </div>
+                                  </div>
+                                  <Badge variant="secondary" className="text-sm px-3 py-1">
+                                    {darkTeamPlayers.length} Players Analyzed
+                                  </Badge>
+                                </CardTitle>
+                              </CardHeader>
+                            </Card>
+                            <div className="pl-6 border-l-4 border-gray-600 space-y-4">
+                              {darkTeamPlayers.map((evaluation: any) => (
                               <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
                                 <CardHeader>
                                   <CardTitle className="text-lg flex items-center justify-between">
@@ -596,20 +617,31 @@ export default function AnalysisDetail() {
                                 </CardContent>
                               </Card>
                             ))}
-                          </>
+                            </div>
+                          </div>
                         )}
                         
                         {/* Unknown Team Players */}
                         {unknownTeamPlayers.length > 0 && (
-                          <>
-                            <div className="flex items-center gap-2 mt-4 mb-2">
-                              <div className="h-px bg-gray-400 flex-grow"></div>
-                              <Badge variant="secondary">
-                                Other Players ({unknownTeamPlayers.length})
-                              </Badge>
-                              <div className="h-px bg-gray-400 flex-grow"></div>
-                            </div>
-                            {unknownTeamPlayers.map((evaluation: any) => (
+                          <div className="mt-8 p-6 rounded-2xl bg-orange-50/30 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800">
+                            <Card className="border-2 border-orange-300 bg-orange-50 dark:bg-orange-900/20 mb-6 shadow-lg">
+                              <CardHeader className="pb-4 bg-orange-100 dark:bg-orange-900/30 rounded-t-xl">
+                                <CardTitle className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-orange-300 to-orange-500 border-3 border-orange-400 rounded-full shadow-md"></div>
+                                    <div>
+                                      <span className="text-2xl font-bold">Other Players</span>
+                                      <p className="text-sm text-muted-foreground">Team affiliation unclear</p>
+                                    </div>
+                                  </div>
+                                  <Badge variant="secondary" className="text-sm px-3 py-1">
+                                    {unknownTeamPlayers.length} Players Analyzed
+                                  </Badge>
+                                </CardTitle>
+                              </CardHeader>
+                            </Card>
+                            <div className="pl-6 border-l-4 border-orange-300 space-y-4">
+                              {unknownTeamPlayers.map((evaluation: any) => (
                               <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
                                 <CardHeader>
                                   <CardTitle className="text-lg flex items-center justify-between">
@@ -689,8 +721,9 @@ export default function AnalysisDetail() {
                                   </div>
                                 </CardContent>
                               </Card>
-                            ))}
-                          </>
+                              ))}
+                            </div>
+                          </div>
                         )}
                       </>
                     );

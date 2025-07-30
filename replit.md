@@ -465,3 +465,27 @@ The database schema is well-designed for detailed play tracking:
   - Maintains all existing analysis details while adding clear team organization
 - **Files Modified**: client/src/pages/analysis-detail.tsx
 - **Status**: Player evaluations now clearly organized by team affiliation
+
+### 2025-01-30 - Dramatically Enhanced Visual Team Separation
+- **Issue**: User requested easier visual breakup between the two teams
+- **Changes Made**:
+  - Wrapped each team section in distinct colored background containers with rounded corners (rounded-2xl)
+  - Enhanced team headers with larger visual elements:
+    - Increased team color circles from 8x8 to 10x10 with shadow effects
+    - Added team descriptions below team names ("Light colored jerseys", etc.)
+    - Increased team name font size to text-2xl for better visibility
+    - Added color-coded header backgrounds matching team colors
+  - Implemented distinct background colors for each team section:
+    - White Team: Light gray background (bg-gray-50/30)
+    - Dark Team: Dark gray background (bg-gray-800/10)
+    - Other Players: Orange-tinted background (bg-orange-50/30)
+  - Increased left border thickness and padding (pl-6 instead of pl-4)
+  - Added shadow-lg to team header cards for depth
+  - Improved spacing with p-6 padding around team containers
+- **Visual Improvements**:
+  - Clear visual separation between teams with colored containers
+  - Easy-to-spot team sections with distinct color schemes
+  - Professional appearance with subtle transparency effects
+  - Better hierarchy with enhanced headers and spacing
+- **Files Modified**: client/src/pages/analysis-detail.tsx
+- **Status**: Team sections now have dramatically improved visual separation

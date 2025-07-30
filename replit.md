@@ -542,3 +542,35 @@ The database schema is well-designed for detailed play tracking:
   - client/src/App.tsx (added new routes)
   - client/src/components/navigation.tsx (dropdown already existed)
 - **Status**: Specialized analysis pages fully functional with proper navigation and data display
+
+### 2025-01-30 - Enhanced Player Analysis with Multiple Clips and Comprehensive Stat Sheets
+- **Issue**: User requested multiple clips per player in video analysis and individual stat sheets for each player
+- **Changes Made**:
+  - Created PlayerStatSheet component with comprehensive player statistics:
+    - Player header with position detection and overall performance rating
+    - Quick stats grid showing goals, assists, saves, caused turnovers
+    - Skills analysis with progress bars for dodging, shooting, passing, etc.
+    - Complete timeline of all clips with timestamps and confidence scores
+    - Extracted strengths and areas for improvement from AI analysis
+    - 5-star rating system based on average confidence
+  - Enhanced PlayerEvaluationsGrouped component:
+    - Added expandable stat sheets for each player
+    - Show/hide functionality with "View Stats" button
+    - Preview shows first 2 clips when collapsed
+    - Displays "+X more clips" indicator for players with multiple evaluations
+    - Maintains existing team grouping (White Team, Dark Team, Other Players)
+  - Stat extraction features:
+    - Automatic position detection from AI analysis content
+    - Skills tracking based on keyword mentions in evaluations
+    - Action counting for goals, assists, saves, turnovers
+    - Time range calculation showing first to last clip timestamps
+- **Technical Details**:
+  - PlayerStatSheet analyzes all evaluations for a player to extract meaningful statistics
+  - Skills and actions are tracked using pattern matching on AI analysis content
+  - Component state manages expanded/collapsed players for better UX
+  - Progress bars visualize skill frequency relative to total clips
+- **Files Created/Modified**:
+  - client/src/components/player-stat-sheet.tsx (new comprehensive stat component)
+  - client/src/components/player-evaluations-grouped.tsx (added stat sheet integration)
+  - client/src/pages/player-evaluation.tsx (created dedicated player evaluation page)
+- **Status**: Multiple clips per player and stat sheets fully implemented and functional

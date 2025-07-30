@@ -1,6 +1,9 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
+import { useState } from "react";
+import PlayerStatSheet from "./player-stat-sheet";
 
 interface PlayerEvaluation {
   id: number;
@@ -23,6 +26,20 @@ export default function PlayerEvaluationsGrouped({
   evaluations, 
   formatTimestamp 
 }: PlayerEvaluationsGroupedProps) {
+  // State for expanded player stat sheets
+  const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
+  
+  // Toggle player expansion
+  const togglePlayer = (playerKey: string) => {
+    const newExpanded = new Set(expandedPlayers);
+    if (newExpanded.has(playerKey)) {
+      newExpanded.delete(playerKey);
+    } else {
+      newExpanded.add(playerKey);
+    }
+    setExpandedPlayers(newExpanded);
+  };
+  
   // First, group evaluations by player
   const playerGroups = new Map<string, PlayerEvaluation[]>();
   
@@ -113,16 +130,42 @@ export default function PlayerEvaluationsGrouped({
                   {playerEvals[0].metadata?.playerNumber ? `Player #${playerEvals[0].metadata.playerNumber}` : playerKey}
                 </span>
               </div>
-              <Badge variant="secondary" className="text-xs">
-                {playerEvals.length} {playerEvals.length === 1 ? 'clip' : 'clips'}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  {playerEvals.length} {playerEvals.length === 1 ? 'clip' : 'clips'}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => togglePlayer(playerKey)}
+                  className="h-7 px-2"
+                >
+                  <BarChart3 className="w-3 h-3 mr-1" />
+                  {expandedPlayers.has(playerKey) ? 'Hide' : 'View'} Stats
+                  {expandedPlayers.has(playerKey) ? (
+                    <ChevronUp className="w-3 h-3 ml-1" />
+                  ) : (
+                    <ChevronDown className="w-3 h-3 ml-1" />
+                  )}
+                </Button>
+              </div>
             </div>
             
-            {/* Multiple clips for this player */}
-            <div className="space-y-3 ml-7">
-              {playerEvals.map((evaluation, index) => (
-                <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
-                  <CardHeader className="pb-3">
+            {/* Show stat sheet if expanded */}
+            {expandedPlayers.has(playerKey) ? (
+              <div className="ml-7 mt-4">
+                <PlayerStatSheet 
+                  playerKey={playerKey}
+                  evaluations={playerEvals}
+                  formatTimestamp={formatTimestamp}
+                />
+              </div>
+            ) : (
+              /* Show preview of clips */
+              <div className="space-y-3 ml-7">
+                {playerEvals.slice(0, 2).map((evaluation, index) => (
+                  <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
+                    <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
@@ -186,7 +229,13 @@ export default function PlayerEvaluationsGrouped({
                   </CardContent>
                 </Card>
               ))}
+              {playerEvals.length > 2 && !expandedPlayers.has(playerKey) && (
+                <p className="text-sm text-muted-foreground text-center mt-2">
+                  +{playerEvals.length - 2} more clips
+                </p>
+              )}
             </div>
+            )}
           </div>
         ))}
       </div>

@@ -331,17 +331,17 @@ async function processYouTubeVideo(
     };
     const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title, userPrompt, youtubeAnalysisOptions);
 
-    // Store analysis results with disclaimer for YouTube
+    // Store analysis results from YouTube video
     await storage.createAnalysis({
       videoId,
       type: "overall",
-      title: "YouTube Video - General Coaching Insights",
-      content: `⚠️ YOUTUBE LIMITATION: This analysis is based on general coaching principles, not actual video content. For accurate team colors, player statistics, and specific play analysis, please upload the video file directly.\n\n${analysis.overallAnalysis}`,
+      title: "Overall Game Analysis",
+      content: analysis.overallAnalysis,
       timestamp: null,
-      confidence: 50, // Lower confidence for YouTube analysis
+      confidence: 95,
       metadata: { 
         type: "overall",
-        source: "youtube_limited" 
+        source: "youtube" 
       },
     });
 

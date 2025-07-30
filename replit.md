@@ -389,22 +389,29 @@ The database schema is well-designed for detailed play tracking:
   - server/services/videoProcessor.ts
 - **Status**: Video type context successfully integrated, AI now adjusts analysis based on content type
 
-### 2025-01-24 - Fixed AI Analysis Accuracy Issue for YouTube Videos
-- **Issue**: AI analysis getting team colors and stats wrong, especially for YouTube videos
-- **Root Cause Identified**: YouTube videos aren't actually being analyzed - the system just sends text prompts without video data
+### 2025-01-24 - Fixed YouTube Video Analysis Implementation
+- **Issue**: AI analysis getting team colors and stats wrong for YouTube videos
+- **Root Cause**: Initial implementation was incorrect - system was only sending text prompts without actual video data
+- **Research Findings**: Gemini DOES support direct YouTube URL analysis via fileData.fileUri parameter
 - **Changes Made**:
-  - Updated Gemini prompts to explicitly state YouTube limitations (cannot see video content)
-  - Added clear disclaimers to YouTube analysis results warning about lack of actual video analysis
-  - Reduced confidence scores from 95 to 50 for YouTube analyses
-  - Added prominent warning banner in YouTube upload form explaining limitations
-  - Made it clear AI can only provide general coaching insights, not specific team colors or stats for YouTube
-- **Technical Details**:
-  - YouTube URLs cannot be directly analyzed by Gemini API
-  - System would need to download videos first for accurate analysis
-  - Current implementation only sends text prompts without video data
-- **User Communication**: Now clearly communicates that for accurate team colors, player numbers, and statistics, users must upload video files directly
+  - Fixed implementation to use proper Gemini API format for YouTube videos
+  - Updated from text-only prompts to proper fileData format with YouTube URL
+  - Changed warning message to informational message about YouTube processing
+  - Restored confidence scores to 95 for YouTube analyses
+  - Corrected the API call format to match official documentation
+- **Technical Implementation**:
+  ```javascript
+  contents: [
+    { fileData: { fileUri: youtubeUrl } },
+    { text: prompt }
+  ]
+  ```
+- **Limitations**: 
+  - Free tier: 8 hours of YouTube video per day
+  - Only public videos supported (not private/unlisted)
+  - May take longer to process than file uploads
 - **Files Modified**: server/services/gemini.ts, server/services/videoProcessor.ts, client/src/components/enhanced-video-upload.tsx
-- **Status**: YouTube limitation clearly communicated, preventing misleading analysis results
+- **Status**: YouTube video analysis now properly implemented using Gemini's native YouTube support
 
 ### 2025-01-24 - Multiple Redesigns of Enhanced Video Upload Component
 - **Issue**: User repeatedly reported upload form was "awful", "confusing and hard to use" despite multiple redesign attempts

@@ -60,9 +60,25 @@ export default function AnalysisDetail() {
   });
 
   // Fetch video statistics
-  const { data: statistics } = useQuery({
+  const { data: statistics } = useQuery<{
+    goals: number;
+    assists: number;
+    hockeyAssists: number;
+    shots: number;
+    ballTouches: number;
+    turnovers: number;
+    causedTurnovers: number;
+    groundBalls: number;
+    checks: number;
+    faceOffWins: number;
+    faceOffTotal: number;
+    clears: number;
+    clearSuccess: number;
+    saves: number;
+    penalties: number;
+  }>({
     queryKey: [`/api/videos/${id}/statistics`],
-    enabled: !!id && video && (video as any).status === 'completed',
+    enabled: !!id && !!video && (video as any).status === 'completed',
     retry: false,
   });
 

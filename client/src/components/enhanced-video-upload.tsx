@@ -367,14 +367,14 @@ export default function EnhancedVideoUpload() {
 
           <TabsContent value="youtube" className="space-y-6">
             <form onSubmit={handleYouTubeUpload} className="space-y-6">
-              {/* YouTube Limitation Warning */}
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              {/* YouTube Analysis Info */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex gap-2">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-medium text-yellow-800 dark:text-yellow-200 mb-1">YouTube Analysis Limitation</p>
-                    <p className="text-yellow-700 dark:text-yellow-300">
-                      YouTube videos cannot be directly analyzed. The AI will provide general coaching insights based on your description, but cannot see actual team colors, player numbers, or game statistics. For accurate analysis, please upload the video file directly.
+                    <p className="font-medium text-blue-800 dark:text-blue-200 mb-1">YouTube Video Analysis</p>
+                    <p className="text-blue-700 dark:text-blue-300">
+                      Gemini AI will analyze the YouTube video directly, including team colors, player movements, and game statistics. This may take a bit longer than file uploads.
                     </p>
                   </div>
                 </div>

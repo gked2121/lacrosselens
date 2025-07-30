@@ -304,29 +304,14 @@ IMPORTANT: Pay extremely close attention to the actual jersey colors you see in 
 
 Please structure your response as JSON with the same format as specified in the schema.`;
 
-    // IMPORTANT LIMITATION: YouTube videos cannot be directly analyzed
-    // We can only provide general coaching insights without specific game details
+    // Gemini supports direct YouTube URL analysis using fileData
     const contents = [
-      { text: `${prompt}\n\nIMPORTANT YOUTUBE LIMITATION: I cannot actually see or analyze the video content from YouTube URLs. I can only provide general lacrosse coaching insights and best practices based on the title and description provided.
-
-I CANNOT provide:
-- Actual team colors from the video
-- Specific player numbers or statistics
-- Real timestamps of events
-- Actual goals, assists, or play-by-play details
-- Specific tactical formations from the video
-
-I CAN provide:
-- General coaching advice for the level and position specified
-- Best practices for the type of analysis requested
-- Common tactical concepts and terminology
-- Skill development recommendations
-- General evaluation criteria
-
-YouTube URL: ${youtubeUrl}
-Video Title: ${title}
-
-Please structure the response to make it clear that this is general coaching guidance, not specific video analysis.` }
+      {
+        fileData: {
+          fileUri: youtubeUrl
+        }
+      },
+      { text: prompt }
     ];
 
     const response = await ai.models.generateContent({

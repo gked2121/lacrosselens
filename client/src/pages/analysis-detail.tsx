@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useParams, Link } from "wouter";
+import { useEffect, useState } from "react";
+import { useParams, Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -35,6 +35,12 @@ export default function AnalysisDetail() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
   const { id } = useParams();
+  const [location] = useLocation();
+  
+  // Extract tab from query parameters
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const initialTab = searchParams.get('tab') || 'overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -222,7 +228,7 @@ export default function AnalysisDetail() {
 
           {/* Analysis Content */}
           {(video as any).status === 'completed' ? (
-            <Tabs defaultValue="overview" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="grid grid-cols-2 lg:grid-cols-5 w-full p-2 rounded-2xl" style={{ backgroundColor: 'hsl(var(--muted))' }}>
                 <TabsTrigger value="overview" className="rounded-xl font-semibold">Overview</TabsTrigger>
                 <TabsTrigger value="players" className="rounded-xl font-semibold">Players</TabsTrigger>

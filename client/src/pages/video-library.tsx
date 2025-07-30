@@ -181,7 +181,7 @@ export default function VideoLibrary() {
                     
                     {/* Play overlay */}
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <Link href={`/videos/${video.id}`} className="w-full max-w-xs mx-4">
+                      <Link href={`/analysis/${video.id}`} className="w-full max-w-xs mx-4">
                         <Button size="lg" className="w-full font-semibold shadow-lg" style={{ backgroundColor: 'white', color: 'hsl(var(--foreground))' }}>
                           <Play className="w-5 h-5 mr-2" />
                           {video.status === 'completed' ? 'View Analysis' : 'View Details'}

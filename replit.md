@@ -511,3 +511,34 @@ The database schema is well-designed for detailed play tracking:
   - client/src/components/player-evaluations-grouped.tsx (new component)
   - client/src/pages/analysis-detail.tsx (refactored to use new component)
 - **Status**: Multiple clips per player now display correctly with proper grouping and visual hierarchy
+
+### 2025-01-30 - Expanded Analysis Capabilities with Dedicated Face-off and Transition Pages
+- **Issue**: User needed specialized analysis pages for face-offs and transitions to complement the detailed player evaluations
+- **Changes Made**:
+  - Created dedicated Face-off Analysis page (`/analysis/faceoffs`) with:
+    - Summary statistics for all face-offs across videos
+    - Common techniques identified (Clamp, Jump Counter, Rake & Pull, Quick Exit)
+    - Individual video cards showing face-off analyses with win probabilities
+    - VideoFaceoffAnalyses component that fetches and displays analyses for each video
+  - Created dedicated Transition Analysis page (`/analysis/transitions`) with:
+    - Summary stats for transition success rates
+    - Clearing and riding strategy breakdowns
+    - Individual video cards with transition analyses
+    - VideoTransitionAnalyses component for detailed transition data
+  - Updated routing in App.tsx to include new pages
+  - Added dropdown navigation in the top navbar for Analysis section
+  - Enhanced analysis detail page to support tab selection via query parameters (?tab=faceoffs)
+- **Technical Implementation**:
+  - Created reusable components for fetching and displaying analyses per video
+  - Implemented query parameter handling for deep linking to specific tabs
+  - Fixed TypeScript errors with proper type assertions for filtered arrays
+  - Added navigation links between specialized pages and main analysis view
+- **Files Created/Modified**:
+  - client/src/pages/faceoff-analysis.tsx (new)
+  - client/src/pages/transition-analysis.tsx (new)
+  - client/src/components/video-faceoff-analyses.tsx (new)
+  - client/src/components/video-transition-analyses.tsx (new)
+  - client/src/pages/analysis-detail.tsx (added query parameter support)
+  - client/src/App.tsx (added new routes)
+  - client/src/components/navigation.tsx (dropdown already existed)
+- **Status**: Specialized analysis pages fully functional with proper navigation and data display

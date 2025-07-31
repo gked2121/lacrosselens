@@ -639,6 +639,30 @@ The database schema is well-designed for detailed play tracking:
   - client/src/components/navigation.tsx (dropdown already existed)
 - **Status**: Specialized analysis pages fully functional with proper navigation and data display
 
+### 2025-01-31 - Redesigned Analysis Results Page with Fluid, Adaptive Layout
+- **Issue**: User reported current tab-based UI was not a good fit for multiple types of video outputs and requested more fluid analysis results page
+- **Solution**: Complete redesign of analysis detail page with collapsible sections and dynamic content adaptation
+- **Key Design Changes**:
+  - Replaced rigid tab-based layout with expandable/collapsible card sections
+  - Each analysis type (Overall, Players, Face-offs, Transitions, Key Moments) in its own card
+  - Visual indicators showing count of each analysis type with colored badges
+  - Sections expand/collapse with smooth transitions and chevron indicators
+  - Empty sections automatically hidden to reduce clutter
+  - Overall Analysis section expanded by default as primary content
+- **UI Improvements**:
+  - Color-coded section headers with matching icons and backgrounds
+  - Quick summary bar at top showing analysis counts
+  - Hover states on section headers indicate interactivity
+  - Each section displays relevant metadata (timestamps, confidence scores, probabilities)
+  - Analysis summary card at bottom shows total analyses generated
+- **Technical Implementation**:
+  - Used useState to track expanded sections
+  - Dynamic section rendering based on analysis counts
+  - Preserved all existing functionality while improving presentation
+  - Maintained authentication checks and error handling
+- **Files Modified**: client/src/pages/analysis-detail.tsx (complete rewrite)
+- **Status**: Fluid, adaptive analysis page successfully implemented for better handling of varying video outputs
+
 ### 2025-01-30 - Enhanced Player Analysis with Multiple Clips and Comprehensive Stat Sheets
 - **Issue**: User requested multiple clips per player in video analysis and individual stat sheets for each player
 - **Changes Made**:

@@ -185,11 +185,11 @@ export default function Navigation() {
           </div>
 
           {/* Upload Button and User Menu */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {/* Upload Video Button */}
             <VideoUpload>
               <Button 
-                className="btn-primary"
+                className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
@@ -197,58 +197,68 @@ export default function Navigation() {
                   // The click will be handled by VideoUpload component
                 }}
               >
-                <Upload className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Upload</span>
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <div className="relative flex items-center gap-2">
+                  <Upload className="w-4 h-4 transform group-hover:-translate-y-0.5 transition-transform" />
+                  <span className="hidden sm:inline">Upload Video</span>
+                  <span className="sm:hidden">Upload</span>
+                </div>
               </Button>
             </VideoUpload>
 
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
+                <Button 
+                  variant="ghost" 
+                  className="relative h-10 w-10 rounded-full ring-2 ring-gray-200 dark:ring-gray-700 hover:ring-purple-400 dark:hover:ring-purple-500 transition-all duration-300 p-0 overflow-hidden group"
+                >
+                  <Avatar className="h-10 w-10">
                     <AvatarImage src={typedUser?.profileImageUrl} alt={typedUser?.firstName || 'User'} />
-                    <AvatarFallback className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-sm">
                       {typedUser?.firstName?.[0] || typedUser?.email?.[0] || 'U'}
                     </AvatarFallback>
                   </Avatar>
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
+              <DropdownMenuContent className="w-56 p-2 shadow-xl border-gray-200 dark:border-gray-700" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal px-2 py-3">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
+                    <p className="text-sm font-semibold leading-none text-gray-900 dark:text-gray-100">
                       {typedUser?.firstName && typedUser?.lastName
                         ? `${typedUser.firstName} ${typedUser.lastName}`
                         : 'User'}
                     </p>
-                    <p className="text-xs leading-none text-muted-foreground">
+                    <p className="text-xs leading-none text-gray-500 dark:text-gray-400">
                       {typedUser?.email || 'No email'}
                     </p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
+                <DropdownMenuSeparator className="my-1" />
+                <DropdownMenuItem asChild className="cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
                   <Link href="/profile">
-                    <span className="flex items-center cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                    <span className="flex items-center px-2 py-2 w-full">
+                      <User className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <span className="text-sm">Profile</span>
                     </span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
                   <Link href="/settings">
-                    <span className="flex items-center cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                    <span className="flex items-center px-2 py-2 w-full">
+                      <Settings className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <span className="text-sm">Settings</span>
                     </span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <a href="/api/logout" className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                <DropdownMenuSeparator className="my-1" />
+                <DropdownMenuItem asChild className="cursor-pointer rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                  <a href="/api/logout" className="w-full">
+                    <span className="flex items-center px-2 py-2 text-red-600 dark:text-red-400">
+                      <LogOut className="mr-3 h-4 w-4" />
+                      <span className="text-sm font-medium">Log out</span>
+                    </span>
                   </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>

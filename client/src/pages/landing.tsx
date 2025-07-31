@@ -293,7 +293,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
       {/* What Makes Us Unique Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-4xl mx-auto text-center">
@@ -347,7 +346,6 @@ export default function Landing() {
           </p>
         </div>
       </section>
-
       {/* Use Cases Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -664,9 +662,7 @@ export default function Landing() {
             Join 500+ Coaches Who
             <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Win More Games</span>
           </h2>
-          <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Your competition is already using AI. Don't get left behind with outdated film sessions.
-          </p>
+          <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto"> Don't get left behind with outdated film sessions.</p>
           
           <div className="flex flex-col items-center gap-6 mb-8">
             <Button 

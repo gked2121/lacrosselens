@@ -29,6 +29,7 @@ export default function PersonalHighlightEvaluations({
   playerName = "Target Player"
 }: PersonalHighlightEvaluationsProps) {
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
+  const [isOtherPlayersExpanded, setIsOtherPlayersExpanded] = useState(false);
   
   const togglePlayer = (playerKey: string) => {
     const newExpanded = new Set(expandedPlayers);
@@ -134,11 +135,11 @@ export default function PersonalHighlightEvaluations({
   });
   
   const renderEvaluationCard = (evaluation: PlayerEvaluation, index: number) => (
-    <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
-      <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-            <Badge variant="outline" className="text-xs">
+    <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all border-l-4 border-l-blue-400">
+      <CardHeader className="pb-3 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs font-medium">
               Clip {index + 1}
             </Badge>
             {evaluation.timestamp && (
@@ -147,49 +148,80 @@ export default function PersonalHighlightEvaluations({
               </Badge>
             )}
           </div>
-          <Badge variant="outline" className="text-xs self-start sm:self-auto">
+          <Badge 
+            variant="outline" 
+            className={`text-xs ${
+              evaluation.confidence >= 80 ? 'border-green-300 text-green-700 bg-green-50' :
+              evaluation.confidence >= 60 ? 'border-yellow-300 text-yellow-700 bg-yellow-50' :
+              'border-red-300 text-red-700 bg-red-50'
+            }`}
+          >
             {evaluation.confidence}% confidence
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="p-3 sm:p-6 pt-0">
-        <div className="space-y-3 sm:space-y-4">
+      <CardContent className="p-4 pt-0">
+        <div className="space-y-3">
           {(() => {
             const positionMatch = evaluation.content.match(/(?:plays?\s+)?(?:as\s+)?(?:a\s+)?(\b(?:attack|attackman|midfield|midfielder|defense|defenseman|goalie|goalkeeper|FOGO|face-?off\s+specialist|LSM|long\s+stick\s+middie)\b)/i);
             const position = positionMatch ? positionMatch[1] : null;
             
+            // Parse content into structured sections
+            const sections = evaluation.content.split('\n\n');
+            const structuredSections: { type: string; label?: string; content: string }[] = [];
+            
+            sections.forEach(section => {
+              if (section.includes('BIOMECHANICS:') || 
+                  section.includes('DECISION MAKING:') || 
+                  section.includes('IMPROVEMENT:') ||
+                  section.includes('TECHNIQUE:') ||
+                  section.includes('TACTICAL:')) {
+                const [label, ...content] = section.split(':');
+                structuredSections.push({
+                  type: 'structured',
+                  label: label.trim(),
+                  content: content.join(':').trim()
+                });
+              } else if (section.trim()) {
+                structuredSections.push({
+                  type: 'general',
+                  content: section.trim()
+                });
+              }
+            });
+            
             return (
               <>
                 {position && (
-                  <div className="mb-2 sm:mb-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                    <span className="text-xs sm:text-sm font-medium text-muted-foreground">Position:</span>
-                    <Badge variant="secondary" className="text-xs self-start">
-                      {position.charAt(0).toUpperCase() + position.slice(1)}
-                    </Badge>
+                  <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Position:</span>
+                      <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                        {position.charAt(0).toUpperCase() + position.slice(1)}
+                      </Badge>
+                    </div>
                   </div>
                 )}
-                {evaluation.content.split('\n\n').map((section, idx) => {
-                  if (section.includes('BIOMECHANICS:') || 
-                      section.includes('DECISION MAKING:') || 
-                      section.includes('IMPROVEMENT:') ||
-                      section.includes('TECHNIQUE:') ||
-                      section.includes('TACTICAL:')) {
-                    const [label, ...content] = section.split(':');
+                
+                {structuredSections.map((section, idx) => {
+                  if (section.type === 'structured') {
                     return (
-                      <div key={idx} className="space-y-1 sm:space-y-2">
-                        <h4 className="font-semibold text-xs sm:text-sm text-primary uppercase tracking-wide">
-                          {label.trim()}
+                      <div key={idx} className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-3 border-l-2 border-l-blue-300">
+                        <h4 className="font-semibold text-sm text-blue-700 dark:text-blue-300 uppercase tracking-wide mb-2">
+                          {section.label}
                         </h4>
-                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed pl-2 sm:pl-4">
-                          {content.join(':').trim()}
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {section.content}
                         </p>
                       </div>
                     );
                   }
                   return (
-                    <p key={idx} className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-                      {section}
-                    </p>
+                    <div key={idx} className="p-3 bg-white dark:bg-gray-800/50 rounded-md border border-gray-200 dark:border-gray-700">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {section.content}
+                      </p>
+                    </div>
                   );
                 })}
               </>
@@ -298,11 +330,14 @@ export default function PersonalHighlightEvaluations({
         </div>
       )}
       
-      {/* Other Players Section */}
+      {/* Other Players Section - Collapsible, starts collapsed */}
       {otherPlayerEvals.size > 0 && (
         <div className="bg-gray-50/30 dark:bg-gray-900/10 p-6 rounded-2xl border border-gray-300">
           <Card className="border-2 border-gray-400 bg-white dark:bg-gray-900/40 mb-6 shadow-lg">
-            <CardHeader className="pb-4 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-t-xl">
+            <CardHeader 
+              className="pb-4 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-t-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors"
+              onClick={() => setIsOtherPlayersExpanded(!isOtherPlayersExpanded)}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-500 rounded-full shadow-md flex items-center justify-center">
@@ -310,33 +345,87 @@ export default function PersonalHighlightEvaluations({
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold">Other Players</h3>
-                    <p className="text-sm text-muted-foreground">Additional players in highlights</p>
+                    <p className="text-sm text-muted-foreground">Additional players in highlights • Click to expand</p>
                   </div>
                 </div>
-                <Badge variant="secondary" className="text-sm px-3 py-1">
-                  {otherPlayerEvals.size} Players
-                </Badge>
+                <div className="flex items-center gap-3">
+                  <Badge variant="secondary" className="text-sm px-3 py-1">
+                    {otherPlayerEvals.size} Players
+                  </Badge>
+                  {isOtherPlayersExpanded ? (
+                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  )}
+                </div>
               </div>
             </CardHeader>
           </Card>
           
-          <div className="space-y-6">
-            {Array.from(otherPlayerEvals.entries()).map(([number, evals]) => (
-              <div key={number} className="pl-6 border-l-4 border-gray-400">
-                <h4 className="text-lg font-semibold mb-3">Player #{number}</h4>
-                <div className="space-y-3">
-                  {evals.slice(0, 2).map((evaluation, index) => 
-                    renderEvaluationCard(evaluation, index)
-                  )}
-                  {evals.length > 2 && (
-                    <p className="text-sm text-muted-foreground text-center">
-                      +{evals.length - 2} more clips
-                    </p>
+          {isOtherPlayersExpanded && (
+            <div className="space-y-6 animate-in slide-in-from-top-2 duration-200">
+              {Array.from(otherPlayerEvals.entries()).map(([number, evals]) => (
+                <div key={number} className="pl-6 border-l-4 border-gray-400">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-lg font-semibold">Player #{number}</h4>
+                    <Badge variant="outline" className="text-xs">
+                      {evals.length} clip{evals.length !== 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {evals.slice(0, 3).map((evaluation, index) => 
+                      renderEvaluationCard(evaluation, index)
+                    )}
+                    {evals.length > 3 && (
+                      <Card className="border-dashed border-2 border-gray-300 bg-gray-50/50 dark:bg-gray-900/50">
+                        <CardContent className="p-4 text-center">
+                          <p className="text-sm text-muted-foreground">
+                            +{evals.length - 3} more clip{evals.length - 3 !== 1 ? 's' : ''} for this player
+                          </p>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => togglePlayer(`other-${number}`)}
+                            className="h-8 mt-2"
+                          >
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            {expandedPlayers.has(`other-${number}`) ? 'Hide' : 'View'} All Clips
+                            {expandedPlayers.has(`other-${number}`) ? (
+                              <ChevronUp className="w-4 h-4 ml-2" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 ml-2" />
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                  
+                  {expandedPlayers.has(`other-${number}`) && evals.length > 3 && (
+                    <div className="mt-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                      {evals.slice(3).map((evaluation, index) => 
+                        renderEvaluationCard(evaluation, index + 3)
+                      )}
+                    </div>
                   )}
                 </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Collapsed preview when not expanded */}
+          {!isOtherPlayersExpanded && (
+            <div className="pl-6 border-l-4 border-gray-400">
+              <div className="bg-gray-50/50 dark:bg-gray-900/50 rounded-lg p-4 text-center">
+                <p className="text-sm text-muted-foreground mb-2">
+                  Analysis includes feedback on {otherPlayerEvals.size} other player{otherPlayerEvals.size !== 1 ? 's' : ''}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Click header above to view detailed feedback
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>

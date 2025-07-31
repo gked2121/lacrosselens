@@ -62,9 +62,7 @@ export default function Landing() {
           </div>
           
           <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black mb-8 leading-[0.85] tracking-tight">
-            <span className="block bg-gradient-to-b from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent pb-2 text-[60px]">
-              AI That Understands
-            </span>
+            <span className="block bg-gradient-to-b from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent pb-2 text-[60px]">AI That Understands Lacrosse</span>
             <span className="block mt-4 from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-x bg-300% text-[60px]">
               Lacrosse Like You Do
             </span>

@@ -194,39 +194,39 @@ export default function AnalysisDetail() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <Link href="/videos">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+              <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
             </Link>
             <Badge 
               variant={(video as any).status === 'completed' ? 'default' : 'secondary'}
-              className="gradient-primary text-primary-foreground border-0"
+              className="gradient-primary text-primary-foreground border-0 text-xs sm:text-sm"
             >
               {(video as any).status === 'completed' ? 'Analysis Complete' : 'Processing'}
             </Badge>
           </div>
           
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
+          <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-tight">
                 {(video as any).title}
               </h1>
               {(video as any).description && (
-                <p className="text-muted-foreground mt-1">
+                <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2 line-clamp-2 sm:line-clamp-none">
                   {(video as any).description}
                 </p>
               )}
               {/* Special notice for highlight tapes */}
               {(video as any).title && ((video as any).title.toLowerCase().includes('highlight') || 
                 (video as any).metadata?.videoType === 'highlight_tape') && playerEvaluations.length > 1 && (
-                <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                  <p className="text-sm text-amber-800 dark:text-amber-200 flex items-start gap-2">
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                  <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span>
                       <strong>Player Highlight Analysis:</strong> This analysis evaluates all players visible in {(video as any).title.split(' ')[0]}'s highlights, 
@@ -236,18 +236,19 @@ export default function AnalysisDetail() {
                 </div>
               )}
             </div>
-            <div className="flex gap-3">
-              <Button className="btn-secondary">
-                <Download className="w-4 h-4 mr-2" />
-                Export Report
+            <div className="flex gap-2 sm:gap-3 flex-wrap">
+              <Button className="btn-secondary text-xs sm:text-sm px-2 sm:px-4">
+                <Download className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Export Report</span>
               </Button>
               {(video as any).youtubeUrl && (
                 <Button 
-                  className="btn-primary"
+                  className="btn-primary text-xs sm:text-sm px-2 sm:px-4"
                   onClick={() => window.open((video as any).youtubeUrl, '_blank')}
                 >
-                  <Play className="w-4 h-4 mr-2" />
-                  Watch on YouTube
+                  <Play className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Watch on YouTube</span>
+                  <span className="sm:hidden">Watch</span>
                 </Button>
               )}
             </div>
@@ -256,7 +257,7 @@ export default function AnalysisDetail() {
 
         {/* Video Preview */}
         {(video as any).thumbnailUrl && (
-          <Card className="mb-6 overflow-hidden shadow-soft">
+          <Card className="mb-4 sm:mb-6 overflow-hidden shadow-soft">
             <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900">
               <img 
                 src={(video as any).thumbnailUrl} 
@@ -266,12 +267,12 @@ export default function AnalysisDetail() {
               {(video as any).youtubeUrl && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Button 
-                    size="lg"
-                    className="glass text-white border-white/20 hover:bg-white/20"
+                    size="sm"
+                    className="glass text-white border-white/20 hover:bg-white/20 text-xs sm:text-sm sm:size-lg px-3 sm:px-6 py-2 sm:py-3"
                     onClick={() => window.open((video as any).youtubeUrl, '_blank')}
                   >
-                    <Play className="w-6 h-6 mr-2" />
-                    Play Video
+                    <Play className="w-4 h-4 sm:w-6 sm:h-6 sm:mr-2" />
+                    <span className="hidden sm:inline">Play Video</span>
                   </Button>
                 </div>
               )}
@@ -281,25 +282,25 @@ export default function AnalysisDetail() {
 
         {/* Analysis Content */}
         {(video as any).status === 'completed' ? (
-          <div className="space-y-6">
+          <div className="space-y-3 sm:space-y-6">
             {/* Overall Analysis - Always Visible */}
             {overallAnalysis && (
               <Card className="shadow-soft">
-                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg" onClick={() => toggleSection('overview')}>
-                  <CardTitle className="flex items-center justify-between">
+                <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg p-3 sm:p-6" onClick={() => toggleSection('overview')}>
+                  <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                     <div className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-primary" />
+                      <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                       Overall Analysis
                     </div>
                     {expandedSections.has('overview') ? (
-                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                      <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-muted-foreground" />
                     )}
                   </CardTitle>
                 </CardHeader>
                 {expandedSections.has('overview') && (
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6">
                     {/* Parse and format the overall analysis content */}
                     {overallAnalysis.content.split('\n\n').map((section: string, idx: number) => {
                       const [title, ...contentLines] = section.split('\n');
@@ -307,26 +308,26 @@ export default function AnalysisDetail() {
                         <div key={idx} className="space-y-2">
                           {title && title.includes(':') ? (
                             <>
-                              <h3 className="font-semibold text-foreground">
+                              <h3 className="font-semibold text-foreground text-sm sm:text-base">
                                 {title.replace(':', '')}
                               </h3>
-                              <div className="pl-4 space-y-1">
+                              <div className="pl-2 sm:pl-4 space-y-1">
                                 {contentLines.map((line: string, lineIdx: number) => (
-                                  <p key={lineIdx} className="text-muted-foreground">
+                                  <p key={lineIdx} className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                                     {line}
                                   </p>
                                 ))}
                               </div>
                             </>
                           ) : (
-                            <p className="text-muted-foreground">
+                            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                               {section}
                             </p>
                           )}
                         </div>
                       );
                     })}
-                    <div className="mt-6 pt-4 border-t flex items-center gap-4">
+                    <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t flex flex-wrap items-center gap-2 sm:gap-4">
                       <Badge variant="outline" className="text-xs">
                         Confidence: {overallAnalysis.confidence}%
                       </Badge>
@@ -346,43 +347,43 @@ export default function AnalysisDetail() {
               return (
                 <Card key={section.id} className="shadow-soft overflow-hidden">
                   <CardHeader 
-                    className={`cursor-pointer hover:bg-muted/50 transition-colors ${section.bgColor} ${section.borderColor} border-b`}
+                    className={`cursor-pointer hover:bg-muted/50 transition-colors ${section.bgColor} ${section.borderColor} border-b p-3 sm:p-6`}
                     onClick={() => toggleSection(section.id)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${section.bgColor} ${section.borderColor} border`}>
-                          <section.icon className={`w-5 h-5 ${section.color}`} />
+                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                        <div className={`p-1.5 sm:p-2 rounded-lg ${section.bgColor} ${section.borderColor} border flex-shrink-0`}>
+                          <section.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${section.color}`} />
                         </div>
-                        <div>
-                          <CardTitle className="text-lg">{section.title}</CardTitle>
-                          <p className="text-sm text-muted-foreground mt-1">
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-sm sm:text-lg leading-tight">{section.title}</CardTitle>
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                             {section.count} {section.count === 1 ? 'analysis' : 'analyses'} available
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <Badge variant="secondary" className="text-lg font-bold">
+                      <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                        <Badge variant="secondary" className="text-sm sm:text-lg font-bold px-2 sm:px-3">
                           {section.count}
                         </Badge>
                         {expandedSections.has(section.id) ? (
-                          <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                          <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                          <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                         )}
                       </div>
                     </div>
                   </CardHeader>
                   
                   {expandedSections.has(section.id) && (
-                    <CardContent className="p-6">
+                    <CardContent className="p-3 sm:p-6">
                       {/* Player Evaluations */}
                       {section.id === 'players' && (
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {/* Additional context for highlight tapes */}
                           {(video as any).title?.toLowerCase().includes('highlight') && (
-                            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
-                              <p className="text-sm text-blue-800 dark:text-blue-200">
+                            <div className="p-3 sm:p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+                              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
                                 <strong>Note:</strong> This analysis includes all players visible throughout {(video as any).title.split(' ')[0]}'s highlight reel - 
                                 teammates, opponents, and other players who appear in the footage. Each player is evaluated based on their performance 
                                 in the clips where they appear.
@@ -398,16 +399,16 @@ export default function AnalysisDetail() {
                       
                       {/* Face-off Analysis */}
                       {section.id === 'faceoffs' && (
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {faceOffAnalyses.map((faceoff: any, index: number) => (
                             <Card key={faceoff.id} className="shadow-sm hover:shadow-md transition-all">
-                              <CardHeader>
-                                <CardTitle className="text-base flex items-center justify-between">
+                              <CardHeader className="p-3 sm:p-6">
+                                <CardTitle className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                   <span>Face-off #{index + 1}</span>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                                     {faceoff.metadata?.winProbability && (
                                       <Badge 
-                                        className={`${
+                                        className={`text-xs ${
                                           faceoff.metadata.winProbability >= 70 
                                             ? 'bg-green-500/10 text-green-600 border-green-500/20' 
                                             : faceoff.metadata.winProbability >= 50
@@ -426,11 +427,11 @@ export default function AnalysisDetail() {
                                   </div>
                                 </CardTitle>
                               </CardHeader>
-                              <CardContent>
-                                <p className="text-muted-foreground whitespace-pre-wrap">
+                              <CardContent className="p-3 sm:p-6 pt-0">
+                                <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base leading-relaxed">
                                   {faceoff.content}
                                 </p>
-                                <div className="mt-4 pt-4 border-t">
+                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
                                   <Badge variant="outline" className="text-xs">
                                     Confidence: {faceoff.confidence}%
                                   </Badge>
@@ -443,16 +444,16 @@ export default function AnalysisDetail() {
                       
                       {/* Transition Analysis */}
                       {section.id === 'transitions' && (
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {transitionAnalyses.map((transition: any, index: number) => (
                             <Card key={transition.id} className="shadow-sm hover:shadow-md transition-all">
-                              <CardHeader>
-                                <CardTitle className="text-base flex items-center justify-between">
+                              <CardHeader className="p-3 sm:p-6">
+                                <CardTitle className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                   <span>Transition #{index + 1}</span>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                                     {transition.metadata?.successProbability && (
                                       <Badge 
-                                        className={`${
+                                        className={`text-xs ${
                                           transition.metadata.successProbability >= 70 
                                             ? 'bg-green-500/10 text-green-600 border-green-500/20' 
                                             : transition.metadata.successProbability >= 50
@@ -471,11 +472,11 @@ export default function AnalysisDetail() {
                                   </div>
                                 </CardTitle>
                               </CardHeader>
-                              <CardContent>
-                                <p className="text-muted-foreground whitespace-pre-wrap">
+                              <CardContent className="p-3 sm:p-6 pt-0">
+                                <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base leading-relaxed">
                                   {transition.content}
                                 </p>
-                                <div className="mt-4 pt-4 border-t">
+                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
                                   <Badge variant="outline" className="text-xs">
                                     Confidence: {transition.confidence}%
                                   </Badge>
@@ -488,24 +489,24 @@ export default function AnalysisDetail() {
                       
                       {/* Key Moments */}
                       {section.id === 'moments' && (
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {keyMoments.map((moment: any, index: number) => (
                             <Card key={moment.id} className="shadow-sm hover:shadow-md transition-all">
-                              <CardHeader>
-                                <CardTitle className="text-base flex items-center justify-between">
-                                  <span>{moment.title || `Moment #${index + 1}`}</span>
+                              <CardHeader className="p-3 sm:p-6">
+                                <CardTitle className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                  <span className="line-clamp-2 sm:line-clamp-none">{moment.title || `Moment #${index + 1}`}</span>
                                   {moment.timestamp && (
-                                    <Badge variant="secondary" className="text-xs">
+                                    <Badge variant="secondary" className="text-xs flex-shrink-0">
                                       {formatTimestamp(moment.timestamp)}
                                     </Badge>
                                   )}
                                 </CardTitle>
                               </CardHeader>
-                              <CardContent>
-                                <p className="text-muted-foreground whitespace-pre-wrap">
+                              <CardContent className="p-3 sm:p-6 pt-0">
+                                <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base leading-relaxed">
                                   {moment.content}
                                 </p>
-                                <div className="mt-4 pt-4 border-t flex items-center gap-2">
+                                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t flex flex-wrap items-center gap-2">
                                   <Badge variant="outline" className="text-xs">
                                     Confidence: {moment.confidence}%
                                   </Badge>

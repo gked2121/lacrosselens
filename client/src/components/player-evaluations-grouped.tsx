@@ -101,36 +101,36 @@ export default function PlayerEvaluationsGrouped({
     badgeColor: string,
     isDarkTeam: boolean = false
   ) => (
-    <div className={`mt-6 p-6 rounded-2xl ${bgColor} border ${borderColor}`}>
-      <Card className={`border-2 ${borderColor} ${isDarkTeam ? 'bg-gray-800/30 dark:bg-gray-900' : 'bg-white dark:bg-gray-900/40'} mb-6 shadow-lg`}>
-        <CardHeader className={`pb-4 ${isDarkTeam ? 'bg-gray-800/50 dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-800/50'} rounded-t-xl`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 ${badgeColor} border-3 border-gray-500 rounded-full shadow-md`}></div>
-              <div>
-                <span className={`text-2xl font-bold ${isDarkTeam ? 'text-white dark:text-gray-100' : ''}`}>{teamName}</span>
-                <p className={`text-sm ${isDarkTeam ? 'text-gray-300 dark:text-gray-400' : 'text-muted-foreground'}`}>{teamDescription}</p>
+    <div className={`mt-3 sm:mt-6 p-3 sm:p-6 rounded-2xl ${bgColor} border ${borderColor}`}>
+      <Card className={`border-2 ${borderColor} ${isDarkTeam ? 'bg-gray-800/30 dark:bg-gray-900' : 'bg-white dark:bg-gray-900/40'} mb-3 sm:mb-6 shadow-lg`}>
+        <CardHeader className={`pb-3 sm:pb-4 p-3 sm:p-6 ${isDarkTeam ? 'bg-gray-800/50 dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-800/50'} rounded-t-xl`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 ${badgeColor} border-3 border-gray-500 rounded-full shadow-md flex-shrink-0`}></div>
+              <div className="min-w-0">
+                <span className={`text-lg sm:text-2xl font-bold ${isDarkTeam ? 'text-white dark:text-gray-100' : ''}`}>{teamName}</span>
+                <p className={`text-xs sm:text-sm ${isDarkTeam ? 'text-gray-300 dark:text-gray-400' : 'text-muted-foreground'}`}>{teamDescription}</p>
               </div>
             </div>
-            <Badge variant="secondary" className="text-sm px-3 py-1">
+            <Badge variant="secondary" className="text-xs sm:text-sm px-2 sm:px-3 py-1 self-start sm:self-auto">
               {players.size} Players Analyzed
             </Badge>
           </div>
         </CardHeader>
       </Card>
       
-      <div className={`pl-6 border-l-4 ${borderColor} space-y-6`}>
+      <div className={`pl-3 sm:pl-6 border-l-4 ${borderColor} space-y-3 sm:space-y-6`}>
         {Array.from(players.entries()).map(([playerKey, playerEvals]) => (
-          <div key={playerKey} className="space-y-3">
+          <div key={playerKey} className="space-y-2 sm:space-y-3">
             {/* Player Header */}
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                <span className="text-lg font-bold">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                <span className="text-base sm:text-lg font-bold line-clamp-1">
                   {playerEvals[0].metadata?.playerNumber ? `Player #${playerEvals[0].metadata.playerNumber}` : playerKey}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-6 sm:ml-0">
                 <Badge variant="secondary" className="text-xs">
                   {playerEvals.length} {playerEvals.length === 1 ? 'clip' : 'clips'}
                 </Badge>
@@ -138,10 +138,11 @@ export default function PlayerEvaluationsGrouped({
                   variant="ghost"
                   size="sm"
                   onClick={() => togglePlayer(playerKey)}
-                  className="h-7 px-2"
+                  className="h-6 sm:h-7 px-2 text-xs sm:text-sm"
                 >
                   <BarChart3 className="w-3 h-3 mr-1" />
-                  {expandedPlayers.has(playerKey) ? 'Hide' : 'View'} Stats
+                  <span className="hidden sm:inline">{expandedPlayers.has(playerKey) ? 'Hide' : 'View'} Stats</span>
+                  <span className="sm:hidden">{expandedPlayers.has(playerKey) ? 'Hide' : 'Stats'}</span>
                   {expandedPlayers.has(playerKey) ? (
                     <ChevronUp className="w-3 h-3 ml-1" />
                   ) : (
@@ -153,7 +154,7 @@ export default function PlayerEvaluationsGrouped({
             
             {/* Show stat sheet if expanded */}
             {expandedPlayers.has(playerKey) ? (
-              <div className="ml-7 mt-4">
+              <div className="ml-3 sm:ml-7 mt-3 sm:mt-4">
                 <PlayerStatSheet 
                   playerKey={playerKey}
                   evaluations={playerEvals}
@@ -162,12 +163,12 @@ export default function PlayerEvaluationsGrouped({
               </div>
             ) : (
               /* Show preview of clips */
-              <div className="space-y-3 ml-7">
+              <div className="space-y-2 sm:space-y-3 ml-3 sm:ml-7">
                 {playerEvals.slice(0, 2).map((evaluation, index) => (
                   <Card key={evaluation.id} className="shadow-soft hover:shadow-glow transition-all">
-                    <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                    <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                         <Badge variant="outline" className="text-xs">
                           Clip {index + 1}
                         </Badge>
@@ -177,13 +178,13 @@ export default function PlayerEvaluationsGrouped({
                           </Badge>
                         )}
                       </div>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs self-start sm:self-auto">
                         {evaluation.confidence}% confidence
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="p-3 sm:p-6 pt-0">
+                    <div className="space-y-3 sm:space-y-4">
                       {(() => {
                         const positionMatch = evaluation.content.match(/(?:plays?\s+)?(?:as\s+)?(?:a\s+)?(\b(?:attack|attackman|midfield|midfielder|defense|defenseman|goalie|goalkeeper|FOGO|face-?off\s+specialist|LSM|long\s+stick\s+middie)\b)/i);
                         const position = positionMatch ? positionMatch[1] : null;
@@ -191,9 +192,9 @@ export default function PlayerEvaluationsGrouped({
                         return (
                           <>
                             {position && (
-                              <div className="mb-3 flex items-center gap-2">
-                                <span className="text-sm font-medium text-muted-foreground">Position:</span>
-                                <Badge variant="secondary" className="text-xs">
+                              <div className="mb-2 sm:mb-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                <span className="text-xs sm:text-sm font-medium text-muted-foreground">Position:</span>
+                                <Badge variant="secondary" className="text-xs self-start">
                                   {position.charAt(0).toUpperCase() + position.slice(1)}
                                 </Badge>
                               </div>
@@ -206,18 +207,18 @@ export default function PlayerEvaluationsGrouped({
                                   section.includes('TACTICAL:')) {
                                 const [label, ...content] = section.split(':');
                                 return (
-                                  <div key={idx} className="space-y-2">
-                                    <h4 className="font-semibold text-sm text-primary uppercase tracking-wide">
+                                  <div key={idx} className="space-y-1 sm:space-y-2">
+                                    <h4 className="font-semibold text-xs sm:text-sm text-primary uppercase tracking-wide">
                                       {label.trim()}
                                     </h4>
-                                    <p className="text-muted-foreground pl-4">
+                                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed pl-2 sm:pl-4">
                                       {content.join(':').trim()}
                                     </p>
                                   </div>
                                 );
                               }
                               return (
-                                <p key={idx} className="text-muted-foreground">
+                                <p key={idx} className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                                   {section}
                                 </p>
                               );
@@ -230,7 +231,7 @@ export default function PlayerEvaluationsGrouped({
                 </Card>
               ))}
               {playerEvals.length > 2 && !expandedPlayers.has(playerKey) && (
-                <p className="text-sm text-muted-foreground text-center mt-2">
+                <p className="text-xs sm:text-sm text-muted-foreground text-center mt-2 ml-3 sm:ml-7">
                   +{playerEvals.length - 2} more clips
                 </p>
               )}

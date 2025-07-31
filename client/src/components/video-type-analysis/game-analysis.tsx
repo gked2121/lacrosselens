@@ -154,52 +154,52 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 w-full max-w-none">
       {/* Game Overview Metrics */}
-      <Card className="border-emerald-200 dark:border-emerald-800 shadow-lg">
-        <CardHeader className="bg-emerald-50 dark:bg-emerald-950/20 border-b border-emerald-200 dark:border-emerald-800">
+      <Card className="border-emerald-200 dark:border-emerald-800 shadow-md">
+        <CardHeader className="bg-emerald-50 dark:bg-emerald-950/20 border-b border-emerald-200 dark:border-emerald-800 py-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500 rounded-lg">
-              <BarChart3 className="w-6 h-6 text-white" />
+              <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <CardTitle className="text-xl">Game Overview & Performance Metrics</CardTitle>
+            <CardTitle className="text-lg">Game Overview & Performance Metrics</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Players Tracked</span>
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Players Tracked</span>
               </div>
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{gameMetrics.totalPlayers}</p>
+              <p className="text-xl font-bold text-blue-900 dark:text-blue-100">{gameMetrics.totalPlayers}</p>
               <p className="text-xs text-blue-600 dark:text-blue-400">{gameMetrics.avgPlayerConfidence}% avg confidence</p>
             </div>
             
-            <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Face-offs</span>
+            <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield className="w-4 h-4 text-purple-600" />
+                <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Face-offs</span>
               </div>
-              <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{gameMetrics.totalFaceoffs}</p>
+              <p className="text-xl font-bold text-purple-900 dark:text-purple-100">{gameMetrics.totalFaceoffs}</p>
               <p className="text-xs text-purple-600 dark:text-purple-400">{gameMetrics.faceoffWinRate}% success rate</p>
             </div>
             
-            <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">Transitions</span>
+            <div className="bg-green-50 dark:bg-green-950/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="w-4 h-4 text-green-600" />
+                <span className="text-xs font-medium text-green-700 dark:text-green-300">Transitions</span>
               </div>
-              <p className="text-2xl font-bold text-green-900 dark:text-green-100">{gameMetrics.totalTransitions}</p>
+              <p className="text-xl font-bold text-green-900 dark:text-green-100">{gameMetrics.totalTransitions}</p>
               <p className="text-xs text-green-600 dark:text-green-400">{gameMetrics.transitionSuccessRate}% effective</p>
             </div>
             
-            <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-orange-600" />
-                <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Elite Moments</span>
+            <div className="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-4 h-4 text-orange-600" />
+                <span className="text-xs font-medium text-orange-700 dark:text-orange-300">Elite Moments</span>
               </div>
-              <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{gameMetrics.eliteMoments}</p>
+              <p className="text-xl font-bold text-orange-900 dark:text-orange-100">{gameMetrics.eliteMoments}</p>
               <p className="text-xs text-orange-600 dark:text-orange-400">{gameMetrics.gameIntensity} intensity</p>
             </div>
           </div>
@@ -253,15 +253,15 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
 
 
       {/* Analysis Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
         {analysisSections.map((section) => {
           if (section.count === 0) return null;
           return (
             <Card key={section.id} className={`${section.bgColor} ${section.borderColor} border cursor-pointer hover:shadow-md transition-all`}
               onClick={() => toggleSection(section.id)}>
-              <CardContent className="p-4 text-center">
-                <section.icon className={`w-8 h-8 ${section.color} mx-auto mb-2`} />
-                <p className="text-2xl font-bold">{section.count}</p>
+              <CardContent className="p-3 text-center">
+                <section.icon className={`w-6 h-6 ${section.color} mx-auto mb-1`} />
+                <p className="text-xl font-bold">{section.count}</p>
                 <p className="text-xs text-muted-foreground">{section.title.replace(' Analysis', '')}</p>
               </CardContent>
             </Card>
@@ -274,38 +274,38 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
         if (section.count === 0) return null;
         
         return (
-          <Card key={section.id} className="shadow-soft overflow-hidden">
+          <Card key={section.id} className="shadow-sm overflow-hidden">
             <CardHeader 
-              className={`cursor-pointer hover:bg-muted/50 transition-colors ${section.bgColor} ${section.borderColor} border-b p-3 sm:p-6`}
+              className={`cursor-pointer hover:bg-muted/50 transition-colors ${section.bgColor} ${section.borderColor} border-b p-3`}
               onClick={() => toggleSection(section.id)}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                  <div className={`p-1.5 sm:p-2 rounded-lg ${section.bgColor} ${section.borderColor} border flex-shrink-0`}>
-                    <section.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${section.color}`} />
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <div className={`p-1.5 rounded-lg ${section.bgColor} ${section.borderColor} border flex-shrink-0`}>
+                    <section.icon className={`w-4 h-4 ${section.color}`} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <CardTitle className="text-sm sm:text-lg leading-tight">{section.title}</CardTitle>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                      {section.count} {section.count === 1 ? 'analysis' : 'analyses'} available
+                    <CardTitle className="text-base leading-tight">{section.title}</CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      {section.count} {section.count === 1 ? 'item' : 'items'}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-                  <Badge variant="secondary" className="text-sm sm:text-lg font-bold px-2 sm:px-3">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Badge variant="secondary" className="text-sm font-bold px-2">
                     {section.count}
                   </Badge>
                   {expandedSections.has(section.id) ? (
-                    <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   )}
                 </div>
               </div>
             </CardHeader>
             
             {expandedSections.has(section.id) && (
-              <CardContent className="p-3 sm:p-6">
+              <CardContent className="p-3">
                 {/* Overall Analysis */}
                 {section.id === 'overall' && overallAnalysis && (
                   <div className="prose prose-sm max-w-none">

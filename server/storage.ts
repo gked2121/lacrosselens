@@ -31,8 +31,10 @@ export interface IStorage {
   // Video operations
   createVideo(video: InsertVideo): Promise<Video>;
   getUserVideos(userId: string): Promise<Video[]>;
+  getAllVideos(): Promise<Video[]>;
   getVideo(id: number): Promise<Video | undefined>;
   updateVideoStatus(id: number, status: string): Promise<Video>;
+  updateVideo(id: number, updates: Partial<Video>): Promise<void>;
   
   // Analysis operations
   createAnalysis(analysis: InsertAnalysis): Promise<Analysis>;
@@ -89,6 +91,10 @@ export class DatabaseStorage implements IStorage {
 
   async getUserVideos(userId: string): Promise<Video[]> {
     return await db.select().from(videos).where(eq(videos.userId, userId)).orderBy(desc(videos.createdAt));
+  }
+
+  async getAllVideos(): Promise<Video[]> {
+    return await db.select().from(videos).orderBy(desc(videos.createdAt));
   }
 
   async getVideo(id: number): Promise<Video | undefined> {

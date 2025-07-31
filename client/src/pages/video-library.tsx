@@ -97,50 +97,85 @@ export default function VideoLibrary() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
-        {/* Page Header */}
-        <div className="page-header">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
+        {/* Enhanced Page Header with Stats */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-1">
-              <h1 className="page-title">Video Library</h1>
-              <p className="page-description">
-                Your AI-powered lacrosse video analysis hub
+              <h1 className="text-3xl font-bold text-gray-900">Video Library</h1>
+              <p className="text-lg text-gray-600">
+                AI-powered lacrosse video analysis hub
               </p>
             </div>
-            <div className="flex gap-3">
-              <Button className="btn-primary" onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Upload Video</span>
-                <span className="sm:hidden">Upload</span>
+            
+            {/* Quick Stats */}
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-600">
+                  {Array.isArray(videos) ? videos.filter((v: any) => v.status === 'completed').length : 0}
+                </p>
+                <p className="text-sm text-gray-600">Analyzed</p>
+              </div>
+              <div className="w-px h-12 bg-gray-200"></div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-amber-600">
+                  {Array.isArray(videos) ? videos.filter((v: any) => v.status === 'processing').length : 0}
+                </p>
+                <p className="text-sm text-gray-600">Processing</p>
+              </div>
+              <div className="w-px h-12 bg-gray-200"></div>
+              <Button 
+                className="btn-primary shadow-md hover:shadow-lg transition-all" 
+                onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Upload Video
               </Button>
             </div>
           </div>
         </div>
 
-          {/* Filters */}
-          <div className="mb-8 flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search videos..." 
-                className="input-modern pl-12"
-              />
+          {/* Enhanced Filters with Better Styling */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Input 
+                  placeholder="Search by title, team, or player..." 
+                  className="pl-12 pr-4 py-2.5 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                />
+              </div>
+              <Select>
+                <SelectTrigger className="w-full sm:w-48 bg-white border-gray-300 hover:bg-gray-50 transition-colors">
+                  <Filter className="w-4 h-4 mr-2 text-gray-600" />
+                  <SelectValue placeholder="All Videos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Videos</SelectItem>
+                  <SelectItem value="completed">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Analyzed
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="processing">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                      Processing
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="failed">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      Failed
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select>
-              <SelectTrigger className="w-full sm:w-48 input-modern">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Videos</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Video Grid */}
@@ -160,10 +195,11 @@ export default function VideoLibrary() {
               ))}
             </div>
           ) : Array.isArray(videos) && videos.length > 0 ? (
-            <div className="grid-responsive">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {(videos as any[]).map((video: any) => (
-                <Card key={video.id} className="card-interactive group overflow-hidden">
-                  <div className="relative aspect-video bg-muted group-hover:scale-[1.02] transition-transform duration-300">
+                <div key={video.id} className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
+                  {/* Enhanced Thumbnail Section */}
+                  <div className="relative aspect-video bg-gray-100">
                     {video.thumbnailUrl ? (
                       <img 
                         src={video.thumbnailUrl} 
@@ -171,129 +207,153 @@ export default function VideoLibrary() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                         <div className="text-center">
-                          <Video className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-xs text-muted-foreground">No preview available</p>
+                          <Video className="w-16 h-16 text-gray-400 mx-auto mb-3" />
+                          <p className="text-sm text-gray-500 font-medium">No preview available</p>
                         </div>
                       </div>
                     )}
                     
-                    {/* Play overlay */}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <Link href={`/analysis/${video.id}`} className="w-full max-w-xs mx-4">
-                        <Button size="lg" className="w-full btn-primary shadow-xl">
-                          <Play className="w-5 h-5 mr-2" />
-                          {video.status === 'completed' ? 'View Analysis' : 'View Details'}
-                        </Button>
+                    {/* Gradient Overlay for Better Text Readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    {/* Enhanced Play Button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Link 
+                        href={`/analysis/${video.id}`} 
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 group-hover:scale-100"
+                      >
+                        <div className="bg-white/95 backdrop-blur-sm rounded-full p-5 shadow-2xl hover:bg-white transition-colors">
+                          <Play className="w-8 h-8 text-blue-600 fill-blue-600" />
+                        </div>
                       </Link>
                     </div>
 
-                    {/* Status badge */}
+                    {/* Enhanced Status Badge */}
                     <div className="absolute top-3 right-3">
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          className={
-                            video.status === 'completed' ? 'status-completed' :
-                            video.status === 'processing' ? 'status-processing' :
-                            video.status === 'failed' ? 'status-failed' :
-                            'status-uploading'
-                          }
-                        >
-                          <div 
-                            className={`w-2 h-2 rounded-full ${getStatusColor(video.status)} ${
-                              video.status === 'processing' ? 'animate-pulse' : ''
-                            }`}
-                          />
-                          {getStatusText(video.status)}
-                        </Badge>
-                        {video.status === 'failed' && (
+                      {video.status === 'completed' && (
+                        <div className="bg-green-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                          Analyzed
+                        </div>
+                      )}
+                      {video.status === 'processing' && (
+                        <div className="bg-amber-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                          Processing
+                        </div>
+                      )}
+                      {video.status === 'failed' && (
+                        <div className="flex items-center gap-2">
+                          <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                            Failed
+                          </div>
                           <Button
                             size="sm"
-                            variant="outline"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               retryVideoMutation.mutate(video.id);
                             }}
                             disabled={retryVideoMutation.isPending}
-                            className="btn-outline h-6 px-2 text-xs"
+                            className="bg-white/90 hover:bg-white text-red-600 border-0 shadow-lg px-3 py-1.5 rounded-full text-sm font-semibold"
                           >
                             {retryVideoMutation.isPending ? (
-                              <RefreshCw className="w-3 h-3 animate-spin" />
+                              <RefreshCw className="w-4 h-4 animate-spin" />
                             ) : (
                               <>
-                                <RefreshCw className="w-3 h-3 mr-1" />
+                                <RefreshCw className="w-4 h-4 mr-1" />
                                 Retry
                               </>
                             )}
                           </Button>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Duration Badge */}
+                    {video.duration && (
+                      <div className="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 rounded text-sm font-medium">
+                        {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
+                      </div>
+                    )}
                   </div>
 
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-xl mb-3 line-clamp-1 transition-colors" style={{ color: 'hsl(var(--foreground))' }}>
+                  {/* Enhanced Content Section */}
+                  <div className="p-5">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                       {video.title}
                     </h3>
                     
                     {video.description && (
-                      <p className="text-base mb-4 line-clamp-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                         {video.description}
                       </p>
                     )}
 
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    {/* Enhanced Metadata */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-3 text-gray-500">
+                        <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {new Date(video.createdAt).toLocaleDateString()}
+                          {new Date(video.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </div>
-                        
-                        {video.duration && (
-                          <div className="flex items-center gap-2 text-sm font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                            <Clock className="w-4 h-4" />
-                            {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
+                        {video.youtubeUrl && (
+                          <div className="flex items-center gap-1 text-red-600">
+                            <Play className="w-4 h-4 fill-current" />
+                            YouTube
                           </div>
                         )}
                       </div>
-
-                      {video.youtubeUrl && (
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-sm px-3 py-1 font-semibold" style={{ backgroundColor: 'hsl(0 84% 95%)', color: 'hsl(0 84% 50%)', borderColor: 'hsl(0 84% 85%)' }}>
-                            <Play className="w-4 h-4 mr-1" />
-                            YouTube
-                          </Badge>
-                        </div>
+                      
+                      {video.status === 'completed' && (
+                        <Link 
+                          href={`/analysis/${video.id}`}
+                          className="text-blue-600 hover:text-blue-700 font-semibold hover:underline"
+                        >
+                          View Analysis →
+                        </Link>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 px-4">
-              <Video className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">No videos yet</h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Upload your first lacrosse video to get started with AI-powered analysis.
-              </p>
-              <Button onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                <Plus className="w-4 h-4 mr-2" />
-                Upload Your First Video
-              </Button>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+              <div className="max-w-md mx-auto">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Video className="w-10 h-10 text-blue-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Start Your Analysis Journey</h3>
+                <p className="text-gray-600 mb-8 text-lg">
+                  Upload your first lacrosse video to unlock AI-powered insights and elevate your game.
+                </p>
+                <Button 
+                  onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="btn-primary shadow-md hover:shadow-lg transition-all text-lg px-8 py-3"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Upload Your First Video
+                </Button>
+              </div>
             </div>
           )}
 
-          {/* Upload Section */}
-          <div id="upload-section" className="mt-8">
-            <div className="bg-accent rounded-2xl p-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-3">Upload Video for Analysis</h2>
-              <p className="text-muted-foreground mb-6 text-lg">
-                Upload or link a lacrosse video for comprehensive AI analysis and coaching insights.
-              </p>
-              <EnhancedVideoUpload />
+          {/* Enhanced Upload Section */}
+          <div id="upload-section" className="mt-12">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-3">Add New Video</h2>
+                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                  Upload game footage or paste a YouTube link to get comprehensive AI analysis with NCAA-level insights.
+                </p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <EnhancedVideoUpload />
+              </div>
             </div>
           </div>
         </main>

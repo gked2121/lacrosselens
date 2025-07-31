@@ -44,7 +44,7 @@ export const upload = multer({
   },
 });
 
-async function processVideoUpload(
+export async function processVideoUpload(
   videoId: number,
   filePath: string,
   title: string,
@@ -304,7 +304,7 @@ async function processVideoUpload(
   }
 }
 
-async function processYouTubeVideo(
+export async function processYouTubeVideo(
   videoId: number,
   youtubeUrl: string,
   title: string,
@@ -480,5 +480,4 @@ async function processYouTubeVideo(
   }
 }
 
-// Export functions at the end
-export { processVideoUpload, processYouTubeVideo };
+

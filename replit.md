@@ -646,6 +646,42 @@ The database schema is well-designed for detailed play tracking:
   - client/src/components/video-upload.tsx
 - **Status**: All buttons now have consistent, modern styling with excellent visual feedback
 
+### 2025-01-31 - Implemented Automatic Video Processing Retry with Enhanced UI
+- **Issue**: User's video uploads were getting stuck in processing status indefinitely
+- **Solution**: Built comprehensive video retry service with automatic timeout detection and modern UI redesign
+- **Video Retry Service Features**:
+  - Created VideoRetryService that monitors all processing videos every 30 seconds
+  - Implements 5-minute timeout detection for stuck videos
+  - Automatically retries stuck videos once with full error handling
+  - Updates video status to 'failed' if retry doesn't succeed
+  - Tracks processing videos to prevent duplicate retries
+  - Integrates seamlessly with existing video processing pipeline
+- **Enhanced Video Library UI**:
+  - Complete redesign with modern card-based layout
+  - Added header with quick stats showing analyzed/processing counts
+  - Redesigned video cards with:
+    - Clean thumbnail display with gradient overlay on hover
+    - Large centered play button that appears on hover
+    - Enhanced status badges with better visibility (colored pills)
+    - One-click retry button for failed videos
+    - Improved metadata display with duration badges
+    - Better typography and spacing
+  - Enhanced filters section with visual status indicators
+  - Improved empty state with call-to-action
+  - Redesigned upload section with gradient background
+- **Technical Implementation**:
+  - VideoRetryService runs on server startup
+  - Exports processVideoUpload and processYouTubeVideo for retry functionality
+  - Fixed TypeScript errors and proper error handling
+  - Maintains modern 2025 mobile-first aesthetic
+- **Files Created/Modified**:
+  - server/services/videoRetryService.ts (new automatic retry service)
+  - client/src/pages/video-library.tsx (complete UI redesign)
+  - server/services/videoProcessor.ts (exported processing functions)
+  - server/storage.ts (added updateVideo method)
+  - server/index.ts (integrated retry service on startup)
+- **Status**: Videos no longer get stuck in processing, automatic retry ensures reliability, and UI provides excellent user experience
+
 ### 2025-01-30 - Expanded Analysis Capabilities with Dedicated Face-off and Transition Pages
 - **Issue**: User needed specialized analysis pages for face-offs and transitions to complement the detailed player evaluations
 - **Changes Made**:

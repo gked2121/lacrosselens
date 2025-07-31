@@ -239,7 +239,7 @@ export class TwoPhaseGeminiAnalyzer {
           responseMimeType: "application/json",
         },
         contents: [
-          { fileData: { fileUri: youtubeUrl } },
+          youtubeUrl,
           PHASE1_EXTRACTION_PROMPT
         ]
       });

@@ -116,7 +116,7 @@ export async function processVideoUpload(
       // Phase 2: Format the data for specific outputs
       console.log(`Starting Phase 2: Formatting analysis for display`);
       const [playerEvaluations, statistics, tactical, highlights] = await Promise.all([
-        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'player_evaluations'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'playerEvaluation'),
         TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'statistics'),
         TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'tactical'),
         TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'highlights')
@@ -323,7 +323,7 @@ export async function processYouTubeVideo(
       // Phase 2: Format the data for specific outputs
       console.log(`Starting Phase 2: Formatting analysis for display`);
       const [playerEvaluations, statistics, tactical, highlights] = await Promise.all([
-        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'player_evaluations'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'playerEvaluation'),
         TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'statistics'),
         TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'tactical'),
         TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'highlights')

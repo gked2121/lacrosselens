@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Play, Target, Users, Zap, BarChart3, Clock, Shield, CheckCircle, Star, TrendingUp, Award, ArrowRight, Video, Sparkles } from "lucide-react";
+import { Play, Target, Users, Zap, BarChart3, Clock, Shield, CheckCircle, Star, TrendingUp, Award, ArrowRight, Video, Sparkles, Brain } from "lucide-react";
 
 export default function Landing() {
   const handleLogin = () => {
@@ -38,153 +38,156 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-1/2 -right-1/2 w-[150%] h-[150%] rounded-full blur-3xl opacity-5" style={{ backgroundColor: 'hsl(259 100% 65%)' }}></div>
-          <div className="absolute -bottom-1/2 -left-1/2 w-[150%] h-[150%] rounded-full blur-3xl opacity-5" style={{ backgroundColor: 'hsl(259 100% 65%)' }}></div>
+      <section className="min-h-[85vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Modern animated background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-transparent to-blue-50 dark:from-purple-950/20 dark:via-transparent dark:to-blue-950/20" />
+          <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-purple-400/30 to-pink-400/30 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-cyan-400/30 rounded-full blur-3xl animate-pulse animation-delay-2000" />
         </div>
         
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-green-500/30 bg-green-500/10 mb-8">
-            <Sparkles className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-medium text-green-600">Limited Time: 30-Day Free Pro Access</span>
+        <div className="max-w-7xl mx-auto text-center relative z-10 pt-20">
+          {/* Animated badge with gradient border */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 mb-10 rounded-full bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-purple-500/10 border border-transparent bg-clip-padding relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-purple-500/20 rounded-full" />
+            <div className="absolute inset-[1px] bg-white dark:bg-gray-950 rounded-full" />
+            <div className="relative flex items-center gap-3">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-r from-purple-500 to-blue-500"></span>
+              </span>
+              <span className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Limited Time: 30-Day Free Pro Access
+              </span>
+            </div>
           </div>
           
-          <h1 className="text-5xl sm:text-7xl font-black mb-6 leading-tight">
-            Turn Game Film Into
-            <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Elite Scouting Reports</span>
+          <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black mb-8 leading-[0.85] tracking-tight">
+            <span className="block bg-gradient-to-b from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent pb-2">
+              AI That Understands
+            </span>
+            <span className="block mt-4 text-[1.1em] bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-x bg-300%">
+              Lacrosse Like You Do
+            </span>
           </h1>
-          <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Elite programs use AI for player development, opponent scouting, and recruiting. Join 500+ coaches who save 
-            <span className="font-semibold"> 15+ hours weekly</span> while winning more games.
+          <p className="text-xl sm:text-2xl lg:text-3xl font-light text-gray-700 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+            Advanced AI analyzes every dodge, check, and clear with the expertise of a D1 coach. 
+            <span className="font-semibold text-gray-900 dark:text-white"> Transform your game</span> with insights that turn 
+            <span className="font-semibold text-gray-900 dark:text-white"> good players into great ones</span>.
           </p>
           
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-10 text-sm">
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span className="font-medium">4.9/5 Coach Rating</span>
+          {/* AI Trust Indicators */}
+          <div className="flex flex-wrap items-center justify-center gap-8 mb-12">
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full shadow-sm">
+              <Brain className="w-5 h-5 text-purple-600" />
+              <span className="font-semibold">AI Trained on 10K+ Games</span>
             </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-500" />
-              <span className="font-medium">68% Win Rate Improvement</span>
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full shadow-sm">
+              <Target className="w-5 h-5 text-blue-600" />
+              <span className="font-semibold">95% Analysis Accuracy</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4" style={{ color: 'hsl(259 100% 65%)' }} />
-              <span className="font-medium">NCAA D1 Trusted</span>
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full shadow-sm">
+              <Users className="w-5 h-5 text-green-600" />
+              <span className="font-semibold">500+ Teams Improved</span>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
             <Button 
               size="lg" 
               onClick={handleLogin} 
-              className="btn-primary text-lg px-10 py-7 shadow-xl hover:shadow-2xl"
+              className="group bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg px-10 py-7 shadow-xl hover:shadow-2xl hover:from-purple-700 hover:to-blue-700 transition-all"
             >
-              <Video className="w-5 h-5 mr-2" />
-              Analyze Your First Video Free
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Brain className="w-5 h-5 mr-2" />
+              Start AI Analysis Free
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              className="btn-outline text-lg px-8 py-7"
+              className="text-lg px-8 py-7 border-2 hover:bg-gray-50 dark:hover:bg-gray-900"
             >
               <Play className="w-5 h-5 mr-2" />
-              See 2-Min Demo
+              Watch AI in Action
             </Button>
           </div>
           
-          <p className="text-sm text-muted-foreground">
-            Join 500+ coaches • No credit card • Cancel anytime
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            For Coaches & Players • AI-Powered Analysis • No Credit Card
           </p>
           
         </div>
       </section>
       
-      {/* Social Proof Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 border-y border-border/50 bg-muted/20">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-center text-sm text-muted-foreground mb-6 uppercase tracking-wider">
-            Trusted by Championship Programs Nationwide
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
-            <div className="text-2xl font-bold opacity-60 hover:opacity-100 transition-opacity">Duke</div>
-            <div className="text-2xl font-bold opacity-60 hover:opacity-100 transition-opacity">Syracuse</div>
-            <div className="text-2xl font-bold opacity-60 hover:opacity-100 transition-opacity">Johns Hopkins</div>
-            <div className="text-2xl font-bold opacity-60 hover:opacity-100 transition-opacity">Maryland</div>
-            <div className="text-2xl font-bold opacity-60 hover:opacity-100 transition-opacity">Virginia</div>
-            <div className="text-2xl font-bold opacity-60 hover:opacity-100 transition-opacity">Notre Dame</div>
-          </div>
-        </div>
-      </section>
+      
 
-      {/* Benefits Section */}
+      {/* AI Benefits Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="mb-4" variant="outline">
-              <Award className="w-3 h-3 mr-1" />
-              Why Top Programs Choose LacrosseLens
+            <Badge className="mb-4 px-4 py-2" variant="outline">
+              <Brain className="w-4 h-4 mr-2" />
+              AI-Powered Lacrosse Intelligence
             </Badge>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-4">
-              Stop Watching Film for Hours.
-              <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Start Winning More Games.</span>
+            <h2 className="text-4xl sm:text-6xl font-bold mb-6">
+              Our AI Sees What Others Miss
+              <span className="block text-3xl sm:text-5xl mt-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                For Coaches & Players Who Want to Win
+              </span>
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Our AI watches every second so you don't have to. Get actionable insights 
-              that actually improve your win rate.
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              Advanced AI trained on thousands of lacrosse games analyzes every dodge, shot, clear, and ride. 
+              Get insights that transform average teams into championship contenders.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="bg-card border-border/50 hover:border-border transition-all duration-300 group hover:shadow-lg">
+            <Card className="bg-card border-2 border-purple-200 dark:border-purple-900 hover:border-purple-400 dark:hover:border-purple-700 transition-all duration-300 group hover:shadow-lg">
               <CardContent className="p-8">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
-                  <Users className="w-7 h-7" style={{ color: 'hsl(259 100% 65%)' }} />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Brain className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Recruit Smarter Players</h3>
+                <h3 className="text-2xl font-bold mb-3">AI Coach Assistant</h3>
                 <p className="text-muted-foreground mb-4 text-lg">
-                  Instantly evaluate prospects with AI that spots talent your eyes might miss. Know their ceiling before they step on campus.
+                  AI analyzes every player's stick skills, footwork, and decision-making. Get personalized development plans for each athlete.
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Skill projection reports</span>
+                    <span>Technique breakdown per player</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Position fit analysis</span>
+                    <span>Identifies bad habits instantly</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Development timeline</span>
+                    <span>Tracks improvement over time</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border/50 hover:border-border transition-all duration-300 group hover:shadow-lg">
+            <Card className="bg-card border-2 border-blue-200 dark:border-blue-900 hover:border-blue-400 dark:hover:border-blue-700 transition-all duration-300 group hover:shadow-lg">
               <CardContent className="p-8">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: 'hsl(259 100% 65% / 0.1)' }}>
-                  <Target className="w-7 h-7" style={{ color: 'hsl(259 100% 65%)' }} />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Target className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Win 74% More Face-Offs</h3>
+                <h3 className="text-2xl font-bold mb-3">Face-Off AI Analysis</h3>
                 <p className="text-muted-foreground mb-4 text-lg">
-                  AI breaks down every clamp, counter move, and wing play. Turn your FOGO specialists into possession machines.
+                  AI studies every FOGO's clamp timing, hand position, and counter moves. Discover opponent tendencies before they do.
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Frame-by-frame technique</span>
+                    <span>AI predicts counter moves</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Counter move library</span>
+                    <span>Wing play effectiveness</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Win probability scoring</span>
+                    <span>Optimal clamp angles</span>
                   </div>
                 </div>
               </CardContent>

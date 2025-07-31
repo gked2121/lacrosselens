@@ -931,3 +931,14 @@ The database schema is well-designed for detailed play tracking:
   - **Removed Complexity**: No tabs, expandable sections, or game-specific metrics for drill videos
 - **Files Modified**: client/src/pages/analysis-detail.tsx (added drill detection and separate UI path)
 - **Status**: Drill videos now have their own specialized, simplified analysis display
+
+### 2025-01-31 - Fixed Drill Video Descriptions and Terminology
+- **Issue**: User reported drill video descriptions were displaying game-like text ("YouTube video by Miles du Bois, published on 7/31/2025. Video analysis uploaded for coaching insights")
+- **Solution**: Updated the drill-specific description to use appropriate terminology
+- **Changes Made**:
+  - Changed description format for drill videos to: "YouTube video by [channel], published on [date]. Drill analysis for technique improvement and skill development"
+  - Removed redundant "Video analysis uploaded for coaching insights" text
+  - Used "Training drill" instead of "Uploaded video" for non-YouTube drill content
+  - Maintained separate description logic for game footage vs drill videos
+- **Files Modified**: client/src/pages/analysis-detail.tsx (drill description updates)
+- **Status**: Drill videos now display appropriate descriptions that match their training/practice context

@@ -221,23 +221,37 @@ export default function AnalysisDetail() {
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-tight">
                 {(video as any).title}
               </h1>
-              {(video as any).description && (
-                <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2 line-clamp-2 sm:line-clamp-none">
-                  {(video as any).description}
+              {/* Check if this is a drill video */}
+              {((video as any).metadata?.videoType === 'drill' || 
+                (video as any).title?.toLowerCase().includes('drill') ||
+                (video as any).title?.toLowerCase().includes('training') ||
+                (video as any).title?.toLowerCase().includes('shooting')) ? (
+                <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+                  {(video as any).youtubeUrl ? 'YouTube video' : 'Training drill'} by {(video as any).metadata?.channel || 'coach'}
+                  {(video as any).metadata?.publishedAt ? `, published on ${new Date((video as any).metadata.publishedAt).toLocaleDateString()}` : ''}. 
+                  Drill analysis for technique improvement and skill development
                 </p>
-              )}
-              {/* Special notice for highlight tapes */}
-              {(video as any).title && ((video as any).title.toLowerCase().includes('highlight') || 
-                (video as any).metadata?.videoType === 'highlight_tape') && playerEvaluations.length > 1 && (
-                <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                  <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200 flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span>
-                      <strong>Player Highlight Analysis:</strong> This analysis evaluates all players visible in {(video as any).title.split(' ')[0]}'s highlights, 
-                      including opponents and teammates. {playerEvaluations.length} different players were identified and analyzed throughout the video.
-                    </span>
-                  </p>
-                </div>
+              ) : (
+                <>
+                  {(video as any).description && (
+                    <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2 line-clamp-2 sm:line-clamp-none">
+                      {(video as any).description}
+                    </p>
+                  )}
+                  {/* Special notice for highlight tapes */}
+                  {(video as any).title && ((video as any).title.toLowerCase().includes('highlight') || 
+                    (video as any).metadata?.videoType === 'highlight_tape') && playerEvaluations.length > 1 && (
+                    <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                      <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200 flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>
+                          <strong>Player Highlight Analysis:</strong> This analysis evaluates all players visible in {(video as any).title.split(' ')[0]}'s highlights, 
+                          including opponents and teammates. {playerEvaluations.length} different players were identified and analyzed throughout the video.
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <div className="flex gap-2 sm:gap-3 flex-wrap">

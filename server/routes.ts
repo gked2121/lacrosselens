@@ -256,6 +256,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all transition analyses for a user
+  app.get('/api/transition-analyses', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const videos = await storage.getUserVideos(userId);
+      
+      // Get all transition analyses across all videos
+      const transitionData = await Promise.all(
+        videos
+          .filter(v => v.status === 'completed')
+          .map(async (video) => {
+            const analyses = await storage.getVideoAnalyses(video.id);
+            const transitions = analyses.filter(a => a.type === 'transition');
+            return {
+              videoId: video.id,
+              videoTitle: video.title,
+              uploadDate: video.createdAt,
+              transitions: transitions.map(t => ({
+                ...t,
+                videoTitle: video.title
+              }))
+            };
+          })
+      );
+
+      // Calculate aggregate statistics
+      const allTransitions = transitionData.flatMap(d => d.transitions);
+      const totalTransitions = allTransitions.length;
+      
+      // Extract success rates from metadata
+      const clearingSuccessRates = allTransitions
+        .filter(t => t.metadata && typeof t.metadata === 'object' && 'clearingSuccess' in t.metadata)
+        .map(t => (t.metadata as any).clearingSuccess as number);
+      const ridingSuccessRates = allTransitions
+        .filter(t => t.metadata && typeof t.metadata === 'object' && 'ridingSuccess' in t.metadata)
+        .map(t => (t.metadata as any).ridingSuccess as number);
+      
+      const avgClearingSuccess = clearingSuccessRates.length > 0
+        ? clearingSuccessRates.reduce((sum, rate) => sum + rate, 0) / clearingSuccessRates.length
+        : 0;
+      const avgRidingSuccess = ridingSuccessRates.length > 0
+        ? ridingSuccessRates.reduce((sum, rate) => sum + rate, 0) / ridingSuccessRates.length
+        : 0;
+      
+      // Extract strategies from content
+      const strategies = new Map<string, number>();
+      allTransitions.forEach(t => {
+        const strategyMatches = t.content.match(/(?:banana split|wide break|over the shoulder|fast break|slow break|substitution pattern|defensive slide)/gi);
+        if (strategyMatches) {
+          strategyMatches.forEach(strat => {
+            const normalized = strat.toLowerCase();
+            strategies.set(normalized, (strategies.get(normalized) || 0) + 1);
+          });
+        }
+      });
+
+      res.json({
+        totalTransitions,
+        avgClearingSuccess: Math.round(avgClearingSuccess),
+        avgRidingSuccess: Math.round(avgRidingSuccess),
+        videoBreakdown: transitionData.filter(d => d.transitions.length > 0),
+        strategies: Array.from(strategies.entries()).map(([name, count]) => ({ name, count })),
+        recentTransitions: allTransitions.slice(-10).reverse()
+      });
+    } catch (error) {
+      console.error("Error fetching transition analyses:", error);
+      res.status(500).json({ message: "Failed to fetch transition analyses" });
+    }
+  });
+
+  // Get all face-off analyses for a user
+  app.get('/api/faceoff-analyses', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const videos = await storage.getUserVideos(userId);
+      
+      // Get all face-off analyses across all videos
+      const faceoffData = await Promise.all(
+        videos
+          .filter(v => v.status === 'completed')
+          .map(async (video) => {
+            const analyses = await storage.getVideoAnalyses(video.id);
+            const faceoffs = analyses.filter(a => a.type === 'face_off');
+            return {
+              videoId: video.id,
+              videoTitle: video.title,
+              uploadDate: video.createdAt,
+              faceoffs: faceoffs.map(fo => ({
+                ...fo,
+                videoTitle: video.title
+              }))
+            };
+          })
+      );
+
+      // Calculate aggregate statistics
+      const allFaceoffs = faceoffData.flatMap(d => d.faceoffs);
+      const totalFaceoffs = allFaceoffs.length;
+      const avgWinProbability = totalFaceoffs > 0
+        ? allFaceoffs.reduce((sum, fo) => sum + ((fo.metadata && typeof fo.metadata === 'object' && 'winProbability' in fo.metadata) ? (fo.metadata as any).winProbability : 50), 0) / totalFaceoffs
+        : 0;
+      
+      // Extract techniques from content
+      const techniques = new Map<string, number>();
+      allFaceoffs.forEach(fo => {
+        const techniqueMatches = fo.content.match(/(?:clamp|jump counter|rake.*pull|quick exit|plunger|laser|traditional)/gi);
+        if (techniqueMatches) {
+          techniqueMatches.forEach(tech => {
+            const normalized = tech.toLowerCase();
+            techniques.set(normalized, (techniques.get(normalized) || 0) + 1);
+          });
+        }
+      });
+
+      res.json({
+        totalFaceoffs,
+        avgWinProbability: Math.round(avgWinProbability),
+        videoBreakdown: faceoffData.filter(d => d.faceoffs.length > 0),
+        techniques: Array.from(techniques.entries()).map(([name, count]) => ({ name, count })),
+        recentFaceoffs: allFaceoffs.slice(-10).reverse()
+      });
+    } catch (error) {
+      console.error("Error fetching face-off analyses:", error);
+      res.status(500).json({ message: "Failed to fetch face-off analyses" });
+    }
+  });
+
   // Team routes
   app.post('/api/teams', isAuthenticated, async (req: any, res) => {
     try {

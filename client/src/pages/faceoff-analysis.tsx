@@ -3,7 +3,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
-import VideoFaceoffAnalyses from "@/components/video-faceoff-analyses";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,33 @@ import {
   Timer
 } from "lucide-react";
 
+interface FaceoffAnalysis {
+  id: number;
+  videoId: number;
+  videoTitle?: string;
+  content: string;
+  timestamp: number;
+  confidence: number;
+  metadata?: {
+    winProbability?: number;
+    technique?: string;
+    outcome?: string;
+  };
+}
+
+interface FaceoffData {
+  totalFaceoffs: number;
+  avgWinProbability: number;
+  videoBreakdown: Array<{
+    videoId: number;
+    videoTitle: string;
+    uploadDate: string;
+    faceoffs: FaceoffAnalysis[];
+  }>;
+  techniques: Array<{ name: string; count: number }>;
+  recentFaceoffs: FaceoffAnalysis[];
+}
+
 export default function FaceoffAnalysis() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -45,13 +71,14 @@ export default function FaceoffAnalysis() {
     }
   }, [isAuthenticated, authLoading, toast]);
 
-  // Fetch all videos with face-off analyses
-  const { data: videos, isLoading: videosLoading } = useQuery({
-    queryKey: ["/api/videos"],
+  // Fetch face-off specific data
+  const { data: faceoffData, isLoading: dataLoading } = useQuery<FaceoffData>({
+    queryKey: ["/api/faceoff-analyses"],
     retry: false,
+    enabled: isAuthenticated,
   });
 
-  if (authLoading || videosLoading) {
+  if (authLoading || dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoaderPinwheel className="w-8 h-8 animate-spin text-primary" />
@@ -63,16 +90,32 @@ export default function FaceoffAnalysis() {
     return null; // Will redirect via useEffect
   }
 
-  // Filter videos that have face-off analyses
-  const videosWithFaceoffs = (videos as any[])?.filter((video: any) => 
-    video.analysisCount > 0 && video.status === 'completed'
-  ) || [];
+  const { 
+    totalFaceoffs = 0, 
+    avgWinProbability = 0, 
+    videoBreakdown = [], 
+    techniques = [],
+    recentFaceoffs = []
+  } = faceoffData || {};
 
   // Format timestamp helper
   const formatTimestamp = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Get technique badge color
+  const getTechniqueColor = (technique: string) => {
+    const colors: Record<string, string> = {
+      'clamp': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      'jump counter': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'rake & pull': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      'quick exit': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+      'plunger': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      'laser': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+    };
+    return colors[technique.toLowerCase()] || 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
   };
 
   return (
@@ -97,166 +140,169 @@ export default function FaceoffAnalysis() {
         </div>
 
         {/* Summary Statistics */}
-        {videosWithFaceoffs.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card className="shadow-soft">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Videos</p>
-                    <p className="text-2xl font-bold">{videosWithFaceoffs.length}</p>
+        {totalFaceoffs > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              <Card className="shadow-soft">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Videos</p>
+                      <p className="text-2xl font-bold">{videoBreakdown.length}</p>
+                    </div>
+                    <Video className="w-8 h-8 text-primary opacity-20" />
                   </div>
-                  <Video className="w-8 h-8 text-primary opacity-20" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card className="shadow-soft">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Face-offs Analyzed</p>
-                    <p className="text-2xl font-bold">
-                      {videosWithFaceoffs.reduce((sum: number, video: any) => 
-                        sum + (video.faceoffCount || 0), 0
-                      )}
-                    </p>
+              <Card className="shadow-soft">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Face-offs Analyzed</p>
+                      <p className="text-2xl font-bold">{totalFaceoffs}</p>
+                    </div>
+                    <CircleDot className="w-8 h-8 text-primary opacity-20" />
                   </div>
-                  <CircleDot className="w-8 h-8 text-primary opacity-20" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card className="shadow-soft">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Avg Win Rate</p>
-                    <p className="text-2xl font-bold">68%</p>
+              <Card className="shadow-soft">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Avg Win Probability</p>
+                      <p className="text-2xl font-bold">{avgWinProbability}%</p>
+                    </div>
+                    <Trophy className="w-8 h-8 text-primary opacity-20" />
                   </div>
-                  <Trophy className="w-8 h-8 text-primary opacity-20" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card className="shadow-soft">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Key Insights</p>
-                    <p className="text-2xl font-bold">124</p>
+              <Card className="shadow-soft">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Techniques Found</p>
+                      <p className="text-2xl font-bold">{techniques.length}</p>
+                    </div>
+                    <TrendingUp className="w-8 h-8 text-primary opacity-20" />
                   </div>
-                  <TrendingUp className="w-8 h-8 text-primary opacity-20" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Key Techniques Section */}
-        <Card className="shadow-soft mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-primary" />
-              Common Techniques Identified
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="w-full justify-center py-2">
-                  <Swords className="w-4 h-4 mr-2" />
-                  Clamp Technique
-                </Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="w-full justify-center py-2">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Jump Counter
-                </Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="w-full justify-center py-2">
-                  <Target className="w-4 h-4 mr-2" />
-                  Rake & Pull
-                </Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="w-full justify-center py-2">
-                  <Timer className="w-4 h-4 mr-2" />
-                  Quick Exit
-                </Badge>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Videos with Face-off Analyses */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            Videos with Face-off Analysis
-          </h2>
+            {/* Key Techniques Section */}
+            {techniques.length > 0 && (
+              <Card className="shadow-soft mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-primary" />
+                    Techniques Identified ({techniques.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {techniques.slice(0, 8).map((tech, idx) => (
+                      <div key={idx} className={`rounded-lg p-3 ${getTechniqueColor(tech.name)}`}>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium capitalize">{tech.name}</span>
+                          <Badge variant="secondary" className="ml-2">
+                            {tech.count}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-          {videosWithFaceoffs.length > 0 ? (
-            <div className="space-y-4">
-              {videosWithFaceoffs.map((video: any) => (
-                <VideoFaceoffAnalyses 
-                  key={video.id}
-                  video={video}
-                  formatTimestamp={formatTimestamp}
-                />
-              ))}
-            </div>
-          ) : (
-            <Card className="shadow-soft">
-              <CardContent className="py-12 text-center">
-                <CircleDot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  No face-off analyses available yet
-                </p>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Upload a video to get started with face-off analysis
-                </p>
-                <Link href="/videos">
-                  <Button>
-                    <Video className="w-4 h-4 mr-2" />
-                    Go to Video Library
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            {/* Video Breakdown */}
+            {videoBreakdown.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  Face-offs by Video ({videoBreakdown.length} videos)
+                </h2>
 
-        {/* Pro Tips */}
-        {videosWithFaceoffs.length > 0 && (
-          <Card className="shadow-soft mt-8 bg-primary/5 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <AlertCircle className="w-5 h-5" />
-                Face-off Analysis Tips
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Upload videos with clear face-off angles for best analysis accuracy</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Include multiple face-offs in your video for comprehensive technique evaluation</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>The AI analyzes stance, hand positioning, and exit strategies automatically</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Compare face-off specialists across different games to track improvement</span>
-                </li>
-              </ul>
+                <div className="grid gap-4">
+                  {videoBreakdown.map((video) => (
+                    <Card key={video.videoId} className="shadow-soft hover:shadow-glow transition-all">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="text-lg">{video.videoTitle}</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(video.uploadDate).toLocaleDateString()} • {video.faceoffs.length} face-offs
+                            </p>
+                          </div>
+                          <Link href={`/analysis/${video.videoId}?tab=faceoffs`}>
+                            <Button size="sm" variant="outline">
+                              View Details
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {video.faceoffs.slice(0, 3).map((faceoff) => (
+                            <div key={faceoff.id} className="border-l-4 border-primary/30 pl-4 py-2">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs">
+                                    {formatTimestamp(faceoff.timestamp)}
+                                  </Badge>
+                                  {faceoff.metadata?.technique && (
+                                    <Badge className={getTechniqueColor(faceoff.metadata.technique)}>
+                                      {faceoff.metadata.technique}
+                                    </Badge>
+                                  )}
+                                  {faceoff.metadata?.winProbability && (
+                                    <Badge variant="secondary">
+                                      {faceoff.metadata.winProbability}% win probability
+                                    </Badge>
+                                  )}
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {faceoff.confidence}% confidence
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {faceoff.content}
+                              </p>
+                            </div>
+                          ))}
+                          {video.faceoffs.length > 3 && (
+                            <p className="text-sm text-muted-foreground text-center">
+                              +{video.faceoffs.length - 3} more face-offs
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          /* Empty State */
+          <Card className="shadow-soft">
+            <CardContent className="p-12 text-center">
+              <CircleDot className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h2 className="text-2xl font-semibold mb-2">No Face-off Data Yet</h2>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Upload lacrosse videos to get detailed face-off analysis including techniques, 
+                win probabilities, and strategic insights.
+              </p>
+              <Link href="/videos">
+                <Button className="btn-primary">
+                  <Video className="w-4 h-4 mr-2" />
+                  Upload Your First Video
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         )}

@@ -6,6 +6,7 @@ import { analyzeLacrosseVideo, analyzeLacrosseVideoFromYouTube } from "./gemini"
 import { generateVideoThumbnail, getVideoMetadata, getYouTubeThumbnail } from "./thumbnailGenerator";
 import { AdvancedVideoAnalyzer } from "./advancedVideoAnalysis";
 import { EnhancedPromptSystem } from "./enhancedPromptSystem";
+import { EnhancedAnalysisProcessor } from "./enhancedAnalysisProcessor";
 
 // Configure multer for video uploads
 const uploadDir = "uploads/videos";
@@ -211,80 +212,84 @@ async function processVideoUpload(
     - Transition Analyses: ${analysis.transitionAnalysis.length} analyses
     - Key Moments: ${analysis.keyMoments.length} moments`);
 
-    // Store standard analysis results
-    await storage.createAnalysis({
+    // Use Enhanced Analysis Processor for comprehensive data storage
+    console.log("Using Enhanced Analysis Processor for detailed data extraction and storage");
+    
+    // Store overall analysis with enhanced processing
+    await EnhancedAnalysisProcessor.processAndStoreAnalysis(
       videoId,
-      type: "overall",
-      title: "Overall Game Analysis",
-      content: analysis.overallAnalysis,
-      timestamp: null,
-      confidence: 95,
-      metadata: { type: "overall" },
-    });
+      "overall",
+      analysis.overallAnalysis,
+      { 
+        type: "overall",
+        videoType: analysisOptions?.videoType,
+        level: analysisOptions?.level 
+      },
+      0,
+      95
+    );
 
-    // Store player evaluations
+    // Process player evaluations with detailed player profiles
     for (const playerEval of analysis.playerEvaluations) {
-      await storage.createAnalysis({
+      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
-        type: "player_evaluation",
-        title: `Player Evaluation ${playerEval.playerNumber ? `- #${playerEval.playerNumber}` : ""}`,
-        content: playerEval.evaluation,
-        timestamp: playerEval.timestamp ? Math.round(playerEval.timestamp) : null,
-        confidence: Math.round(playerEval.confidence),
-        metadata: { 
-          type: "player_evaluation",
-          playerNumber: playerEval.playerNumber 
+        "player_evaluation",
+        playerEval.evaluation,
+        { 
+          playerNumber: playerEval.playerNumber,
+          timestamp: playerEval.timestamp 
         },
-      });
+        playerEval.timestamp ? Math.round(playerEval.timestamp) : undefined,
+        Math.round(playerEval.confidence)
+      );
     }
 
-    // Store face-off analysis
+    // Process face-off analysis with detailed breakdowns
     for (const faceOff of analysis.faceOffAnalysis) {
-      await storage.createAnalysis({
+      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
-        type: "face_off",
-        title: "Face-Off Analysis",
-        content: faceOff.analysis,
-        timestamp: faceOff.timestamp ? Math.round(faceOff.timestamp) : null,
-        confidence: Math.round(faceOff.confidence),
-        metadata: { 
-          type: "face_off",
-          winProbability: faceOff.winProbability 
+        "face_off",
+        faceOff.analysis,
+        { 
+          winProbability: faceOff.winProbability,
+          timestamp: faceOff.timestamp
         },
-      });
+        faceOff.timestamp ? Math.round(faceOff.timestamp) : undefined,
+        Math.round(faceOff.confidence)
+      );
     }
 
-    // Store transition analysis
+    // Process transition analysis with tactical details
     for (const transition of analysis.transitionAnalysis) {
-      await storage.createAnalysis({
+      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
-        type: "transition",
-        title: "Transition Intelligence",
-        content: transition.analysis,
-        timestamp: transition.timestamp ? Math.round(transition.timestamp) : null,
-        confidence: Math.round(transition.confidence),
-        metadata: { 
-          type: "transition",
-          successProbability: transition.successProbability 
+        "transition",
+        transition.analysis,
+        { 
+          successProbability: transition.successProbability,
+          timestamp: transition.timestamp
         },
-      });
+        transition.timestamp ? Math.round(transition.timestamp) : undefined,
+        Math.round(transition.confidence)
+      );
     }
 
-    // Store key moments
+    // Process key moments with play-by-play details
     for (const moment of analysis.keyMoments) {
-      await storage.createAnalysis({
+      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
-        type: "key_moment",
-        title: `Key Moment: ${moment.type}`,
-        content: moment.description,
-        timestamp: moment.timestamp ? Math.round(moment.timestamp) : null,
-        confidence: Math.round(moment.confidence),
-        metadata: { 
-          type: "key_moment",
-          momentType: moment.type 
+        "key_moment",
+        moment.description,
+        { 
+          momentType: moment.type,
+          timestamp: moment.timestamp
         },
-      });
+        moment.timestamp ? Math.round(moment.timestamp) : undefined,
+        Math.round(moment.confidence)
+      );
     }
+
+    console.log(`Enhanced analysis processing completed for video ${videoId}`);
 
     // Update video status to completed
     await storage.updateVideoStatus(videoId, "completed");

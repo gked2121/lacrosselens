@@ -6,7 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EnhancedAnalyticsDashboard } from "@/components/enhanced-analytics-dashboard";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -229,12 +230,13 @@ export default function AnalysisDetail() {
           {/* Analysis Content */}
           {(video as any).status === 'completed' ? (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid grid-cols-2 lg:grid-cols-5 w-full p-2 rounded-2xl" style={{ backgroundColor: 'hsl(var(--muted))' }}>
+              <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full p-2 rounded-2xl" style={{ backgroundColor: 'hsl(var(--muted))' }}>
                 <TabsTrigger value="overview" className="rounded-xl font-semibold">Overview</TabsTrigger>
                 <TabsTrigger value="players" className="rounded-xl font-semibold">Players</TabsTrigger>
                 <TabsTrigger value="faceoffs" className="rounded-xl font-semibold">Face-offs</TabsTrigger>
                 <TabsTrigger value="transitions" className="rounded-xl font-semibold">Transitions</TabsTrigger>
                 <TabsTrigger value="moments" className="rounded-xl font-semibold">Key Moments</TabsTrigger>
+                <TabsTrigger value="analytics" className="rounded-xl font-semibold">Analytics</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
@@ -392,7 +394,7 @@ export default function AnalysisDetail() {
                 {playerEvaluations.length > 0 ? (
                   <PlayerEvaluationsGrouped 
                     evaluations={playerEvaluations}
-                    formatTimestamp={formatTimestamp}
+                    formatTimestamp={formatTimestamp as (timestamp: number) => string}
                   />
                 ) : (
                   <Card className="shadow-soft">
@@ -807,6 +809,23 @@ export default function AnalysisDetail() {
                     </CardContent>
                   </Card>
                 )}
+              </TabsContent>
+
+              <TabsContent value="analytics" className="space-y-4">
+                <Card className="shadow-soft">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-primary" />
+                      Advanced Analytics Dashboard
+                    </CardTitle>
+                    <CardDescription>
+                      In-depth performance metrics and tactical insights powered by our enhanced analysis engine
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <EnhancedAnalyticsDashboard videoId={parseInt(id || '0')} />
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           ) : (

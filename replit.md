@@ -425,6 +425,51 @@ The database schema is well-designed for detailed play tracking:
 - **Files Modified**: server/services/gemini.ts, server/services/videoProcessor.ts, client/src/components/enhanced-video-upload.tsx
 - **Status**: YouTube video analysis now properly implemented using Gemini's native YouTube support
 
+### 2025-01-31 - Implemented Comprehensive Enhanced Database Schema for Granular Lacrosse Analytics
+- **Issue**: User emphasized "More detailed and better database will make app better" and requested to "think this out in detail"
+- **Major Enhancement**: Complete database overhaul with 10+ specialized tables for capturing every detail from AI video analysis
+- **New Tables Created**:
+  - **playerProfiles**: Comprehensive player attributes including skills (dodging, shooting, passing), physical metrics, position data
+  - **playEvents**: Granular play-by-play tracking with timestamps, event types, field zones, player involvement
+  - **faceoffDetails**: Specialized face-off data (techniques, wing support, exit directions, technical scores)
+  - **transitionDetails**: Clear/ride analytics with player roles, zones, success tracking
+  - **gameSituations**: Context tracking (man-up/down, timeouts, quarter info)
+  - **playerPerformanceMetrics**: Period-based performance tracking
+  - **possessions**: Possession analytics with shot clock, formation data
+  - **tacticalFormations**: Formation effectiveness tracking
+  - **playerMatchups**: 1v1 matchup analytics
+  - **coachingNotes**: AI-generated coaching insights
+- **Enhanced Analysis Processing**:
+  - Created EnhancedAnalysisProcessor service to extract structured data from Gemini AI analysis
+  - Automatically parses AI text to populate specialized tables with lacrosse-specific metrics
+  - Extracts player numbers, positions, skills, and performance data from analysis content
+  - Identifies and stores face-off techniques, transition patterns, and tactical formations
+- **Advanced Analytics Engine**:
+  - Built EnhancedAnalyticsService providing detailed statistical analysis
+  - Player performance metrics with goals, assists, saves, turnovers, ground balls
+  - Team analytics including offensive/defensive efficiency, possession time
+  - Game flow analysis with momentum tracking and critical period identification
+  - Coaching insights with strengths, weaknesses, and tactical recommendations
+- **Frontend Integration**:
+  - Created EnhancedAnalyticsDashboard component with comprehensive visualization
+  - Added Analytics tab to video analysis detail page
+  - Displays team-specific metrics, formation effectiveness, momentum periods
+  - Shows detailed face-off analytics with technique success rates
+  - Provides coaching recommendations based on AI analysis
+- **Technical Implementation**:
+  - Used Drizzle ORM with PostgreSQL for type-safe database operations
+  - Implemented JSONB fields for flexible metadata storage
+  - Created analytics API routes for data access
+  - Integrated with existing video processing pipeline
+- **Files Created/Modified**: 
+  - shared/enhanced-schema.ts (new comprehensive schema)
+  - server/services/enhancedAnalysisProcessor.ts (data extraction service)
+  - server/services/enhancedAnalytics.ts (analytics engine)
+  - server/routes/analytics.ts (API endpoints)
+  - client/src/components/enhanced-analytics-dashboard.tsx (UI component)
+  - server/services/videoProcessor.ts (integrated enhanced processing)
+- **Status**: Enhanced database schema deployed and integrated, providing the most detailed lacrosse analytics possible from AI video analysis
+
 ### 2025-01-24 - Multiple Redesigns of Enhanced Video Upload Component
 - **Issue**: User repeatedly reported upload form was "awful", "confusing and hard to use" despite multiple redesign attempts
 - **Multiple Redesign Attempts**:

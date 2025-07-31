@@ -6,6 +6,7 @@ import { upload, processVideoUpload, processYouTubeVideo } from "./services/vide
 import { insertVideoSchema, insertTeamSchema, insertPlayerSchema } from "@shared/schema";
 import * as path from "path";
 import * as fs from "fs";
+import analyticsRouter from "./routes/analytics";
 
 // Helper function to calculate average confidence from analyses
 async function calculateAverageConfidence(videoIds: number[]): Promise<number> {
@@ -585,6 +586,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to retry video processing" });
     }
   });
+
+  // Analytics routes
+  app.use("/api/analytics", analyticsRouter);
 
   const httpServer = createServer(app);
   return httpServer;

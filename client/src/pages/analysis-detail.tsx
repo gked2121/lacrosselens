@@ -7,7 +7,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 
 import { DrillAnalysis } from "@/components/video-type-analysis/drill-analysis";
-import { HighlightAnalysisEnhanced } from "@/components/video-type-analysis/highlight-analysis-enhanced";
+import { HighlightAnalysisEnhanced } from "@/components/video-type-analysis/highlight-analysis-temp";
 import { RecruitingAnalysisEnhanced } from "@/components/video-type-analysis/recruiting-analysis-enhanced";
 import { PracticeAnalysisEnhanced } from "@/components/video-type-analysis/practice-analysis-enhanced";
 import { ScrimmageAnalysisEnhanced } from "@/components/video-type-analysis/scrimmage-analysis-enhanced";

@@ -30,8 +30,62 @@ import {
   Gem,
   Crown,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  AlertTriangle
 } from "lucide-react";
+
+// ExpandableText Component
+interface ExpandableTextProps {
+  content: string;
+  index: number;
+  expandedSet: Set<number>;
+  setExpandedSet: (set: Set<number>) => void;
+  truncateLength: number;
+  className?: string;
+}
+
+function ExpandableText({ content, index, expandedSet, setExpandedSet, truncateLength, className }: ExpandableTextProps) {
+  const isExpanded = expandedSet.has(index);
+  const shouldTruncate = content.length > truncateLength;
+  
+  const toggleExpansion = () => {
+    const newSet = new Set(expandedSet);
+    if (newSet.has(index)) {
+      newSet.delete(index);
+    } else {
+      newSet.add(index);
+    }
+    setExpandedSet(newSet);
+  };
+
+  if (!shouldTruncate) {
+    return <p className={className}>{content}</p>;
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className={className}>
+        {isExpanded ? content : `${content.substring(0, truncateLength)}...`}
+      </p>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={toggleExpansion}
+        className="h-auto p-0 text-xs font-medium hover:no-underline flex items-center gap-1"
+      >
+        {isExpanded ? (
+          <>
+            Show less <ChevronUp className="w-3 h-3" />
+          </>
+        ) : (
+          <>
+            Show more <ChevronDown className="w-3 h-3" />
+          </>
+        )}
+      </Button>
+    </div>
+  );
+}
 
 interface HighlightAnalysisEnhancedProps {
   video: any;
@@ -405,15 +459,81 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
         <CardContent className="pt-6">
           {/* Enhanced Player Analysis Grid */}
           <div className="space-y-6">
-            {/* Technical Skills Breakdown */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target className="w-5 h-5 text-green-600" />
-                    <h4 className="font-semibold text-green-800 dark:text-green-200">Shooting Analysis</h4>
+            {/* Visual Skills Performance Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-full">
+                        <Target className="w-6 h-6 text-green-600" />
+                      </div>
+                      <h4 className="font-bold text-lg text-green-800 dark:text-green-200">Shooting</h4>
+                    </div>
+                    {(() => {
+                      const shootingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('shot') || 
+                        analysis.content.toLowerCase().includes('shooting') ||
+                        analysis.content.toLowerCase().includes('scores') ||
+                        analysis.content.toLowerCase().includes('goal')
+                      );
+                      const avgScore = shootingAnalyses.length > 0 
+                        ? Math.round(shootingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / shootingAnalyses.length)
+                        : 0;
+                      return (
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-green-600">{avgScore}%</div>
+                          <div className="text-xs text-green-500">Performance</div>
+                        </div>
+                      );
+                    })()}
                   </div>
-                  <div className="space-y-2 text-sm">
+                  
+                  {/* Visual Progress Bar */}
+                  <div className="mb-4">
+                    <Progress 
+                      value={(() => {
+                        const shootingAnalyses = playerEvaluations.filter(analysis => 
+                          analysis.content.toLowerCase().includes('shot') || 
+                          analysis.content.toLowerCase().includes('shooting') ||
+                          analysis.content.toLowerCase().includes('scores') ||
+                          analysis.content.toLowerCase().includes('goal')
+                        );
+                        return shootingAnalyses.length > 0 
+                          ? Math.round(shootingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / shootingAnalyses.length)
+                          : 0;
+                      })()} 
+                      className="h-3 bg-green-100 dark:bg-green-900/30"
+                    />
+                  </div>
+                  {/* Key Statistics */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    {(() => {
+                      const shootingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('shot') || 
+                        analysis.content.toLowerCase().includes('shooting') ||
+                        analysis.content.toLowerCase().includes('scores') ||
+                        analysis.content.toLowerCase().includes('goal')
+                      );
+                      return (
+                        <>
+                          <div className="text-center p-3 bg-white/50 dark:bg-green-950/30 rounded-lg">
+                            <div className="text-xl font-bold text-green-600">{shootingAnalyses.length}</div>
+                            <div className="text-xs text-green-500">Clips</div>
+                          </div>
+                          <div className="text-center p-3 bg-white/50 dark:bg-green-950/30 rounded-lg">
+                            <div className="text-xl font-bold text-green-600">
+                              {shootingAnalyses.length > 0 ? Math.round(shootingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / shootingAnalyses.length) : 0}%
+                            </div>
+                            <div className="text-xs text-green-500">Avg Score</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                  
+                  {/* Compact Analysis Preview */}
+                  <div className="space-y-2">
                     {(() => {
                       const shootingAnalyses = playerEvaluations.filter(analysis => 
                         analysis.content.toLowerCase().includes('shot') || 
@@ -423,26 +543,32 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                       );
                       
                       if (shootingAnalyses.length === 0) {
-                        return <p className="text-muted-foreground">No shooting analysis available</p>;
+                        return (
+                          <div className="text-center py-4 text-muted-foreground">
+                            <Target className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">No shooting analysis available</p>
+                          </div>
+                        );
                       }
                       
-                      return shootingAnalyses.slice(0, 3).map((analysis, idx) => (
-                        <div key={idx} className="p-2 bg-green-100 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge className="bg-green-600 text-white text-xs">
+                      return shootingAnalyses.slice(0, 2).map((analysis, idx) => (
+                        <div key={idx} className="p-3 bg-white/60 dark:bg-green-950/40 rounded-lg border border-green-200/50 dark:border-green-800/50 hover:bg-white/80 dark:hover:bg-green-950/60 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
                               {formatTimestamp(analysis.timestamp)}
                             </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              {analysis.confidence}%
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-600 font-medium">{analysis.confidence}%</span>
+                            </div>
                           </div>
                           <ExpandableText
                             content={analysis.content}
                             index={idx}
                             expandedSet={expandedShootingItems}
                             setExpandedSet={setExpandedShootingItems}
-                            truncateLength={150}
-                            className="text-xs text-green-800 dark:text-green-200"
+                            truncateLength={80}
+                            className="text-sm text-green-800 dark:text-green-200"
                           />
                         </div>
                       ));
@@ -451,13 +577,82 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 </CardContent>
               </Card>
 
-              <Card className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Activity className="w-5 h-5 text-purple-600" />
-                    <h4 className="font-semibold text-purple-800 dark:text-purple-200">Dodging & Movement</h4>
+              <Card className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20 border-purple-200 dark:border-purple-800 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-full">
+                        <Activity className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h4 className="font-bold text-lg text-purple-800 dark:text-purple-200">Dodging</h4>
+                    </div>
+                    {(() => {
+                      const dodgingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('dodge') || 
+                        analysis.content.toLowerCase().includes('split') ||
+                        analysis.content.toLowerCase().includes('roll') ||
+                        analysis.content.toLowerCase().includes('change of pace') ||
+                        analysis.content.toLowerCase().includes('beats his man')
+                      );
+                      const avgScore = dodgingAnalyses.length > 0 
+                        ? Math.round(dodgingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / dodgingAnalyses.length)
+                        : 0;
+                      return (
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-purple-600">{avgScore}%</div>
+                          <div className="text-xs text-purple-500">Performance</div>
+                        </div>
+                      );
+                    })()}
                   </div>
-                  <div className="space-y-2 text-sm">
+                  
+                  {/* Visual Progress Bar */}
+                  <div className="mb-4">
+                    <Progress 
+                      value={(() => {
+                        const dodgingAnalyses = playerEvaluations.filter(analysis => 
+                          analysis.content.toLowerCase().includes('dodge') || 
+                          analysis.content.toLowerCase().includes('split') ||
+                          analysis.content.toLowerCase().includes('roll') ||
+                          analysis.content.toLowerCase().includes('change of pace') ||
+                          analysis.content.toLowerCase().includes('beats his man')
+                        );
+                        return dodgingAnalyses.length > 0 
+                          ? Math.round(dodgingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / dodgingAnalyses.length)
+                          : 0;
+                      })()} 
+                      className="h-3 bg-purple-100 dark:bg-purple-900/30"
+                    />
+                  </div>
+                  
+                  {/* Key Statistics */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    {(() => {
+                      const dodgingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('dodge') || 
+                        analysis.content.toLowerCase().includes('split') ||
+                        analysis.content.toLowerCase().includes('roll') ||
+                        analysis.content.toLowerCase().includes('change of pace') ||
+                        analysis.content.toLowerCase().includes('beats his man')
+                      );
+                      return (
+                        <>
+                          <div className="text-center p-3 bg-white/50 dark:bg-purple-950/30 rounded-lg">
+                            <div className="text-xl font-bold text-purple-600">{dodgingAnalyses.length}</div>
+                            <div className="text-xs text-purple-500">Clips</div>
+                          </div>
+                          <div className="text-center p-3 bg-white/50 dark:bg-purple-950/30 rounded-lg">
+                            <div className="text-xl font-bold text-purple-600">
+                              {dodgingAnalyses.length > 0 ? Math.round(dodgingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / dodgingAnalyses.length) : 0}%
+                            </div>
+                            <div className="text-xs text-purple-500">Avg Score</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                  {/* Compact Analysis Preview */}
+                  <div className="space-y-2">
                     {(() => {
                       const dodgingAnalyses = playerEvaluations.filter(analysis => 
                         analysis.content.toLowerCase().includes('dodge') || 
@@ -468,26 +663,32 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                       );
                       
                       if (dodgingAnalyses.length === 0) {
-                        return <p className="text-muted-foreground">No dodging analysis available</p>;
+                        return (
+                          <div className="text-center py-4 text-muted-foreground">
+                            <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">No dodging analysis available</p>
+                          </div>
+                        );
                       }
                       
-                      return dodgingAnalyses.slice(0, 3).map((analysis, idx) => (
-                        <div key={idx} className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded border border-purple-200 dark:border-purple-800">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge className="bg-purple-600 text-white text-xs">
+                      return dodgingAnalyses.slice(0, 2).map((analysis, idx) => (
+                        <div key={idx} className="p-3 bg-white/60 dark:bg-purple-950/40 rounded-lg border border-purple-200/50 dark:border-purple-800/50 hover:bg-white/80 dark:hover:bg-purple-950/60 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
                               {formatTimestamp(analysis.timestamp)}
                             </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              {analysis.confidence}%
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Zap className="w-3 h-3 text-purple-500" />
+                              <span className="text-xs text-purple-600 font-medium">{analysis.confidence}%</span>
+                            </div>
                           </div>
                           <ExpandableText
                             content={analysis.content}
                             index={idx}
                             expandedSet={expandedDodgingItems}
                             setExpandedSet={setExpandedDodgingItems}
-                            truncateLength={150}
-                            className="text-xs text-purple-800 dark:text-purple-200"
+                            truncateLength={80}
+                            className="text-sm text-purple-800 dark:text-purple-200"
                           />
                         </div>
                       ));
@@ -496,13 +697,83 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 </CardContent>
               </Card>
 
-              <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Zap className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-semibold text-blue-800 dark:text-blue-200">Passing & Vision</h4>
+              <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-full">
+                        <Zap className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <h4 className="font-bold text-lg text-blue-800 dark:text-blue-200">Passing</h4>
+                    </div>
+                    {(() => {
+                      const passingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('pass') || 
+                        analysis.content.toLowerCase().includes('feed') ||
+                        analysis.content.toLowerCase().includes('assist') ||
+                        analysis.content.toLowerCase().includes('vision') ||
+                        analysis.content.toLowerCase().includes('finds')
+                      );
+                      const avgScore = passingAnalyses.length > 0 
+                        ? Math.round(passingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / passingAnalyses.length)
+                        : 0;
+                      return (
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-blue-600">{avgScore}%</div>
+                          <div className="text-xs text-blue-500">Performance</div>
+                        </div>
+                      );
+                    })()}
                   </div>
-                  <div className="space-y-2 text-sm">
+                  
+                  {/* Visual Progress Bar */}
+                  <div className="mb-4">
+                    <Progress 
+                      value={(() => {
+                        const passingAnalyses = playerEvaluations.filter(analysis => 
+                          analysis.content.toLowerCase().includes('pass') || 
+                          analysis.content.toLowerCase().includes('feed') ||
+                          analysis.content.toLowerCase().includes('assist') ||
+                          analysis.content.toLowerCase().includes('vision') ||
+                          analysis.content.toLowerCase().includes('finds')
+                        );
+                        return passingAnalyses.length > 0 
+                          ? Math.round(passingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / passingAnalyses.length)
+                          : 0;
+                      })()} 
+                      className="h-3 bg-blue-100 dark:bg-blue-900/30"
+                    />
+                  </div>
+                  
+                  {/* Key Statistics */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    {(() => {
+                      const passingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('pass') || 
+                        analysis.content.toLowerCase().includes('feed') ||
+                        analysis.content.toLowerCase().includes('assist') ||
+                        analysis.content.toLowerCase().includes('vision') ||
+                        analysis.content.toLowerCase().includes('finds')
+                      );
+                      return (
+                        <>
+                          <div className="text-center p-3 bg-white/50 dark:bg-blue-950/30 rounded-lg">
+                            <div className="text-xl font-bold text-blue-600">{passingAnalyses.length}</div>
+                            <div className="text-xs text-blue-500">Clips</div>
+                          </div>
+                          <div className="text-center p-3 bg-white/50 dark:bg-blue-950/30 rounded-lg">
+                            <div className="text-xl font-bold text-blue-600">
+                              {passingAnalyses.length > 0 ? Math.round(passingAnalyses.reduce((sum: number, a: any) => sum + a.confidence, 0) / passingAnalyses.length) : 0}%
+                            </div>
+                            <div className="text-xs text-blue-500">Avg Score</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                  
+                  {/* Compact Analysis Preview */}
+                  <div className="space-y-2">
                     {(() => {
                       const passingAnalyses = playerEvaluations.filter(analysis => 
                         analysis.content.toLowerCase().includes('pass') || 
@@ -513,26 +784,32 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                       );
                       
                       if (passingAnalyses.length === 0) {
-                        return <p className="text-muted-foreground">No passing analysis available</p>;
+                        return (
+                          <div className="text-center py-4 text-muted-foreground">
+                            <Zap className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm">No passing analysis available</p>
+                          </div>
+                        );
                       }
                       
-                      return passingAnalyses.slice(0, 3).map((analysis, idx) => (
-                        <div key={idx} className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded border border-blue-200 dark:border-blue-800">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge className="bg-blue-600 text-white text-xs">
+                      return passingAnalyses.slice(0, 2).map((analysis, idx) => (
+                        <div key={idx} className="p-3 bg-white/60 dark:bg-blue-950/40 rounded-lg border border-blue-200/50 dark:border-blue-800/50 hover:bg-white/80 dark:hover:bg-blue-950/60 transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
                               {formatTimestamp(analysis.timestamp)}
                             </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              {analysis.confidence}%
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Eye className="w-3 h-3 text-blue-500" />
+                              <span className="text-xs text-blue-600 font-medium">{analysis.confidence}%</span>
+                            </div>
                           </div>
                           <ExpandableText
                             content={analysis.content}
                             index={idx}
                             expandedSet={expandedPassingItems}
                             setExpandedSet={setExpandedPassingItems}
-                            truncateLength={150}
-                            className="text-xs text-blue-800 dark:text-blue-200"
+                            truncateLength={80}
+                            className="text-sm text-blue-800 dark:text-blue-200"
                           />
                         </div>
                       ));
@@ -564,81 +841,124 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
               </CardContent>
             </Card>
 
-            {/* Performance Trends */}
-            <Card className="border-orange-200 dark:border-orange-800">
-              <CardHeader className="bg-orange-50 dark:bg-orange-950/20">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-orange-600" />
-                  <CardTitle className="text-lg">Performance Trends & Patterns</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-orange-800 dark:text-orange-200 flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4" />
-                      Consistent Strengths
-                    </h4>
-                    {(() => {
-                      const strengthsMap = new Map<string, number>();
-                      const strengthKeywords = ['excellent', 'outstanding', 'strong', 'good', 'effective', 'solid'];
-                      
-                      playerEvaluations.forEach(analysis => {
-                        strengthKeywords.forEach(keyword => {
-                          if (analysis.content.toLowerCase().includes(keyword)) {
-                            strengthsMap.set(keyword, (strengthsMap.get(keyword) || 0) + 1);
-                          }
-                        });
-                      });
-                      
-                      const strengthEntries = Array.from(strengthsMap.entries())
-                        .sort(([,a], [,b]) => b - a)
-                        .slice(0, 5);
-                      
-                      return strengthEntries.map(([strength, count]) => (
-                        <div key={strength} className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/20 rounded">
-                          <span className="text-sm capitalize text-green-800 dark:text-green-200">{strength} performance</span>
-                          <Badge className="bg-green-600 text-white text-xs">{count} mentions</Badge>
-                        </div>
-                      ));
-                    })()}
+            {/* Visual Performance Insights Dashboard */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Strengths Visualization */}
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800 shadow-lg">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-full">
+                        <TrendingUp className="w-6 h-6 text-green-600" />
+                      </div>
+                      <CardTitle className="text-xl text-green-800 dark:text-green-200">Elite Strengths</CardTitle>
+                    </div>
+                    <Badge className="bg-green-600 text-white px-3 py-1">
+                      {strengths.length} identified
+                    </Badge>
                   </div>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-red-800 dark:text-red-200 flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" />
-                      Development Areas
-                    </h4>
-                    {(() => {
-                      const weaknessMap = new Map<string, number>();
-                      const weaknessKeywords = ['improve', 'struggle', 'weak', 'needs work', 'poor', 'inconsistent'];
-                      
-                      playerEvaluations.forEach(analysis => {
-                        weaknessKeywords.forEach(keyword => {
-                          if (analysis.content.toLowerCase().includes(keyword)) {
-                            weaknessMap.set(keyword, (weaknessMap.get(keyword) || 0) + 1);
-                          }
-                        });
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {(() => {
+                    const strengthsMap = new Map<string, number>();
+                    const strengthKeywords = ['excellent', 'outstanding', 'strong', 'good', 'effective', 'solid'];
+                    
+                    playerEvaluations.forEach(analysis => {
+                      strengthKeywords.forEach(keyword => {
+                        if (analysis.content.toLowerCase().includes(keyword)) {
+                          strengthsMap.set(keyword, (strengthsMap.get(keyword) || 0) + 1);
+                        }
                       });
+                    });
+                    
+                    const strengthEntries = Array.from(strengthsMap.entries())
+                      .sort(([,a], [,b]) => b - a)
+                      .slice(0, 4);
+                    
+                    return strengthEntries.map(([strength, count], index) => {
+                      const maxCount = Math.max(...Array.from(strengthsMap.values()));
+                      const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
                       
-                      const weaknessEntries = Array.from(weaknessMap.entries())
-                        .sort(([,a], [,b]) => b - a)
-                        .slice(0, 5);
-                      
-                      return weaknessEntries.map(([weakness, count]) => (
-                        <div key={weakness} className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/20 rounded">
-                          <span className="text-sm capitalize text-red-800 dark:text-red-200">{weakness === 'needs work' ? 'needs work' : `${weakness} areas`}</span>
-                          <Badge className="bg-red-600 text-white text-xs">{count} mentions</Badge>
+                      return (
+                        <div key={strength} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <span className="font-medium capitalize text-green-800 dark:text-green-200">
+                                {strength} performance
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-green-600">{count}</div>
+                              <div className="text-xs text-green-500">mentions</div>
+                            </div>
+                          </div>
+                          <Progress value={percentage} className="h-2 bg-green-100 dark:bg-green-900/30" />
                         </div>
-                      ));
-                    })()}
+                      );
+                    });
+                  })()}
+                </CardContent>
+              </Card>
+
+              {/* Development Areas Visualization */}
+              <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-orange-200 dark:border-orange-800 shadow-lg">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-orange-100 dark:bg-orange-900/50 rounded-full">
+                        <Target className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <CardTitle className="text-xl text-orange-800 dark:text-orange-200">Growth Areas</CardTitle>
+                    </div>
+                    <Badge className="bg-orange-600 text-white px-3 py-1">
+                      {weaknesses.length} identified
+                    </Badge>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {(() => {
+                    const weaknessMap = new Map<string, number>();
+                    const weaknessKeywords = ['improve', 'struggle', 'weak', 'needs work', 'poor', 'inconsistent'];
+                    
+                    playerEvaluations.forEach(analysis => {
+                      weaknessKeywords.forEach(keyword => {
+                        if (analysis.content.toLowerCase().includes(keyword)) {
+                          weaknessMap.set(keyword, (weaknessMap.get(keyword) || 0) + 1);
+                        }
+                      });
+                    });
+                    
+                    const weaknessEntries = Array.from(weaknessMap.entries())
+                      .sort(([,a], [,b]) => b - a)
+                      .slice(0, 4);
+                    
+                    return weaknessEntries.map(([weakness, count], index) => {
+                      const maxCount = Math.max(...Array.from(weaknessMap.values()));
+                      const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                      
+                      return (
+                        <div key={weakness} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <AlertTriangle className="w-4 h-4 text-orange-600" />
+                              <span className="font-medium capitalize text-orange-800 dark:text-orange-200">
+                                {weakness === 'needs work' ? 'Needs Development' : `${weakness} areas`}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-orange-600">{count}</div>
+                              <div className="text-xs text-orange-500">mentions</div>
+                            </div>
+                          </div>
+                          <Progress value={percentage} className="h-2 bg-orange-100 dark:bg-orange-900/30" />
+                        </div>
+                      );
+                    });
+                  })()}
+                </CardContent>
+              </Card>
+            </div>
 
       {/* Elite Moments Timeline */}
       {keyMoments.length > 0 && (

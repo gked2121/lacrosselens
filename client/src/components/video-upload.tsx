@@ -434,7 +434,7 @@ export default function VideoUpload({ children }: VideoUploadProps) {
 
               <Button 
                 type="submit" 
-                className="w-full bg-foreground text-background hover:opacity-90" 
+                className="w-full btn-primary" 
                 disabled={isLoading || !youtubeUrl}
               >
                 {youtubeUploadMutation.isPending ? (
@@ -466,14 +466,14 @@ export default function VideoUpload({ children }: VideoUploadProps) {
                   
                   <div className="flex justify-center gap-2 mt-4">
                     {!isRecording && !recordedBlob && (
-                      <Button onClick={startRecording} className="bg-foreground text-background hover:opacity-90">
+                      <Button onClick={startRecording} className="btn-primary">
                         <Camera className="w-4 h-4 mr-2" />
                         Start Recording
                       </Button>
                     )}
                     
                     {isRecording && (
-                      <Button onClick={stopRecording} variant="destructive">
+                      <Button onClick={stopRecording} className="btn-danger">
                         <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
                         Stop Recording
                       </Button>
@@ -481,10 +481,10 @@ export default function VideoUpload({ children }: VideoUploadProps) {
                     
                     {recordedBlob && !isRecording && (
                       <div className="flex gap-2">
-                        <Button onClick={() => setRecordedBlob(null)} variant="outline">
+                        <Button onClick={() => setRecordedBlob(null)} className="btn-outline">
                           Record Again
                         </Button>
-                        <Button onClick={uploadRecording} disabled={isLoading} className="bg-foreground text-background hover:opacity-90">
+                        <Button onClick={uploadRecording} disabled={isLoading} className="btn-primary">
                           {fileUploadMutation.isPending ? (
                             <>
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

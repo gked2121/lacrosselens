@@ -229,14 +229,14 @@ export default function Dashboard() {
                 </p>
                 <div className="space-y-3">
                   <Link href="/videos">
-                    <Button className="w-full group bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                    <Button className="w-full btn-primary group">
                       <FileVideo className="w-4 h-4 mr-2" />
                       Upload Video File
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                   <Link href="/videos">
-                    <Button variant="outline" className="w-full group border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/50">
+                    <Button variant="outline" className="w-full btn-outline group">
                       <Play className="w-4 h-4 mr-2" />
                       Analyze YouTube Video
                     </Button>
@@ -320,7 +320,7 @@ export default function Dashboard() {
                     <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">No videos yet</h3>
                     <p className="text-slate-600 dark:text-slate-400 mb-6">Upload your first video to start analyzing your game footage</p>
                     <Link href="/videos">
-                      <Button className="bg-gradient-to-r from-primary to-primary/80">
+                      <Button className="btn-primary">
                         <Plus className="w-4 h-4 mr-2" />
                         Upload Video
                       </Button>

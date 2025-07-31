@@ -105,7 +105,7 @@ export default function AnalysisDetail() {
           <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-xl font-semibold mb-2">Video not found</h3>
           <Link href="/videos">
-            <Button variant="outline">
+            <Button className="btn-outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Videos
             </Button>
@@ -226,7 +226,7 @@ export default function AnalysisDetail() {
               )}
             </div>
             <div className="flex gap-3">
-              <Button variant="secondary">
+              <Button className="btn-secondary">
                 <Download className="w-4 h-4 mr-2" />
                 Export Report
               </Button>

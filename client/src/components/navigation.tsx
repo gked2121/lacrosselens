@@ -168,7 +168,7 @@ export default function Navigation() {
             {/* Upload Video Button */}
             <VideoUpload>
               <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium rounded-lg"
+                className="btn-primary"
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();

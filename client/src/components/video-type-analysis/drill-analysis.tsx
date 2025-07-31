@@ -8,6 +8,7 @@ import {
   Zap, 
   CheckCircle, 
   AlertTriangle,
+  AlertCircle,
   TrendingUp,
   Activity,
   User,

@@ -120,35 +120,35 @@ export default function VideoLibrary() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
-        {/* Enhanced Page Header with Stats */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        {/* Mobile-Optimized Page Header with Stats */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
             <div className="space-y-1">
-              <h1 className="text-3xl font-bold text-gray-900">Video Library</h1>
-              <p className="text-lg text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Video Library</h1>
+              <p className="text-base sm:text-lg text-gray-600">
                 Game film breakdown and scouting reports
               </p>
             </div>
             
-            {/* Quick Stats */}
-            <div className="flex items-center gap-6">
+            {/* Mobile-Optimized Quick Stats */}
+            <div className="flex items-center gap-3 sm:gap-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">
                   {Array.isArray(videos) ? videos.filter((v: any) => v.status === 'completed').length : 0}
                 </p>
-                <p className="text-sm text-gray-600">Analyzed</p>
+                <p className="text-xs sm:text-sm text-gray-600">Analyzed</p>
               </div>
-              <div className="w-px h-12 bg-gray-200"></div>
+              <div className="w-px h-10 sm:h-12 bg-gray-200"></div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-amber-600">
+                <p className="text-xl sm:text-2xl font-bold text-amber-600">
                   {Array.isArray(videos) ? videos.filter((v: any) => v.status === 'processing').length : 0}
                 </p>
-                <p className="text-sm text-gray-600">Processing</p>
+                <p className="text-xs sm:text-sm text-gray-600">Processing</p>
               </div>
-              <div className="w-px h-12 bg-gray-200"></div>
+              <div className="w-px h-10 sm:h-12 bg-gray-200 hidden sm:block"></div>
               <Button 
-                className="btn-primary shadow-md hover:shadow-lg transition-all" 
+                className="btn-primary shadow-md hover:shadow-lg transition-all hidden sm:flex" 
                 onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -158,20 +158,20 @@ export default function VideoLibrary() {
           </div>
         </div>
 
-          {/* Enhanced Filters with Better Styling */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+          {/* Mobile-Optimized Filters */}
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-gray-400" />
                 <Input 
-                  placeholder="Search by title, team, or player..." 
-                  className="pl-12 pr-4 py-2.5 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="Search videos..." 
+                  className="pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-48 bg-white border-gray-300 hover:bg-gray-50 transition-colors">
+                <SelectTrigger className="w-full sm:w-48 bg-white border-gray-300 hover:bg-gray-50 transition-colors text-sm sm:text-base">
                   <Filter className="w-4 h-4 mr-2 text-gray-600" />
                   <SelectValue placeholder="All Videos" />
                 </SelectTrigger>
@@ -217,9 +217,9 @@ export default function VideoLibrary() {
               ))}
             </div>
           ) : filteredVideos.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredVideos.map((video: any) => (
-                <div key={video.id} className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
+                <div key={video.id} className="group relative bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
                   {/* Enhanced Thumbnail Section */}
                   <div className="relative aspect-video bg-gray-100">
                     {video.thumbnailUrl ? (
@@ -252,24 +252,24 @@ export default function VideoLibrary() {
                       </Link>
                     </div>
 
-                    {/* Enhanced Status Badge */}
-                    <div className="absolute top-3 right-3">
+                    {/* Mobile-Optimized Status Badge */}
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                       {video.status === 'completed' && (
-                        <div className="bg-green-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
-                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className="bg-green-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-1.5 sm:gap-2">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></div>
                           Analyzed
                         </div>
                       )}
                       {video.status === 'processing' && (
-                        <div className="bg-amber-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
-                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <div className="bg-amber-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-1.5 sm:gap-2">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse"></div>
                           Processing
                         </div>
                       )}
                       {video.status === 'failed' && (
-                        <div className="flex items-center gap-2">
-                          <div className="bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <div className="bg-red-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-lg flex items-center gap-1.5 sm:gap-2">
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></div>
                             Failed
                           </div>
                           <Button
@@ -280,7 +280,7 @@ export default function VideoLibrary() {
                               retryVideoMutation.mutate(video.id);
                             }}
                             disabled={retryVideoMutation.isPending}
-                            className="bg-white/90 hover:bg-white text-red-600 border-0 shadow-lg px-3 py-1.5 rounded-full text-sm font-semibold"
+                            className="bg-white/90 hover:bg-white text-red-600 border-0 shadow-lg px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold"
                           >
                             {retryVideoMutation.isPending ? (
                               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -295,31 +295,31 @@ export default function VideoLibrary() {
                       )}
                     </div>
 
-                    {/* Duration Badge */}
+                    {/* Mobile-Optimized Duration Badge */}
                     {video.duration && (
-                      <div className="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 rounded text-sm font-medium">
+                      <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs sm:text-sm font-medium">
                         {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
                       </div>
                     )}
                   </div>
 
-                  {/* Enhanced Content Section */}
-                  <div className="p-5">
-                    <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  {/* Mobile-Optimized Content Section */}
+                  <div className="p-4 sm:p-5">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                       {video.title}
                     </h3>
                     
                     {video.description && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
                         {video.description}
                       </p>
                     )}
 
-                    {/* Enhanced Metadata */}
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-3 text-gray-500">
+                    {/* Mobile-Optimized Metadata */}
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
+                      <div className="flex items-center gap-2 sm:gap-3 text-gray-500">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                           {new Date(video.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </div>
                         {video.youtubeUrl && (

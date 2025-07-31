@@ -250,27 +250,27 @@ export default function AnalysisDetail() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      {/* Simple Header */}
+      {/* Mobile-Optimized Header */}
       <div className="border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
             <Link href="/videos">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+              <Button variant="ghost" size="sm" className="px-2 sm:px-4">
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
             </Link>
-            <div className="flex items-center gap-3">
-              <Badge variant={(video as any).status === 'completed' ? 'default' : 'secondary'}>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Badge variant={(video as any).status === 'completed' ? 'default' : 'secondary'} className="text-xs">
                 {(video as any).status}
               </Badge>
               {(video as any).youtubeUrl && (
                 <Button 
                   size="sm"
-                  className="btn-primary"
+                  className="btn-primary text-xs sm:text-sm px-3 sm:px-4"
                   onClick={() => window.open((video as any).youtubeUrl, '_blank')}
                 >
-                  <Play className="w-4 h-4 mr-2" />
+                  <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Watch
                 </Button>
               )}
@@ -279,11 +279,11 @@ export default function AnalysisDetail() {
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 py-6">
-        {/* Compact Video Info */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">{(video as any).title}</h1>
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        {/* Mobile-Optimized Video Info */}
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold mb-2 leading-tight">{(video as any).title}</h1>
+          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
             <span>{videoType || 'Game'} Analysis</span>
             {(video as any).duration && (
               <span>• {Math.floor((video as any).duration / 60)}:{((video as any).duration % 60).toString().padStart(2, '0')}</span>
@@ -291,9 +291,9 @@ export default function AnalysisDetail() {
             <span>• {new Date((video as any).createdAt).toLocaleDateString()}</span>
           </div>
           
-          {/* Thumbnail if available */}
+          {/* Mobile-Optimized Thumbnail */}
           {(video as any).thumbnailUrl && (
-            <div className="relative w-full max-w-md aspect-video rounded-lg overflow-hidden bg-gray-900 mb-4">
+            <div className="relative w-full max-w-full sm:max-w-md aspect-video rounded-lg overflow-hidden bg-gray-900 mb-4">
               <img 
                 src={(video as any).thumbnailUrl} 
                 alt={(video as any).title}

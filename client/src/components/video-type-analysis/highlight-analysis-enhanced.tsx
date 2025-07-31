@@ -202,95 +202,95 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
   const { strengths, weaknesses } = extractStrengthsWeaknesses();
 
   return (
-    <div className="space-y-6">
-      {/* Header Section */}
+    <div className="space-y-4 sm:space-y-6">
+      {/* Mobile-Optimized Header Section */}
       <Card className="border-slate-200 dark:border-slate-700 shadow-xl bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg">
-                <Crown className="w-8 h-8 text-white" />
+        <CardHeader className="pb-3 sm:pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg sm:rounded-xl shadow-lg flex-shrink-0">
+                <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
-              <div>
-                <CardTitle className="text-3xl flex items-center gap-2">
-                  {playerName}'s Elite Highlights
-                  <Gem className="w-6 h-6 text-blue-600" />
+              <div className="min-w-0">
+                <CardTitle className="text-xl sm:text-2xl md:text-3xl flex items-center gap-2 flex-wrap">
+                  <span className="truncate">{playerName}'s Elite Highlights</span>
+                  <Gem className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
                 </CardTitle>
-                <p className="text-muted-foreground text-lg mt-1">
-                  Comprehensive Performance Analysis & Recruiting Evaluation
+                <p className="text-muted-foreground text-sm sm:text-base md:text-lg mt-1">
+                  <span className="hidden sm:inline">Comprehensive Performance Analysis & </span>Recruiting Evaluation
                 </p>
               </div>
             </div>
-            <div className="text-right">
-              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg px-4 py-2">
+            <div className="self-start sm:self-auto">
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm sm:text-base md:text-lg px-3 sm:px-4 py-1 sm:py-2">
                 {recruitingLevel} Potential
               </Badge>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             <div className="text-center">
-              <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{totalHighlights}</p>
-              <p className="text-sm text-muted-foreground">Total Clips</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 dark:text-blue-300">{totalHighlights}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Total Clips</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">{avgConfidence}%</p>
-              <p className="text-sm text-muted-foreground">Avg Confidence</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-700 dark:text-purple-300">{avgConfidence}%</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Avg Confidence</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-orange-700 dark:text-orange-300">{keyMoments.length}</p>
-              <p className="text-sm text-muted-foreground">Elite Moments</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-orange-700 dark:text-orange-300">{keyMoments.length}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Elite Moments</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Performance Statistics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Mobile-Optimized Performance Statistics Grid */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
-          <CardContent className="p-4 text-center">
-            <Target className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-green-800 dark:text-green-200">{goals}</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Target className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 mx-auto mb-1 sm:mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-green-800 dark:text-green-200">{goals}</p>
             <p className="text-xs text-green-600 dark:text-green-400">Goals Scored</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800">
-          <CardContent className="p-4 text-center">
-            <Zap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{assists}</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-1 sm:mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-blue-800 dark:text-blue-200">{assists}</p>
             <p className="text-xs text-blue-600 dark:text-blue-400">Assists/Feeds</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-orange-200 dark:border-orange-800">
-          <CardContent className="p-4 text-center">
-            <Shield className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-orange-800 dark:text-orange-200">{saves}</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 mx-auto mb-1 sm:mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-orange-800 dark:text-orange-200">{saves}</p>
             <p className="text-xs text-orange-600 dark:text-orange-400">Saves Made</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-800">
-          <CardContent className="p-4 text-center">
-            <Activity className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">{dodges}</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 mx-auto mb-1 sm:mb-2" />
+            <p className="text-xl sm:text-2xl font-bold text-purple-800 dark:text-purple-200">{dodges}</p>
             <p className="text-xs text-purple-600 dark:text-purple-400">Successful Dodges</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Skill Analysis Breakdown */}
+      {/* Mobile-Optimized Skill Analysis Breakdown */}
       <Card className="shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-slate-100 to-blue-100 dark:from-slate-800 dark:to-blue-900 border-b">
-          <div className="flex items-center gap-3">
-            <BarChart3 className="w-6 h-6 text-blue-600" />
-            <CardTitle className="text-xl">Detailed Skill Analysis</CardTitle>
+        <CardHeader className="bg-gradient-to-r from-slate-100 to-blue-100 dark:from-slate-800 dark:to-blue-900 border-b px-4 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+            <CardTitle className="text-lg sm:text-xl">Detailed Skill Analysis</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
             {Object.entries(skillMentions).map(([skill, count]) => {
               const maxCount = Math.max(...Object.values(skillMentions));
               const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;

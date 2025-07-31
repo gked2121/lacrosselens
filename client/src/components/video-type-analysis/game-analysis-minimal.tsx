@@ -21,22 +21,22 @@ export function GameAnalysisMinimal({ video, analyses, formatTimestamp }: GameAn
   const keyMoments = analyses?.filter(a => a.type === 'key_moment') || [];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-16">
-      {/* Overview */}
+    <div className="max-w-4xl mx-auto px-0 py-4 sm:py-8 space-y-8 sm:space-y-16">
+      {/* Mobile-Optimized Overview */}
       {overallAnalysis && (
-        <div className="space-y-6">
-          <h2 className="text-3xl font-light tracking-tight">Overview</h2>
-          <div className="pl-8 border-l-2 border-gray-200 dark:border-gray-700">
-            <p className="text-lg leading-8 text-gray-700 dark:text-gray-300">
+        <div className="space-y-4 sm:space-y-6">
+          <h2 className="text-2xl sm:text-3xl font-light tracking-tight">Overview</h2>
+          <div className="pl-4 sm:pl-8 border-l-2 border-gray-200 dark:border-gray-700">
+            <p className="text-base sm:text-lg leading-relaxed sm:leading-8 text-gray-700 dark:text-gray-300">
               {overallAnalysis.content}
             </p>
-            <div className="flex items-center gap-6 mt-4 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500">
               <span className="flex items-center gap-1">
-                <Eye className="w-4 h-4" />
+                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                 {overallAnalysis.confidence}% confidence
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                 {formatTimestamp(overallAnalysis.timestamp) || 'Full Game'}
               </span>
             </div>
@@ -44,34 +44,34 @@ export function GameAnalysisMinimal({ video, analyses, formatTimestamp }: GameAn
         </div>
       )}
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {/* Mobile-Optimized Quick Stats */}
+      <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4 md:gap-8">
         <div className="text-center">
-          <p className="text-4xl font-light">{playerEvaluations.length}</p>
-          <p className="text-sm text-gray-500 mt-2">Players Analyzed</p>
+          <p className="text-2xl sm:text-3xl md:text-4xl font-light">{playerEvaluations.length}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Players Analyzed</p>
         </div>
         <div className="text-center">
-          <p className="text-4xl font-light">{faceOffAnalyses.length}</p>
-          <p className="text-sm text-gray-500 mt-2">Face-offs</p>
+          <p className="text-2xl sm:text-3xl md:text-4xl font-light">{faceOffAnalyses.length}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Face-offs</p>
         </div>
         <div className="text-center">
-          <p className="text-4xl font-light">{transitionAnalyses.length}</p>
-          <p className="text-sm text-gray-500 mt-2">Transitions</p>
+          <p className="text-2xl sm:text-3xl md:text-4xl font-light">{transitionAnalyses.length}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Transitions</p>
         </div>
         <div className="text-center">
-          <p className="text-4xl font-light">{keyMoments.length}</p>
-          <p className="text-sm text-gray-500 mt-2">Key Moments</p>
+          <p className="text-2xl sm:text-3xl md:text-4xl font-light">{keyMoments.length}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Key Moments</p>
         </div>
       </div>
 
-      {/* Players */}
+      {/* Mobile-Optimized Players */}
       {playerEvaluations.length > 0 && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-light tracking-tight">Players</h2>
-            <span className="text-sm text-gray-500">{playerEvaluations.length} analyzed</span>
+            <h2 className="text-2xl sm:text-3xl font-light tracking-tight">Players</h2>
+            <span className="text-xs sm:text-sm text-gray-500">{playerEvaluations.length} analyzed</span>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900/30 rounded-2xl p-8">
+          <div className="bg-gray-50 dark:bg-gray-900/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
             {(video.title?.toLowerCase().includes('highlight') || 
               video.metadata?.videoType === 'highlight_tape') ? (
               <PersonalHighlightEvaluations
@@ -89,14 +89,14 @@ export function GameAnalysisMinimal({ video, analyses, formatTimestamp }: GameAn
         </div>
       )}
 
-      {/* Face-offs */}
+      {/* Mobile-Optimized Face-offs */}
       {faceOffAnalyses.length > 0 && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-light tracking-tight">Face-offs</h2>
-            <span className="text-sm text-gray-500">{faceOffAnalyses.length} tracked</span>
+            <h2 className="text-2xl sm:text-3xl font-light tracking-tight">Face-offs</h2>
+            <span className="text-xs sm:text-sm text-gray-500">{faceOffAnalyses.length} tracked</span>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {faceOffAnalyses.map((faceoff: any, index: number) => (
               <div key={faceoff.id} className="group">
                 <div className="flex items-start gap-4">

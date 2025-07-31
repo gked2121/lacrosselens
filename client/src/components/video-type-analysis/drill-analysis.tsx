@@ -6,11 +6,13 @@ import {
   Target, 
   Clock, 
   Zap, 
-  CheckCircle2, 
-  AlertCircle,
+  CheckCircle, 
+  AlertTriangle,
   TrendingUp,
   Activity,
-  User
+  User,
+  Repeat,
+  BarChart3
 } from "lucide-react";
 
 interface DrillAnalysisProps {

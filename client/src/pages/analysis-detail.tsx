@@ -9,10 +9,10 @@ import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
 import { DrillAnalysis } from "@/components/video-type-analysis/drill-analysis";
-import { HighlightAnalysis } from "@/components/video-type-analysis/highlight-analysis";
-import { RecruitingAnalysis } from "@/components/video-type-analysis/recruiting-analysis";
-import { PracticeAnalysis } from "@/components/video-type-analysis/practice-analysis";
-import { ScrimmageAnalysis } from "@/components/video-type-analysis/scrimmage-analysis";
+import { HighlightAnalysisEnhanced } from "@/components/video-type-analysis/highlight-analysis-enhanced";
+import { RecruitingAnalysisEnhanced } from "@/components/video-type-analysis/recruiting-analysis-enhanced";
+import { PracticeAnalysisEnhanced } from "@/components/video-type-analysis/practice-analysis-enhanced";
+import { ScrimmageAnalysisEnhanced } from "@/components/video-type-analysis/scrimmage-analysis-enhanced";
 import { GameAnalysis } from "@/components/video-type-analysis/game-analysis";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -393,18 +393,18 @@ export default function AnalysisDetail() {
           (() => {
             switch (videoType) {
               case 'drill':
-                return <DrillAnalysis video={video as any} analyses={analyses as any[]} />;
+                return <DrillAnalysis video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
               case 'highlight':
-                return <HighlightAnalysis video={video as any} analyses={analyses as any[]} />;
+                return <HighlightAnalysisEnhanced video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
               case 'recruiting':
-                return <RecruitingAnalysis video={video as any} analyses={analyses as any[]} />;
+                return <RecruitingAnalysisEnhanced video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
               case 'practice':
-                return <PracticeAnalysis video={video as any} analyses={analyses as any[]} />;
+                return <PracticeAnalysisEnhanced video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
               case 'scrimmage':
-                return <ScrimmageAnalysis video={video as any} analyses={analyses as any[]} />;
+                return <ScrimmageAnalysisEnhanced video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
               case 'game':
               default:
-                return <GameAnalysis video={video as any} analyses={analyses as any[]} />;
+                return <GameAnalysis video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
             }
           })()
         ) : (

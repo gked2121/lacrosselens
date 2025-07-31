@@ -26,7 +26,7 @@ interface GameAnalysisProps {
 }
 
 export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisProps) {
-  const [expandedSections, setExpandedSections] = useState(new Set(['overall']));
+  const [expandedSections, setExpandedSections] = useState(new Set(['overview']));
   const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
 
   const overallAnalysis = analyses?.find(a => a.type === 'overall');
@@ -34,6 +34,57 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
   const faceOffAnalyses = analyses?.filter(a => a.type === 'face_off') || [];
   const transitionAnalyses = analyses?.filter(a => a.type === 'transition') || [];
   const keyMoments = analyses?.filter(a => a.type === 'key_moment') || [];
+
+  // Extract real game metrics from our data
+  const gameMetrics = {
+    totalPlayers: playerEvaluations.length,
+    avgPlayerConfidence: playerEvaluations.length > 0 
+      ? Math.round(playerEvaluations.reduce((sum, p) => sum + p.confidence, 0) / playerEvaluations.length)
+      : 0,
+    totalFaceoffs: faceOffAnalyses.length,
+    faceoffWinRate: faceOffAnalyses.length > 0 
+      ? Math.round((faceOffAnalyses.filter(f => 
+          f.content.toLowerCase().includes('win') || 
+          f.content.toLowerCase().includes('won') ||
+          f.content.toLowerCase().includes('successful')
+        ).length / faceOffAnalyses.length) * 100)
+      : 0,
+    totalTransitions: transitionAnalyses.length,
+    transitionSuccessRate: transitionAnalyses.length > 0
+      ? Math.round((transitionAnalyses.filter(t => 
+          t.content.toLowerCase().includes('success') || 
+          t.content.toLowerCase().includes('effective') ||
+          t.content.toLowerCase().includes('clean')
+        ).length / transitionAnalyses.length) * 100)
+      : 0,
+    eliteMoments: keyMoments.length,
+    gameIntensity: keyMoments.length > 8 ? 'Elite' : keyMoments.length > 4 ? 'High' : keyMoments.length > 1 ? 'Medium' : 'Low',
+    timeSpan: analyses.length > 0 ? {
+      earliest: Math.min(...analyses.filter(a => a.timestamp).map(a => a.timestamp)),
+      latest: Math.max(...analyses.filter(a => a.timestamp).map(a => a.timestamp))
+    } : null
+  };
+
+  // Extract team data from player evaluations
+  const teamData = playerEvaluations.reduce((acc, player) => {
+    const isWhiteTeam = player.content.toLowerCase().includes('white') || 
+                       player.content.toLowerCase().includes('light') ||
+                       player.content.toLowerCase().includes('#1 ') ||
+                       player.content.toLowerCase().includes('#2 ') ||
+                       player.content.toLowerCase().includes('#3 ');
+    const teamKey = isWhiteTeam ? 'white' : 'dark';
+    
+    if (!acc[teamKey]) acc[teamKey] = [];
+    acc[teamKey].push(player);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  // Extract goals and scoring from key moments
+  const scoringData = keyMoments.filter(moment => 
+    moment.content.toLowerCase().includes('goal') ||
+    moment.content.toLowerCase().includes('score') ||
+    moment.content.toLowerCase().includes('assist')
+  );
 
   const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections);
@@ -104,6 +155,101 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
 
   return (
     <div className="space-y-6">
+      {/* Game Overview Metrics */}
+      <Card className="border-emerald-200 dark:border-emerald-800 shadow-lg">
+        <CardHeader className="bg-emerald-50 dark:bg-emerald-950/20 border-b border-emerald-200 dark:border-emerald-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-500 rounded-lg">
+              <BarChart3 className="w-6 h-6 text-white" />
+            </div>
+            <CardTitle className="text-xl">Game Overview & Performance Metrics</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="w-5 h-5 text-blue-600" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Players Tracked</span>
+              </div>
+              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{gameMetrics.totalPlayers}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">{gameMetrics.avgPlayerConfidence}% avg confidence</p>
+            </div>
+            
+            <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="w-5 h-5 text-purple-600" />
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Face-offs</span>
+              </div>
+              <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{gameMetrics.totalFaceoffs}</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400">{gameMetrics.faceoffWinRate}% success rate</p>
+            </div>
+            
+            <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">Transitions</span>
+              </div>
+              <p className="text-2xl font-bold text-green-900 dark:text-green-100">{gameMetrics.totalTransitions}</p>
+              <p className="text-xs text-green-600 dark:text-green-400">{gameMetrics.transitionSuccessRate}% effective</p>
+            </div>
+            
+            <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-5 h-5 text-orange-600" />
+                <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Elite Moments</span>
+              </div>
+              <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{gameMetrics.eliteMoments}</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400">{gameMetrics.gameIntensity} intensity</p>
+            </div>
+          </div>
+
+          {/* Team Breakdown */}
+          {Object.keys(teamData).length > 0 && (
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Team Performance Breakdown
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(teamData).map(([teamKey, players]) => (
+                  <div key={teamKey} className={`p-4 rounded-lg border ${
+                    teamKey === 'white' 
+                      ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-700'
+                      : 'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-700'
+                  }`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`w-3 h-3 rounded-full ${
+                        teamKey === 'white' ? 'bg-gray-400' : 'bg-slate-600'
+                      }`}></div>
+                      <span className="font-medium capitalize">{teamKey} Team</span>
+                      <Badge variant="outline">{players.length} players</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Avg Confidence: {Math.round(players.reduce((sum, p) => sum + p.confidence, 0) / players.length)}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Game Timeline */}
+          {gameMetrics.timeSpan && (
+            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900/20 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-gray-600" />
+                <span className="font-medium text-gray-900 dark:text-gray-100">Game Analysis Coverage</span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Analysis spans from {formatTimestamp(gameMetrics.timeSpan.earliest)} to {formatTimestamp(gameMetrics.timeSpan.latest)}
+                ({scoringData.length} scoring plays identified)
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Confidence Score Info */}
       <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
         <CardHeader 

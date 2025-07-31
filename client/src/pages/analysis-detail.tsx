@@ -141,7 +141,9 @@ export default function AnalysisDetail() {
   const analysisSections: AnalysisSection[] = [
     {
       id: 'players',
-      title: 'Player Evaluations',
+      title: (video as any).title?.toLowerCase().includes('highlight') ? 
+        `All Players in ${(video as any).title.split(' ')[0]}'s Highlights` : 
+        'Player Evaluations',
       icon: Users,
       count: playerEvaluations.length,
       color: 'text-primary',
@@ -208,6 +210,19 @@ export default function AnalysisDetail() {
                 <p className="text-muted-foreground mt-1">
                   {(video as any).description}
                 </p>
+              )}
+              {/* Special notice for highlight tapes */}
+              {(video as any).title && ((video as any).title.toLowerCase().includes('highlight') || 
+                (video as any).metadata?.videoType === 'highlight_tape') && playerEvaluations.length > 1 && (
+                <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm text-amber-800 dark:text-amber-200 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>
+                      <strong>Player Highlight Analysis:</strong> This analysis evaluates all players visible in {(video as any).title.split(' ')[0]}'s highlights, 
+                      including opponents and teammates. {playerEvaluations.length} different players were identified and analyzed throughout the video.
+                    </span>
+                  </p>
+                </div>
               )}
             </div>
             <div className="flex gap-3">
@@ -352,10 +367,22 @@ export default function AnalysisDetail() {
                     <CardContent className="p-6">
                       {/* Player Evaluations */}
                       {section.id === 'players' && (
-                        <PlayerEvaluationsGrouped 
-                          evaluations={playerEvaluations}
-                          formatTimestamp={formatTimestamp as (timestamp: number) => string}
-                        />
+                        <div className="space-y-4">
+                          {/* Additional context for highlight tapes */}
+                          {(video as any).title?.toLowerCase().includes('highlight') && (
+                            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+                              <p className="text-sm text-blue-800 dark:text-blue-200">
+                                <strong>Note:</strong> This analysis includes all players visible throughout {(video as any).title.split(' ')[0]}'s highlight reel - 
+                                teammates, opponents, and other players who appear in the footage. Each player is evaluated based on their performance 
+                                in the clips where they appear.
+                              </p>
+                            </div>
+                          )}
+                          <PlayerEvaluationsGrouped 
+                            evaluations={playerEvaluations}
+                            formatTimestamp={formatTimestamp as (timestamp: number) => string}
+                          />
+                        </div>
                       )}
                       
                       {/* Face-off Analysis */}

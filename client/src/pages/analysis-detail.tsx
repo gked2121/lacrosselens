@@ -8,7 +8,7 @@ import Navigation from "@/components/navigation";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -29,7 +29,8 @@ import {
   ChevronDown,
   ChevronUp,
   Activity,
-  Info
+  Info,
+  Zap
 } from "lucide-react";
 
 interface AnalysisSection {
@@ -340,8 +341,123 @@ export default function AnalysisDetail() {
         {/* Analysis Content */}
         {(video as any).status === 'completed' ? (
           <div className="space-y-3 sm:space-y-6">
-            {/* Overall Analysis - Always Visible */}
-            {overallAnalysis && (
+            {/* Check if this is a drill/training video */}
+            {((video as any).metadata?.videoType === 'drill' || 
+              (video as any).title?.toLowerCase().includes('drill') ||
+              (video as any).title?.toLowerCase().includes('training') ||
+              (video as any).title?.toLowerCase().includes('shooting')) ? (
+              /* Drill-specific UI */
+              <div className="space-y-6">
+                {/* Drill Overview */}
+                {overallAnalysis && (
+                  <Card className="shadow-soft border-blue-200/50 bg-blue-50/30">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-2 text-xl">
+                        <Target className="w-6 h-6 text-blue-600" />
+                        Drill Analysis
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="prose prose-sm max-w-none">
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                          {overallAnalysis.content}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Technique Breakdown */}
+                {playerEvaluations.length > 0 && (
+                  <Card className="shadow-soft">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="w-5 h-5 text-green-600" />
+                        Technique Observations
+                      </CardTitle>
+                      <CardDescription>Individual technique analysis from the drill</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {playerEvaluations.map((evaluation: any, index: number) => (
+                          <div key={evaluation.id} className="border-l-4 border-green-500/50 pl-4 py-2">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm">
+                                {evaluation.title || `Player ${index + 1}`}
+                              </h4>
+                              {evaluation.timestamp && (
+                                <span className="text-xs text-muted-foreground">
+                                  {formatTimestamp(evaluation.timestamp)}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {evaluation.content}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Key Coaching Points */}
+                {keyMoments.length > 0 && (
+                  <Card className="shadow-soft border-purple-200/50 bg-purple-50/30">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-purple-600" />
+                        Key Coaching Points
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-3">
+                        {keyMoments.map((moment: any, index: number) => (
+                          <div key={moment.id} className="flex gap-3">
+                            <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-medium text-purple-700">{index + 1}</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {moment.content}
+                              </p>
+                              {moment.timestamp && (
+                                <span className="text-xs text-muted-foreground mt-1 inline-block">
+                                  @ {formatTimestamp(moment.timestamp)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Summary Stats for Drill */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Analysis Summary</h3>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm">{overallAnalysis ? 1 : 0} Overview</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">{playerEvaluations.length} Technique{playerEvaluations.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                      <span className="text-sm">{keyMoments.length} Coaching Point{keyMoments.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Regular game analysis UI */
+              <>
+                {/* Overall Analysis - Always Visible */}
+                {overallAnalysis && (
               <Card className="shadow-soft">
                 <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg p-3 sm:p-6" onClick={() => toggleSection('overview')}>
                   <CardTitle className="flex items-center justify-between text-base sm:text-lg">
@@ -627,6 +743,8 @@ export default function AnalysisDetail() {
                 </div>
               </CardContent>
             </Card>
+            </>
+            )}
           </div>
         ) : (
           <Card className="shadow-soft">

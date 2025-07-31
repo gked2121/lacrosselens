@@ -915,3 +915,19 @@ The database schema is well-designed for detailed play tracking:
   - client/src/pages/video-library.tsx (updated descriptions)
   - client/src/components/detailed-analysis-view.tsx (updated metric labels)
 - **Status**: Authentic lacrosse communication and terminology fully integrated throughout the application
+
+### 2025-01-31 - Implemented Fluid Drill-Specific UI for Training Videos
+- **Issue**: User reported drill videos need different, more fluid UI than game footage analysis - regular tabbed UI wasn't appropriate
+- **Solution**: Created completely separate analysis display for drill and training videos
+- **Key Changes**:
+  - **Automatic Detection**: Detects drill videos based on metadata videoType="drill" or title containing "drill", "training", or "shooting"
+  - **Simplified Layout**: Replaced complex tabbed interface with clean, linear card layout
+  - **Drill-Specific Sections**:
+    * Drill Analysis card with blue theme - shows overall drill breakdown
+    * Technique Observations card with green theme - individual player technique analysis
+    * Key Coaching Points card with purple theme - numbered coaching insights
+    * Summary stats bar with colored indicators instead of complex analytics
+  - **Design Approach**: Fluid, scrollable layout with subtle colored backgrounds and borders
+  - **Removed Complexity**: No tabs, expandable sections, or game-specific metrics for drill videos
+- **Files Modified**: client/src/pages/analysis-detail.tsx (added drill detection and separate UI path)
+- **Status**: Drill videos now have their own specialized, simplified analysis display

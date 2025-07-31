@@ -229,7 +229,7 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 gap-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{totalHighlights}</p>
               <p className="text-sm text-muted-foreground">Total Clips</p>
@@ -239,16 +239,8 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
               <p className="text-sm text-muted-foreground">Avg Confidence</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-green-700 dark:text-green-300">{ratings.average}/10</p>
-              <p className="text-sm text-muted-foreground">Avg Rating</p>
-            </div>
-            <div className="text-center">
               <p className="text-3xl font-bold text-orange-700 dark:text-orange-300">{keyMoments.length}</p>
               <p className="text-sm text-muted-foreground">Elite Moments</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-300">{ratings.high}/10</p>
-              <p className="text-sm text-muted-foreground">Peak Rating</p>
             </div>
           </div>
         </CardContent>

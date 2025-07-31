@@ -36,7 +36,6 @@ export default function Landing() {
           </div>
         </div>
       </header>
-
       {/* Hero Section */}
       <section className="min-h-[85vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Modern animated background */}
@@ -63,7 +62,7 @@ export default function Landing() {
           </div>
           
           <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black mb-8 leading-[0.85] tracking-tight">
-            <span className="block bg-gradient-to-b from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent pb-2">
+            <span className="block bg-gradient-to-b from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent pb-2 text-[60px]">
               AI That Understands
             </span>
             <span className="block mt-4 text-[1.1em] bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-x bg-300%">
@@ -117,9 +116,6 @@ export default function Landing() {
           
         </div>
       </section>
-      
-      
-
       {/* AI Benefits Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -299,7 +295,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
       {/* Use Cases Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -425,7 +420,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
       {/* Testimonials Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
         <div className="max-w-7xl mx-auto">
@@ -509,7 +503,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
       {/* FAQs Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
@@ -575,7 +568,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
       {/* CTA Section */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: 'hsl(259 100% 65% / 0.03)' }}>
         <div className="absolute inset-0 overflow-hidden">
@@ -626,7 +618,6 @@ export default function Landing() {
           </p>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="border-t border-border/50 bg-card/50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

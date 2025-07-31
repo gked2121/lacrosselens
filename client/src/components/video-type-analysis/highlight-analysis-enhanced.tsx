@@ -304,20 +304,235 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
         </CardContent>
       </Card>
 
-      {/* Detailed Player Breakdown */}
+      {/* Detailed Player Performance Breakdown */}
       <Card className="shadow-lg">
         <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-b">
           <div className="flex items-center gap-3">
             <User className="w-5 h-5 text-blue-600" />
-            <CardTitle>Clip-by-Clip Performance Analysis</CardTitle>
+            <CardTitle>Comprehensive Player Performance Analysis</CardTitle>
+            <Badge variant="outline">{playerEvaluations.length} detailed evaluations</Badge>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <PersonalHighlightEvaluations
-            evaluations={playerEvaluations}
-            formatTimestamp={formatTimestamp as (timestamp: number) => string}
-            playerName={playerName}
-          />
+          {/* Enhanced Player Analysis Grid */}
+          <div className="space-y-6">
+            {/* Technical Skills Breakdown */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-5 h-5 text-green-600" />
+                    <h4 className="font-semibold text-green-800 dark:text-green-200">Shooting Analysis</h4>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {(() => {
+                      const shootingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('shot') || 
+                        analysis.content.toLowerCase().includes('shooting') ||
+                        analysis.content.toLowerCase().includes('scores') ||
+                        analysis.content.toLowerCase().includes('goal')
+                      );
+                      
+                      if (shootingAnalyses.length === 0) {
+                        return <p className="text-muted-foreground">No shooting analysis available</p>;
+                      }
+                      
+                      return shootingAnalyses.slice(0, 3).map((analysis, idx) => (
+                        <div key={idx} className="p-2 bg-green-100 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-800">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className="bg-green-600 text-white text-xs">
+                              {formatTimestamp(analysis.timestamp)}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {analysis.confidence}%
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-green-800 dark:text-green-200 leading-relaxed">
+                            {analysis.content.substring(0, 150)}...
+                          </p>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity className="w-5 h-5 text-purple-600" />
+                    <h4 className="font-semibold text-purple-800 dark:text-purple-200">Dodging & Movement</h4>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {(() => {
+                      const dodgingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('dodge') || 
+                        analysis.content.toLowerCase().includes('split') ||
+                        analysis.content.toLowerCase().includes('roll') ||
+                        analysis.content.toLowerCase().includes('change of pace') ||
+                        analysis.content.toLowerCase().includes('beats his man')
+                      );
+                      
+                      if (dodgingAnalyses.length === 0) {
+                        return <p className="text-muted-foreground">No dodging analysis available</p>;
+                      }
+                      
+                      return dodgingAnalyses.slice(0, 3).map((analysis, idx) => (
+                        <div key={idx} className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded border border-purple-200 dark:border-purple-800">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className="bg-purple-600 text-white text-xs">
+                              {formatTimestamp(analysis.timestamp)}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {analysis.confidence}%
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-purple-800 dark:text-purple-200 leading-relaxed">
+                            {analysis.content.substring(0, 150)}...
+                          </p>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-semibold text-blue-800 dark:text-blue-200">Passing & Vision</h4>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {(() => {
+                      const passingAnalyses = playerEvaluations.filter(analysis => 
+                        analysis.content.toLowerCase().includes('pass') || 
+                        analysis.content.toLowerCase().includes('feed') ||
+                        analysis.content.toLowerCase().includes('assist') ||
+                        analysis.content.toLowerCase().includes('vision') ||
+                        analysis.content.toLowerCase().includes('finds')
+                      );
+                      
+                      if (passingAnalyses.length === 0) {
+                        return <p className="text-muted-foreground">No passing analysis available</p>;
+                      }
+                      
+                      return passingAnalyses.slice(0, 3).map((analysis, idx) => (
+                        <div key={idx} className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded border border-blue-200 dark:border-blue-800">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className="bg-blue-600 text-white text-xs">
+                              {formatTimestamp(analysis.timestamp)}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {analysis.confidence}%
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed">
+                            {analysis.content.substring(0, 150)}...
+                          </p>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Complete Clip-by-Clip Analysis */}
+            <Card className="border-slate-200 dark:border-slate-700">
+              <CardHeader className="bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PlayCircle className="w-5 h-5 text-slate-600" />
+                    <CardTitle className="text-lg">Complete Clip-by-Clip Breakdown</CardTitle>
+                  </div>
+                  <Badge className="bg-slate-600 text-white">
+                    {playerEvaluations.length} clips analyzed
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <PersonalHighlightEvaluations
+                  evaluations={playerEvaluations}
+                  formatTimestamp={formatTimestamp as (timestamp: number) => string}
+                  playerName={playerName}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Performance Trends */}
+            <Card className="border-orange-200 dark:border-orange-800">
+              <CardHeader className="bg-orange-50 dark:bg-orange-950/20">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-orange-600" />
+                  <CardTitle className="text-lg">Performance Trends & Patterns</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-orange-800 dark:text-orange-200 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      Consistent Strengths
+                    </h4>
+                    {(() => {
+                      const strengthsMap = new Map<string, number>();
+                      const strengthKeywords = ['excellent', 'outstanding', 'strong', 'good', 'effective', 'solid'];
+                      
+                      playerEvaluations.forEach(analysis => {
+                        strengthKeywords.forEach(keyword => {
+                          if (analysis.content.toLowerCase().includes(keyword)) {
+                            strengthsMap.set(keyword, (strengthsMap.get(keyword) || 0) + 1);
+                          }
+                        });
+                      });
+                      
+                      const strengthEntries = Array.from(strengthsMap.entries())
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 5);
+                      
+                      return strengthEntries.map(([strength, count]) => (
+                        <div key={strength} className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/20 rounded">
+                          <span className="text-sm capitalize text-green-800 dark:text-green-200">{strength} performance</span>
+                          <Badge className="bg-green-600 text-white text-xs">{count} mentions</Badge>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-red-800 dark:text-red-200 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      Development Areas
+                    </h4>
+                    {(() => {
+                      const weaknessMap = new Map<string, number>();
+                      const weaknessKeywords = ['improve', 'struggle', 'weak', 'needs work', 'poor', 'inconsistent'];
+                      
+                      playerEvaluations.forEach(analysis => {
+                        weaknessKeywords.forEach(keyword => {
+                          if (analysis.content.toLowerCase().includes(keyword)) {
+                            weaknessMap.set(keyword, (weaknessMap.get(keyword) || 0) + 1);
+                          }
+                        });
+                      });
+                      
+                      const weaknessEntries = Array.from(weaknessMap.entries())
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 5);
+                      
+                      return weaknessEntries.map(([weakness, count]) => (
+                        <div key={weakness} className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/20 rounded">
+                          <span className="text-sm capitalize text-red-800 dark:text-red-200">{weakness === 'needs work' ? 'needs work' : `${weakness} areas`}</span>
+                          <Badge className="bg-red-600 text-white text-xs">{count} mentions</Badge>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </CardContent>
       </Card>
 

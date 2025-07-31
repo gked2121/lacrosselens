@@ -682,6 +682,35 @@ The database schema is well-designed for detailed play tracking:
   - server/index.ts (integrated retry service on startup)
 - **Status**: Videos no longer get stuck in processing, automatic retry ensures reliability, and UI provides excellent user experience
 
+### 2025-01-31 - Enhanced Personal Highlight Video Analysis with Player Tracking
+- **Issue**: User requested better handling of personal player highlight videos - specifically tracking a single player (like Dylan) across multiple clips
+- **Problem**: Previous system grouped all players together without distinguishing the main highlight subject from opponents/teammates
+- **Solution**: Created specialized PersonalHighlightEvaluations component with intelligent player tracking
+- **Key Features**:
+  - **Automatic Player Detection**: Analyzes all clips to find the most frequently mentioned jersey number (appears in 30%+ of clips)
+  - **Jersey Number Extraction**: Uses comprehensive pattern matching to find player numbers in various formats:
+    - Direct mentions: #12, player 12, jersey 12, wearing 12
+    - Action context: "12 makes the save", "12 scores"
+    - Multiple pattern recognition for reliable detection
+  - **Three-Section Organization**:
+    - Target Player Section: All clips featuring the main highlight subject with their jersey number
+    - Uncertain Identification: Clips where jersey numbers aren't clearly visible
+    - Other Players: Teammates and opponents who appear in the highlights
+  - **Smart Grouping**: Automatically identifies the primary player being highlighted based on frequency analysis
+- **Technical Implementation**:
+  - Created PersonalHighlightEvaluations component with advanced pattern matching
+  - Integrated into analysis-detail page with automatic detection of highlight videos
+  - Extracts player name from video title (e.g., "Dylan" from "Dylan's 2024 Highlights")
+  - Maintains all existing functionality while providing better organization
+- **User Benefits**:
+  - Clear separation of the main player's clips from others
+  - Easy identification of uncertain clips that may need manual review
+  - Better analysis focus on the intended highlight subject
+- **Files Created/Modified**:
+  - client/src/components/personal-highlight-evaluations.tsx (new specialized component)
+  - client/src/pages/analysis-detail.tsx (integrated highlight detection)
+- **Status**: Personal highlight videos now properly track and group the main player's appearances separately
+
 ### 2025-01-30 - Expanded Analysis Capabilities with Dedicated Face-off and Transition Pages
 - **Issue**: User needed specialized analysis pages for face-offs and transitions to complement the detailed player evaluations
 - **Changes Made**:

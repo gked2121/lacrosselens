@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
+import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -380,20 +381,34 @@ export default function AnalysisDetail() {
                       {/* Player Evaluations */}
                       {section.id === 'players' && (
                         <div className="space-y-3 sm:space-y-4">
-                          {/* Additional context for highlight tapes */}
-                          {(video as any).title?.toLowerCase().includes('highlight') && (
-                            <div className="p-3 sm:p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
-                              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
-                                <strong>Note:</strong> This analysis includes all players visible throughout {(video as any).title.split(' ')[0]}'s highlight reel - 
-                                teammates, opponents, and other players who appear in the footage. Each player is evaluated based on their performance 
-                                in the clips where they appear.
-                              </p>
-                            </div>
+                          {/* Check if this is a personal highlight video */}
+                          {((video as any).title?.toLowerCase().includes('highlight') || 
+                            (video as any).metadata?.videoType === 'highlight_tape') ? (
+                            <>
+                              {/* Extract player name from title (first word before "highlight") */}
+                              {(() => {
+                                const titleWords = (video as any).title?.split(' ') || [];
+                                const highlightIndex = titleWords.findIndex((word: string) => 
+                                  word.toLowerCase().includes('highlight')
+                                );
+                                const playerName = highlightIndex > 0 ? titleWords[0] : 'Target Player';
+                                
+                                return (
+                                  <PersonalHighlightEvaluations
+                                    evaluations={playerEvaluations}
+                                    formatTimestamp={formatTimestamp as (timestamp: number) => string}
+                                    playerName={playerName}
+                                  />
+                                );
+                              })()}
+                            </>
+                          ) : (
+                            /* Regular team game analysis */
+                            <PlayerEvaluationsGrouped 
+                              evaluations={playerEvaluations}
+                              formatTimestamp={formatTimestamp as (timestamp: number) => string}
+                            />
                           )}
-                          <PlayerEvaluationsGrouped 
-                            evaluations={playerEvaluations}
-                            formatTimestamp={formatTimestamp as (timestamp: number) => string}
-                          />
                         </div>
                       )}
                       

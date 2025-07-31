@@ -129,13 +129,17 @@ MANDATORY TRACKING CATEGORIES:
    - Pressure level (contested/open/on-the-run)
    - Distance (short 0-10yds, medium 10-20yds, long 20+yds)
 
-2. ENHANCED DEFENSIVE TRACKING:
-   - EVERY check thrown: timestamp, defender #, offensive player #, check type (poke/slap/body), success
-   - Track aggressive vs passive defensive approach and timing quality
-   - Document caused turnovers: defensive pressure that DIRECTLY leads to possession change
-   - Times beaten/dodged on: when offensive player successfully beats defender
-   - All slides: primary slider, help defender, recovery time, effectiveness
-   - Clear tracking: successful outlet passes after defensive possession
+2. ENHANCED DEFENSIVE TRACKING (NCAA METRICS):
+   - EVERY check thrown: timestamp, defender #, offensive player #, check type (poke/slap/body/stick lift), success rate
+   - Track defensive aggression: timing quality, well-timed vs desperate checks
+   - Document CAUSED TURNOVERS (NCAA definition): "positive aggressive action that causes turnover"
+     * Includes: strips, interceptions, forced drops, pressure causing violations
+     * Must be DIRECT result of defender's action, not opponent error
+   - Times beaten/dodged on: when offensive player successfully gets past defender
+   - Slide tracking: hot calls, crease slides, adjacent slides, second slides, recovery
+   - Check timing analysis: aggressive early pressure vs reactive late checks
+   - Check aggression levels: well-timed proactive checks vs desperate recovery attempts
+   - Defender positioning: proper angle, stick position, body leverage during checks
 
 3. GOALKEEPER DETAILED TRACKING:
    - Every shot faced: timestamp, shooter #, shot location, shot type, velocity
@@ -144,13 +148,16 @@ MANDATORY TRACKING CATEGORIES:
    - Outlet passes: target player, success rate
    - Communication instances
 
-4. ENHANCED OFFENSIVE TRACKING:
-   - Slides drawn: when offensive player beats initial defender and FORCES help defense
-   - Hockey assists: pass to the player who makes the assist (secondary assist)
-   - Dodge success rate: completed dodges vs attempts, including dodge type
-   - Creative plays: behind-the-back passes, no-look feeds, trick shots
-   - Ball movement: skip passes, adjacent passes, tempo changes
-   - Off-ball cuts: backdoor cuts, pick plays, clear-throughs
+4. ENHANCED OFFENSIVE TRACKING (ADVANCED METRICS):
+   - SLIDES DRAWN: when offensive player beats defender and FORCES "Hot" call/help defense
+     * Track dodge type that drew slide (roll, split, face, bull)
+     * Note slide response (crease, adjacent, late recovery)
+   - HOCKEY ASSISTS: pass to the player who makes the assist (advanced metric not in NCAA stats)
+     * Track sequences: Player A → Player B → Player C scores (Player A gets hockey assist)
+   - Dodge effectiveness: completion rate, defender beaten, slide drawn outcome
+   - Creative plays: BTB passes, no-look feeds, behind-the-back shots, trick plays
+   - Ball movement efficiency: skip passes, adjacent passes, quick ball movement
+   - Offensive pressure: times forcing defensive reactions, tempo control
 
 5. PHYSICAL OBSERVATIONS:
    - Sprint speed comparisons between players

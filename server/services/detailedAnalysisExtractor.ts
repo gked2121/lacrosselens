@@ -229,16 +229,39 @@ export class DetailedAnalysisExtractor {
       if (evalText.includes("goal") && (evalText.includes("score") || evalText.includes("net"))) player.actions.goals++;
       if (evalText.includes("turnover") || evalText.includes("lost possession") || evalText.includes("stripped")) player.actions.turnovers++;
       
-      // Advanced offensive metrics
-      if (evalText.includes("drew slide") || evalText.includes("beat defender") || evalText.includes("forced help")) player.actions.slidesDrawn++;
-      if (evalText.includes("hockey assist") || evalText.includes("secondary assist") || evalText.includes("pass to assist")) player.actions.hockeyAssists++;
+      // Advanced offensive metrics - slides drawn (forcing help defense)
+      if (evalText.includes("drew slide") || evalText.includes("beat defender") || evalText.includes("forced help") || 
+          evalText.includes("forced slide") || evalText.includes("beat his man") || evalText.includes("drew help") ||
+          evalText.includes("hot call") || evalText.includes("forced hot")) player.actions.slidesDrawn++;
       
-      // Defensive metrics
-      if (evalText.includes("check") || evalText.includes("poke") || evalText.includes("stick check")) player.actions.checksThrown++;
-      if (evalText.includes("successful check") || evalText.includes("disrupted") || evalText.includes("stripped ball")) player.actions.successfulChecks++;
-      if (evalText.includes("caused turnover") || evalText.includes("forced turnover") || evalText.includes("defensive pressure")) player.actions.causedTurnovers++;
-      if (evalText.includes("beaten") || evalText.includes("dodged on") || evalText.includes("got by")) player.actions.timesDodgedOn++;
-      if (evalText.includes("slide") || evalText.includes("help defense") || evalText.includes("provided support")) player.actions.timesSlid++;
+      // Hockey assists (pass to the assist player) - advanced metric
+      if (evalText.includes("hockey assist") || evalText.includes("secondary assist") || evalText.includes("pass to assist") ||
+          evalText.includes("pass leading to assist") || evalText.includes("pass to the passer")) player.actions.hockeyAssists++;
+      
+      // Defensive metrics - comprehensive check tracking
+      if (evalText.includes("check") || evalText.includes("poke") || evalText.includes("stick check") ||
+          evalText.includes("slap check") || evalText.includes("body check") || evalText.includes("lifts stick") ||
+          evalText.includes("stick lift") || evalText.includes("defensive pressure")) player.actions.checksThrown++;
+      
+      // Successful checks - NCAA "caused turnover" criteria  
+      if (evalText.includes("successful check") || evalText.includes("disrupted") || evalText.includes("stripped ball") ||
+          evalText.includes("forces drop") || evalText.includes("strips") || evalText.includes("knocks ball loose") ||
+          evalText.includes("dislodges") || evalText.includes("pokes away")) player.actions.successfulChecks++;
+      
+      // Caused turnovers - NCAA official definition: "positive aggressive action causes turnover"
+      if (evalText.includes("caused turnover") || evalText.includes("forced turnover") || evalText.includes("forces turnover") ||
+          evalText.includes("intercepts") || evalText.includes("steals") || evalText.includes("forces violation") ||
+          evalText.includes("pressure causes") || evalText.includes("aggressive defense forces")) player.actions.causedTurnovers++;
+      
+      // Times beaten/dodged on - defensive vulnerability tracking
+      if (evalText.includes("beaten") || evalText.includes("dodged on") || evalText.includes("got by") ||
+          evalText.includes("beat on dodge") || evalText.includes("loses his man") || evalText.includes("defender beaten") ||
+          evalText.includes("gets past") || evalText.includes("burns past")) player.actions.timesDodgedOn++;
+      
+      // Sliding/help defense - team defensive concepts
+      if (evalText.includes("slides") || evalText.includes("help defense") || evalText.includes("provided support") ||
+          evalText.includes("hot slide") || evalText.includes("crease slide") || evalText.includes("adjacent slide") ||
+          evalText.includes("second slide") || evalText.includes("recovery") || evalText.includes("fills")) player.actions.timesSlid++;
       if (evalText.includes("ground ball") || evalText.includes("scoop") || evalText.includes("loose ball")) player.actions.groundBalls++;
       if (evalText.includes("save") || evalText.includes("stop")) player.actions.saves++;
       if (evalText.includes("clear") || evalText.includes("outlet") || evalText.includes("moved ball out")) player.actions.clears++;
@@ -366,12 +389,16 @@ export class DetailedAnalysisExtractor {
   }
   
   private static calculateAdvancedMetrics(metrics: DetailedAnalysisMetrics): void {
-    // Calculate defensive metrics
+    // Calculate comprehensive defensive and offensive metrics
     let totalChecks = 0;
     let successfulChecks = 0;
     let totalCausedTurnovers = 0;
     let totalSlidesDrawn = 0;
     let totalHockeyAssists = 0;
+    let totalTimesBeaten = 0;
+    let totalDodges = 0;
+    let totalAssists = 0;
+    let totalGoals = 0;
     
     Object.values(metrics.playerMetrics).forEach(player => {
       totalChecks += player.actions.checksThrown;
@@ -379,22 +406,35 @@ export class DetailedAnalysisExtractor {
       totalCausedTurnovers += player.actions.causedTurnovers;
       totalSlidesDrawn += player.actions.slidesDrawn;
       totalHockeyAssists += player.actions.hockeyAssists;
+      totalTimesBeaten += player.actions.timesDodgedOn;
+      totalDodges += player.actions.dodges;
+      totalAssists += player.actions.assists;
+      totalGoals += player.actions.goals;
     });
     
-    // Update advanced defensive metrics
+    // Advanced defensive metrics with NCAA-level analysis
     metrics.advancedStats.defensiveMetrics.totalChecksThrown = totalChecks;
     metrics.advancedStats.defensiveMetrics.checkSuccessRate = totalChecks > 0 ? (successfulChecks / totalChecks) * 100 : 0;
+    metrics.advancedStats.defensiveMetrics.causedTurnoverRate = totalChecks > 0 ? (totalCausedTurnovers / totalChecks) * 100 : 0;
     metrics.advancedStats.defensiveMetrics.aggressiveCheckCount = successfulChecks;
+    metrics.advancedStats.defensiveMetrics.timesBeaten = totalTimesBeaten;
     
-    // Update advanced offensive metrics
+    // Advanced offensive metrics 
     metrics.advancedStats.offensiveMetrics.totalSlidesDrawn = totalSlidesDrawn;
     metrics.advancedStats.offensiveMetrics.hockeyAssistTotal = totalHockeyAssists;
+    metrics.advancedStats.offensiveMetrics.dodgeSuccessRate = totalDodges > 0 ? ((totalDodges - totalTimesBeaten) / totalDodges) * 100 : 0;
+    metrics.advancedStats.offensiveMetrics.assistToGoalRatio = totalGoals > 0 ? totalAssists / totalGoals : 0;
     
-    // Calculate creative plays (BTB, behind-the-back passes, etc.)
+    // Calculate ball movement efficiency (total assists + hockey assists per goal)
+    metrics.advancedStats.offensiveMetrics.ballMovementEfficiency = totalGoals > 0 ? 
+      (totalAssists + totalHockeyAssists) / totalGoals : 0;
+    
+    // Calculate creative plays from techniques observed
     let creativePlays = 0;
     Object.values(metrics.playerMetrics).forEach(player => {
       player.techniques.forEach(tech => {
-        if (tech.includes("BTB") || tech.includes("behind") || tech.includes("no-look")) {
+        if (tech.includes("BTB") || tech.includes("behind") || tech.includes("no-look") || 
+            tech.includes("trick") || tech.includes("creative")) {
           creativePlays++;
         }
       });

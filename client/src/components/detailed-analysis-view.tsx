@@ -8,15 +8,28 @@ interface PlayerMetric {
   totalClips: number;
   averageConfidence: number;
   actions: {
+    // Offensive metrics
     dodges: number;
     shots: number;
     passes: number;
-    defensivePlays: number;
-    groundBalls: number;
-    goals: number;
     assists: number;
-    saves: number;
-    causedTurnovers: number;
+    goals: number;
+    slidesDrawn: number; // Times beat defender and drew help defense
+    hockeyAssists: number; // Pass to player who made assist
+    turnovers: number;
+    
+    // Defensive metrics
+    checksThrown: number; // Total defensive contact attempts
+    successfulChecks: number; // Checks that disrupted opponent
+    causedTurnovers: number; // Direct turnovers from defensive pressure
+    timesDodgedOn: number; // Times beaten by offensive player
+    timesSlid: number; // Times provided help defense
+    groundBalls: number;
+    saves: number; // For goalies
+    clears: number; // Successfully moving ball out of defensive zone
+    
+    // Legacy fields for compatibility
+    defensivePlays: number;
   };
   skillsObserved: string[];
   timeRange: {
@@ -266,8 +279,9 @@ export function DetailedAnalysisView({ videoId }: DetailedAnalysisViewProps) {
                   <div className="text-sm text-red-600">Times Beaten</div>
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                Defensive aggression: {advancedStats?.defensiveMetrics?.checkSuccessRate > 60 ? "Aggressive" : advancedStats?.defensiveMetrics?.checkSuccessRate > 40 ? "Balanced" : "Conservative"}
+              <div className="text-xs text-muted-foreground space-y-1">
+                <div>Defensive aggression: {advancedStats?.defensiveMetrics?.checkSuccessRate > 60 ? "Highly Aggressive" : advancedStats?.defensiveMetrics?.checkSuccessRate > 40 ? "Balanced Approach" : "Conservative Style"}</div>
+                <div>Check timing: {advancedStats?.defensiveMetrics?.checkSuccessRate > 70 ? "Well-timed" : advancedStats?.defensiveMetrics?.checkSuccessRate > 50 ? "Mixed timing" : "Reactive checks"}</div>
               </div>
             </div>
             
@@ -295,8 +309,10 @@ export function DetailedAnalysisView({ videoId }: DetailedAnalysisViewProps) {
                   <div className="text-sm text-blue-600">Dodge Success</div>
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                Offensive style: {advancedStats?.offensiveMetrics?.totalSlidesDrawn > 5 ? "Aggressive Driver" : advancedStats?.offensiveMetrics?.creativePlays > 3 ? "Creative Playmaker" : "Ball Mover"}
+              <div className="text-xs text-muted-foreground space-y-1">
+                <div>Offensive style: {advancedStats?.offensiveMetrics?.totalSlidesDrawn > 5 ? "Aggressive Driver" : advancedStats?.offensiveMetrics?.creativePlays > 3 ? "Creative Playmaker" : "Ball Movement"}</div>
+                <div>Pressure creation: {advancedStats?.offensiveMetrics?.totalSlidesDrawn > 8 ? "Elite slide drawer" : advancedStats?.offensiveMetrics?.totalSlidesDrawn > 3 ? "Forces help defense" : "Stays on ball"}</div>
+                <div>Playmaking: {advancedStats?.offensiveMetrics?.hockeyAssistTotal > 2 ? "Elite vision" : advancedStats?.offensiveMetrics?.hockeyAssistTotal > 0 ? "Good court awareness" : "Direct play"}</div>
               </div>
             </div>
           </div>

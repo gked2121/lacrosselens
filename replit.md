@@ -733,36 +733,39 @@ The database schema is well-designed for detailed play tracking:
   - client/src/pages/player-evaluation.tsx (created dedicated player evaluation page)
 - **Status**: Multiple clips per player and stat sheets fully implemented and functional
 
-### 2025-01-31 - Implemented Advanced NCAA-Level Defensive and Offensive Metrics Tracking System
-- **Issue**: User priority - "Keep adding more detail to how much info is pulled from videos" with focus on advanced lacrosse analytics
-- **Solution**: Comprehensive enhancement of detailed analysis extraction system with NCAA-level defensive and offensive metrics
+### 2025-01-31 - Implemented Comprehensive NCAA-Level Defensive and Offensive Metrics with Authentic Lacrosse Terminology
+- **Issue**: User requested "Do more tracking on defense talk about how aggressive or well timed checks are" and "look up what a caused turnover is" plus advanced offensive metrics
+- **Research**: Conducted comprehensive research of NCAA lacrosse statistics and terminology:
+  - **Caused Turnover (NCAA definition)**: "A player's positive, aggressive action that causes a turnover by the opponent" including strips, interceptions, forced drops, pressure causing violations
+  - **Hockey Assist**: While not officially tracked in NCAA lacrosse, valuable for advanced analytics - the pass to the player who made the assist
+  - **Slides Drawn**: When offensive player beats defender and forces help defense ("Hot" call) - key metric for offensive pressure
 - **Major Enhancements**:
-  - **Advanced Defensive Metrics**: Total checks thrown, check success rate, caused turnovers, times beaten, aggressive check count, slide recovery tracking
-  - **Enhanced Offensive Metrics**: Slides drawn (forcing help defense), hockey assists (secondary assists), creative plays, ball movement efficiency
-  - **Pattern Matching Enhancement**: Added comprehensive keyword detection for lacrosse-specific actions and terminology
-  - **Player Action Tracking**: Expanded from 9 to 16+ tracked actions per player including checksThrown, successfulChecks, causedTurnovers, timesDodgedOn, slidesDrawn, hockeyAssists
+  - **Enhanced Defensive Metrics**: Total checks thrown, check success rate, caused turnovers (NCAA definition), times beaten/dodged on, check timing analysis (aggressive vs reactive), defender positioning evaluation
+  - **Advanced Offensive Metrics**: Slides drawn (forcing help defense), hockey assists (secondary assists), dodge effectiveness, ball movement efficiency, creative plays tracking
+  - **Pattern Matching Enhancement**: Added 20+ new keyword patterns for authentic lacrosse terminology:
+    * Defensive: "poke check", "slap check", "stick lift", "forces drop", "strips", "intercepts", "steals", "forces violation", "beaten", "dodged on", "hot slide", "crease slide"
+    * Offensive: "drew slide", "beat defender", "forced help", "hockey assist", "secondary assist", "beat his man", "drew help", "hot call", "forced hot"
+  - **Check Timing Analysis**: Proactive well-timed checks vs desperate recovery attempts with aggression level classification
 - **UI Enhancements**:
-  - Created "NCAA-Level Lacrosse Analytics" section with professional defensive and offensive analytics panels
-  - Red-themed defensive analytics showing total checks, success rates, disruptions, and times beaten
-  - Blue-themed offensive analytics displaying slides drawn, hockey assists, creative plays, and dodge success rates
-  - Enhanced player overview grid from 3 to 4 columns showing all new defensive and offensive metrics
-  - Added coaching insights with defensive aggression levels and offensive style classifications
-- **Gemini AI Enhancement**: Updated prompts to specifically track and report:
-  - Exact check attempts and success rates using proper lacrosse terminology
-  - Slides drawn tracking when offensive players beat defenders and force help
-  - Hockey assist detection for secondary assists in goal sequences
-  - Enhanced statistical accuracy requirements with specific language examples
-- **Pattern Matching Improvements**:
-  - Defensive: "poke check", "slap check", "stripped ball", "caused turnover", "beaten", "dodged on", "slide", "help defense"
-  - Offensive: "drew slide", "beat defender", "forced help", "hockey assist", "secondary assist", "split dodge", "roll dodge"
-  - Advanced calculation of success rates and style classifications
+  - Enhanced defensive analytics panel with check aggression analysis ("Highly Aggressive", "Balanced Approach", "Conservative Style")
+  - Added check timing evaluation ("Well-timed", "Mixed timing", "Reactive checks")
+  - Enhanced offensive analytics with pressure creation analysis ("Elite slide drawer", "Forces help defense", "Stays on ball")
+  - Added playmaking evaluation ("Elite vision", "Good court awareness", "Direct play")
+- **Calculation Improvements**:
+  - Advanced metrics calculation including dodge success rate, assist-to-goal ratio, ball movement efficiency
+  - Comprehensive defensive vulnerability tracking (times beaten, caused turnover rate)
+  - Enhanced coaching insights based on NCAA-level thresholds and terminology
+- **Gemini AI Enhancement**: Updated prompts with authentic NCAA lacrosse terminology and statistical requirements:
+  - Enhanced caused turnover detection with official NCAA criteria
+  - Slides drawn tracking with proper lacrosse terminology ("hot calls", "help defense")
+  - Check timing and aggression analysis with defensive positioning evaluation
 - **Technical Implementation**:
-  - Enhanced DetailedAnalysisExtractor with calculateAdvancedMetrics method
-  - Updated player action interfaces with comprehensive defensive/offensive tracking
-  - Added intelligent coaching insight generation based on metric thresholds
-  - Integrated advanced metrics into existing analysis pipeline
+  - Updated TypeScript interfaces in both server and client with all new metrics
+  - Enhanced DetailedAnalysisExtractor with comprehensive pattern matching
+  - Improved calculateAdvancedMetrics method with 9 new tracked variables
+  - Fixed TypeScript errors and maintained type safety across the application
 - **Files Enhanced**:
-  - server/services/detailedAnalysisExtractor.ts (major enhancements to metrics tracking)
-  - server/services/gemini.ts (enhanced prompts for advanced metric detection)
-  - client/src/components/detailed-analysis-view.tsx (NCAA-level analytics dashboard)
-- **Status**: Advanced NCAA-level defensive and offensive metrics system fully implemented with comprehensive lacrosse analytics
+  - server/services/detailedAnalysisExtractor.ts (major pattern matching and calculation enhancements)
+  - server/services/gemini.ts (NCAA-level terminology and analysis requirements)
+  - client/src/components/detailed-analysis-view.tsx (enhanced analytics dashboard with authentic terminology)
+- **Status**: Comprehensive NCAA-level defensive and offensive metrics system fully implemented with authentic lacrosse terminology and advanced coaching analytics

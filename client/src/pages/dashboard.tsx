@@ -332,6 +332,78 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* AI Tools Section */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            AI Coaching Tools
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Practice Plan Builder */}
+            <Card className="group relative overflow-hidden bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 dark:from-green-400/5 dark:to-emerald-400/5"></div>
+              <CardContent className="relative p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                    <Target className="w-6 h-6 text-white" />
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
+                    Coming Soon
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Practice Plan Builder</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Generate custom practice plans based on your team's analysis
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Workout Builder */}
+            <Card className="group relative overflow-hidden bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-red-500/5 dark:from-orange-400/5 dark:to-red-400/5"></div>
+              <CardContent className="relative p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0">
+                    Coming Soon
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Workout Builder</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Create personalized training programs for player development
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Game Report Generator */}
+            <Card className="group relative overflow-hidden bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 dark:from-purple-400/5 dark:to-indigo-400/5"></div>
+              <CardContent className="relative p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                    <FileVideo className="w-6 h-6 text-white" />
+                  </div>
+                  <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
+                    Coming Soon
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Game Report Generator</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Auto-generate comprehensive game reports with key insights
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* AI Tips Section */}
         <Card className="bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 border-0 shadow-lg">
           <CardContent className="p-8">

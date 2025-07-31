@@ -281,146 +281,243 @@ export default function AnalysisDetail() {
                     const transitionAnalyses = (analyses as any[]).filter(a => a.type === 'transition');
                     const keyMoments = (analyses as any[]).filter(a => a.type === 'key_moment');
                     
-                    // Create a hidden div to render the content
-                    const exportDiv = document.createElement('div');
-                    exportDiv.style.position = 'absolute';
-                    exportDiv.style.left = '-9999px';
-                    exportDiv.style.width = '800px';
-                    exportDiv.style.backgroundColor = 'white';
-                    exportDiv.style.padding = '40px';
-                    exportDiv.style.fontFamily = 'Arial, sans-serif';
-                    document.body.appendChild(exportDiv);
+                    // Create PDF using jsPDF with proper formatting
+                    const pdf = new jsPDF({
+                      orientation: 'portrait',
+                      unit: 'mm',
+                      format: 'a4'
+                    });
                     
-                    // Build the HTML content matching the web UI style
-                    exportDiv.innerHTML = `
-                      <div style="margin-bottom: 30px;">
-                        <h1 style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">
-                          ${(video as any).title}
-                        </h1>
-                        <p style="color: #6b7280; font-size: 14px;">
-                          ${videoType || 'Game'} Analysis • ${(video as any).duration ? `${Math.floor((video as any).duration / 60)}:${((video as any).duration % 60).toString().padStart(2, '0')}` : 'Unknown duration'} • ${new Date((video as any).createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      
-                      ${overallAnalysis ? `
-                        <div style="margin-bottom: 30px;">
-                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Overall Analysis</h2>
-                          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px;">
-                            <p style="color: #4b5563; line-height: 1.6;">${overallAnalysis.content}</p>
-                            ${overallAnalysis.confidence ? `<p style="color: #6b7280; font-size: 14px; margin-top: 10px;">Confidence: ${overallAnalysis.confidence}%</p>` : ''}
-                          </div>
-                        </div>
-                      ` : ''}
-                      
-                      ${playerEvaluations.length > 0 ? `
-                        <div style="margin-bottom: 30px;">
-                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Player Evaluations (${playerEvaluations.length})</h2>
-                          ${playerEvaluations.slice(0, 10).map((evaluation, index) => `
-                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span style="font-weight: bold; color: #374151;">${evaluation.title || `Player Evaluation ${index + 1}`}</span>
-                                <span style="color: #6b7280; font-size: 14px;">
-                                  ${evaluation.timestamp ? `@ ${formatTimestamp(evaluation.timestamp)}` : ''} • ${evaluation.confidence}% confidence
-                                </span>
-                              </div>
-                              <p style="color: #4b5563; line-height: 1.6;">${evaluation.content}</p>
-                            </div>
-                          `).join('')}
-                          ${playerEvaluations.length > 10 ? `<p style="color: #6b7280; font-style: italic;">... and ${playerEvaluations.length - 10} more evaluations</p>` : ''}
-                        </div>
-                      ` : ''}
-                      
-                      ${faceOffAnalyses.length > 0 ? `
-                        <div style="margin-bottom: 30px;">
-                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Face-off Analysis (${faceOffAnalyses.length})</h2>
-                          ${faceOffAnalyses.map((analysis, index) => `
-                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span style="font-weight: bold; color: #374151;">${analysis.title || `Face-off ${index + 1}`}</span>
-                                <span style="color: #6b7280; font-size: 14px;">
-                                  ${analysis.timestamp ? `@ ${formatTimestamp(analysis.timestamp)}` : ''} • ${analysis.confidence}% confidence
-                                </span>
-                              </div>
-                              <p style="color: #4b5563; line-height: 1.6;">${analysis.content}</p>
-                            </div>
-                          `).join('')}
-                        </div>
-                      ` : ''}
-                      
-                      ${transitionAnalyses.length > 0 ? `
-                        <div style="margin-bottom: 30px;">
-                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Transition Analysis (${transitionAnalyses.length})</h2>
-                          ${transitionAnalyses.map((analysis, index) => `
-                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span style="font-weight: bold; color: #374151;">${analysis.title || `Transition ${index + 1}`}</span>
-                                <span style="color: #6b7280; font-size: 14px;">
-                                  ${analysis.timestamp ? `@ ${formatTimestamp(analysis.timestamp)}` : ''} • ${analysis.confidence}% confidence
-                                </span>
-                              </div>
-                              <p style="color: #4b5563; line-height: 1.6;">${analysis.content}</p>
-                            </div>
-                          `).join('')}
-                        </div>
-                      ` : ''}
-                      
-                      ${keyMoments.length > 0 ? `
-                        <div style="margin-bottom: 30px;">
-                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Key Moments (${keyMoments.length})</h2>
-                          ${keyMoments.map((moment, index) => `
-                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span style="font-weight: bold; color: #374151;">${moment.title || `Moment ${index + 1}`}</span>
-                                <span style="color: #6b7280; font-size: 14px;">
-                                  ${moment.timestamp ? `@ ${formatTimestamp(moment.timestamp)}` : ''} • ${moment.confidence}% confidence
-                                </span>
-                              </div>
-                              <p style="color: #4b5563; line-height: 1.6;">${moment.content}</p>
-                            </div>
-                          `).join('')}
-                        </div>
-                      ` : ''}
-                    `;
+                    const pageWidth = pdf.internal.pageSize.width;
+                    const pageHeight = pdf.internal.pageSize.height;
+                    const margin = 20;
+                    const usableWidth = pageWidth - (2 * margin);
+                    let yPos = margin;
                     
-                    try {
-                      // Convert HTML to canvas
-                      const canvas = await html2canvas(exportDiv, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false
-                      });
-                      
-                      // Create PDF
-                      const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4'
-                      });
-                      
-                      const imgWidth = 210; // A4 width in mm
-                      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                      const pageHeight = 295; // A4 height in mm
-                      let heightLeft = imgHeight;
-                      let position = 0;
-                      
-                      // Add first page
-                      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                      heightLeft -= pageHeight;
-                      
-                      // Add additional pages if needed
-                      while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
+                    // Helper function to add new page if needed
+                    const checkPageBreak = (requiredSpace: number) => {
+                      if (yPos + requiredSpace > pageHeight - margin) {
                         pdf.addPage();
-                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+                        yPos = margin;
+                        return true;
+                      }
+                      return false;
+                    };
+                    
+                    // Helper function to wrap text
+                    const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number) => {
+                      pdf.setFontSize(fontSize);
+                      const lines = pdf.splitTextToSize(text, maxWidth);
+                      pdf.text(lines, x, y);
+                      return lines.length * (fontSize * 0.35);
+                    };
+                    
+                    // Helper function to format timestamp
+                    const formatTimestamp = (timestamp: number) => {
+                      const minutes = Math.floor(timestamp / 60);
+                      const seconds = Math.floor(timestamp % 60);
+                      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    };
+                    
+                    // Header with video info
+                    pdf.setFillColor(59, 130, 246);
+                    pdf.rect(0, 0, pageWidth, 45, 'F');
+                    
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(24);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text((video as any).title, margin, 25);
+                    
+                    pdf.setFontSize(12);
+                    pdf.setFont('helvetica', 'normal');
+                    const duration = (video as any).duration ? `${Math.floor((video as any).duration / 60)}:${((video as any).duration % 60).toString().padStart(2, '0')}` : 'Unknown duration';
+                    const subtitle = `${videoType || 'Game'} Analysis • ${duration} • ${new Date((video as any).createdAt).toLocaleDateString()}`;
+                    pdf.text(subtitle, margin, 38);
+                    
+                    yPos = 55;
+                    pdf.setTextColor(0, 0, 0);
+                    
+                    // Summary Statistics
+                    const totalAnalyses = (analyses as any[]).length;
+                    if (totalAnalyses > 0) {
+                      checkPageBreak(40);
+                      
+                      pdf.setFontSize(18);
+                      pdf.setFont('helvetica', 'bold');
+                      pdf.text('📊 Analysis Summary', margin, yPos);
+                      yPos += 15;
+                      
+                      // Statistics boxes
+                      const stats = [
+                        ['Total Analyses', totalAnalyses.toString()],
+                        ['Player Evaluations', playerEvaluations.length.toString()],
+                        ['Face-offs', faceOffAnalyses.length.toString()],
+                        ['Transitions', transitionAnalyses.length.toString()]
+                      ];
+                      
+                      const boxWidth = (usableWidth - 15) / 4;
+                      const boxHeight = 20;
+                      
+                      stats.forEach((stat, index) => {
+                        const x = margin + (index * (boxWidth + 5));
+                        
+                        // Draw box
+                        pdf.setFillColor(243, 244, 246);
+                        pdf.rect(x, yPos, boxWidth, boxHeight, 'F');
+                        pdf.setDrawColor(229, 231, 235);
+                        pdf.rect(x, yPos, boxWidth, boxHeight, 'S');
+                        
+                        // Add number
+                        pdf.setFontSize(16);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(37, 99, 235);
+                        const numWidth = pdf.getTextWidth(stat[1]);
+                        pdf.text(stat[1], x + (boxWidth - numWidth) / 2, yPos + 8);
+                        
+                        // Add label
+                        pdf.setFontSize(8);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(107, 114, 128);
+                        const labelWidth = pdf.getTextWidth(stat[0]);
+                        pdf.text(stat[0], x + (boxWidth - labelWidth) / 2, yPos + 16);
+                      });
+                      
+                      yPos += 35;
+                      pdf.setTextColor(0, 0, 0);
+                    }
+                    
+                    // Overall Analysis Section
+                    if (overallAnalysis) {
+                      checkPageBreak(40);
+                      
+                      pdf.setFontSize(18);
+                      pdf.setFont('helvetica', 'bold');
+                      pdf.text('🎯 Overall Analysis', margin, yPos);
+                      yPos += 15;
+                      
+                      // Background box
+                      const contentHeight = addWrappedText(overallAnalysis.content, 0, 0, usableWidth - 10, 10) + 10;
+                      checkPageBreak(contentHeight + 20);
+                      
+                      pdf.setFillColor(243, 244, 246);
+                      pdf.rect(margin, yPos - 5, usableWidth, contentHeight + 15, 'F');
+                      
+                      const textHeight = addWrappedText(overallAnalysis.content, margin + 5, yPos + 5, usableWidth - 10, 10);
+                      yPos += textHeight + 15;
+                      
+                      if (overallAnalysis.confidence) {
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(107, 114, 128);
+                        pdf.text(`Confidence: ${overallAnalysis.confidence}%`, margin + 5, yPos);
+                        yPos += 8;
                       }
                       
-                      // Save PDF
-                      pdf.save(`${(video as any).title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-analysis.pdf`);
-                    } finally {
-                      // Clean up
-                      document.body.removeChild(exportDiv);
+                      yPos += 15;
+                      pdf.setTextColor(0, 0, 0);
                     }
+                    
+                    // Player Evaluations Section
+                    if (playerEvaluations.length > 0) {
+                      checkPageBreak(30);
+                      
+                      pdf.setFontSize(18);
+                      pdf.setFont('helvetica', 'bold');
+                      pdf.text(`👤 Player Evaluations (${playerEvaluations.length})`, margin, yPos);
+                      yPos += 15;
+                      
+                      playerEvaluations.slice(0, 10).forEach((evaluation, index) => {
+                        checkPageBreak(35);
+                        
+                        // Header
+                        pdf.setFillColor(249, 250, 251);
+                        pdf.rect(margin, yPos - 5, usableWidth, 12, 'F');
+                        
+                        pdf.setFontSize(12);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(55, 65, 81);
+                        pdf.text(evaluation.title || `Player Evaluation ${index + 1}`, margin + 5, yPos + 3);
+                        
+                        const headerRight = `${evaluation.timestamp ? `@ ${formatTimestamp(evaluation.timestamp)}` : ''} • ${evaluation.confidence}% confidence`;
+                        const headerRightWidth = pdf.getTextWidth(headerRight);
+                        
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(107, 114, 128);
+                        pdf.text(headerRight, pageWidth - margin - headerRightWidth - 5, yPos + 3);
+                        
+                        yPos += 12;
+                        
+                        // Content
+                        pdf.setTextColor(75, 85, 99);
+                        const textHeight = addWrappedText(evaluation.content, margin + 5, yPos, usableWidth - 10, 9);
+                        yPos += textHeight + 10;
+                      });
+                      
+                      if (playerEvaluations.length > 10) {
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(107, 114, 128);
+                        pdf.text(`... and ${playerEvaluations.length - 10} more evaluations`, margin, yPos);
+                        yPos += 15;
+                      }
+                    }
+                    
+                    // Other analysis sections (face-offs, transitions, key moments)
+                    const sections = [
+                      { data: faceOffAnalyses, title: '⚔️ Face-off Analysis', name: 'Face-off' },
+                      { data: transitionAnalyses, title: '🏃 Transition Analysis', name: 'Transition' },
+                      { data: keyMoments, title: '⭐ Key Moments', name: 'Moment' }
+                    ];
+                    
+                    sections.forEach(section => {
+                      if (section.data.length > 0) {
+                        checkPageBreak(30);
+                        
+                        pdf.setFontSize(18);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text(`${section.title} (${section.data.length})`, margin, yPos);
+                        yPos += 15;
+                        
+                        section.data.slice(0, 8).forEach((item, index) => {
+                          checkPageBreak(30);
+                          
+                          // Header
+                          pdf.setFillColor(249, 250, 251);
+                          pdf.rect(margin, yPos - 5, usableWidth, 12, 'F');
+                          
+                          pdf.setFontSize(12);
+                          pdf.setFont('helvetica', 'bold');
+                          pdf.setTextColor(55, 65, 81);
+                          pdf.text(item.title || `${section.name} ${index + 1}`, margin + 5, yPos + 3);
+                          
+                          const headerRight = `${item.timestamp ? `@ ${formatTimestamp(item.timestamp)}` : ''} • ${item.confidence}% confidence`;
+                          const headerRightWidth = pdf.getTextWidth(headerRight);
+                          
+                          pdf.setFontSize(9);
+                          pdf.setTextColor(107, 114, 128);
+                          pdf.text(headerRight, pageWidth - margin - headerRightWidth - 5, yPos + 3);
+                          
+                          yPos += 12;
+                          
+                          // Content
+                          pdf.setTextColor(75, 85, 99);
+                          const textHeight = addWrappedText(item.content, margin + 5, yPos, usableWidth - 10, 9);
+                          yPos += textHeight + 10;
+                        });
+                      }
+                    });
+                    
+                    // Footer
+                    const totalPages = pdf.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                      pdf.setPage(i);
+                      pdf.setFontSize(8);
+                      pdf.setTextColor(107, 114, 128);
+                      pdf.text(`Generated by LacrosseLens AI • Page ${i} of ${totalPages}`, margin, pageHeight - 10);
+                      pdf.text(`Report Date: ${new Date().toLocaleDateString()}`, pageWidth - margin - 50, pageHeight - 10);
+                    }
+                    
+                    // Save PDF
+                    pdf.save(`${(video as any).title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-analysis.pdf`);
                   }}
                 >
                   <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />

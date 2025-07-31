@@ -119,149 +119,250 @@ export default function PlayerStatSheet({
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
 
-  // Export functionality
+  // Export functionality with enhanced formatting
   const handleExport = async () => {
     const playerNumber = evaluations[0]?.metadata?.playerNumber || 
                         playerKey.match(/#?(\d+)/)?.[1] || 
                         playerKey;
     
-    // Create a hidden div to render the content
-    const exportDiv = document.createElement('div');
-    exportDiv.style.position = 'absolute';
-    exportDiv.style.left = '-9999px';
-    exportDiv.style.width = '800px';
-    exportDiv.style.backgroundColor = 'white';
-    exportDiv.style.padding = '40px';
-    exportDiv.style.fontFamily = 'Arial, sans-serif';
-    document.body.appendChild(exportDiv);
+    // Create PDF using jsPDF with proper text formatting
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
     
-    // Build the HTML content matching the web UI style
-    exportDiv.innerHTML = `
-      <div style="margin-bottom: 30px;">
-        <h1 style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">
-          Player #${playerNumber} Analysis Report
-        </h1>
-        <p style="color: #6b7280; font-size: 14px;">
-          ${position} • ${stats.totalClips} clips analyzed • ${stats.avgConfidence}% avg confidence
-        </p>
-        ${stats.timeRange ? `<p style="color: #6b7280; font-size: 12px;">Time Range: ${formatTimestamp(stats.timeRange.start)} - ${formatTimestamp(stats.timeRange.end)}</p>` : ''}
-      </div>
-      
-      ${Array.from(stats.actions.entries()).length > 0 ? `
-        <div style="margin-bottom: 30px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Performance Metrics</h2>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-            ${Array.from(stats.actions.entries()).slice(0, 4).map(([action, count]) => `
-              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${count}</div>
-                <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">${action}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
-      
-      ${topSkills.length > 0 ? `
-        <div style="margin-bottom: 30px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Skills Analysis</h2>
-          ${topSkills.map(([skill, count]) => `
-            <div style="margin-bottom: 15px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                <span style="color: #4b5563;">${skill}</span>
-                <span style="color: #6b7280; font-size: 14px;">${count} mentions</span>
-              </div>
-              <div style="background-color: #e5e7eb; height: 8px; border-radius: 4px;">
-                <div style="background-color: #3b82f6; height: 100%; width: ${(count / stats.totalClips) * 100}%; border-radius: 4px;"></div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-      
-      <div style="margin-bottom: 30px;">
-        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Detailed Evaluations</h2>
-        ${evaluations.slice(0, 10).map((evaluation, index) => `
-          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-              <span style="font-weight: bold; color: #374151;">Clip ${index + 1}</span>
-              <span style="color: #6b7280; font-size: 14px;">
-                ${evaluation.timestamp ? `@ ${formatTimestamp(evaluation.timestamp)}` : ''} • ${evaluation.confidence}% confidence
-              </span>
-            </div>
-            <p style="color: #4b5563; line-height: 1.6;">${evaluation.content}</p>
-          </div>
-        `).join('')}
-        ${evaluations.length > 10 ? `<p style="color: #6b7280; font-style: italic;">... and ${evaluations.length - 10} more clips</p>` : ''}
-      </div>
-      
-      ${stats.strengths.length > 0 || stats.improvements.length > 0 ? `
-        <div style="margin-bottom: 30px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Summary</h2>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-            ${stats.strengths.length > 0 ? `
-              <div>
-                <h3 style="font-size: 16px; font-weight: bold; color: #059669; margin-bottom: 10px;">Key Strengths</h3>
-                <ul style="list-style: none; padding: 0;">
-                  ${stats.strengths.map(strength => `
-                    <li style="margin-bottom: 5px; color: #4b5563;">• ${strength}</li>
-                  `).join('')}
-                </ul>
-              </div>
-            ` : ''}
-            ${stats.improvements.length > 0 ? `
-              <div>
-                <h3 style="font-size: 16px; font-weight: bold; color: #ea580c; margin-bottom: 10px;">Areas to Develop</h3>
-                <ul style="list-style: none; padding: 0;">
-                  ${stats.improvements.map(improvement => `
-                    <li style="margin-bottom: 5px; color: #4b5563;">• ${improvement}</li>
-                  `).join('')}
-                </ul>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      ` : ''}
-    `;
+    const pageWidth = pdf.internal.pageSize.width;
+    const pageHeight = pdf.internal.pageSize.height;
+    const margin = 20;
+    const usableWidth = pageWidth - (2 * margin);
+    let yPos = margin;
     
-    try {
-      // Convert HTML to canvas
-      const canvas = await html2canvas(exportDiv, {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
-      
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pageHeight = 295; // A4 height in mm
-      let heightLeft = imgHeight;
-      let position = 0;
-      
-      // Add first page
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      
-      // Add additional pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
+    // Helper function to add new page if needed
+    const checkPageBreak = (requiredSpace: number) => {
+      if (yPos + requiredSpace > pageHeight - margin) {
         pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        yPos = margin;
+        return true;
+      }
+      return false;
+    };
+    
+    // Helper function to wrap text
+    const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number) => {
+      pdf.setFontSize(fontSize);
+      const lines = pdf.splitTextToSize(text, maxWidth);
+      pdf.text(lines, x, y);
+      return lines.length * (fontSize * 0.35); // Return height used
+    };
+    
+    // Header with player info
+    pdf.setFillColor(59, 130, 246); // Blue background
+    pdf.rect(0, 0, pageWidth, 40, 'F');
+    
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(`Player #${playerNumber} Analysis Report`, margin, 25);
+    
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`${position} • ${stats.totalClips} clips analyzed • ${stats.avgConfidence}% avg confidence`, margin, 35);
+    
+    yPos = 50;
+    
+    // Reset text color
+    pdf.setTextColor(0, 0, 0);
+    
+    // Performance Metrics Section
+    if (Array.from(stats.actions.entries()).length > 0) {
+      checkPageBreak(50);
+      
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('🎯 Performance Metrics', margin, yPos);
+      yPos += 15;
+      
+      // Draw metrics in a grid
+      const metrics = Array.from(stats.actions.entries()).slice(0, 4);
+      const boxWidth = (usableWidth - 10) / 2;
+      const boxHeight = 25;
+      
+      metrics.forEach((metric, index) => {
+        const [action, count] = metric;
+        const row = Math.floor(index / 2);
+        const col = index % 2;
+        const x = margin + (col * (boxWidth + 5));
+        const y = yPos + (row * (boxHeight + 5));
+        
+        // Draw box
+        pdf.setFillColor(243, 244, 246); // Light gray
+        pdf.rect(x, y, boxWidth, boxHeight, 'F');
+        pdf.setDrawColor(229, 231, 235); // Border
+        pdf.rect(x, y, boxWidth, boxHeight, 'S');
+        
+        // Add count
+        pdf.setFontSize(20);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235); // Blue
+        const countText = count.toString();
+        const countWidth = pdf.getTextWidth(countText);
+        pdf.text(countText, x + (boxWidth - countWidth) / 2, y + 12);
+        
+        // Add label
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(107, 114, 128); // Gray
+        const labelWidth = pdf.getTextWidth(action);
+        pdf.text(action, x + (boxWidth - labelWidth) / 2, y + 20);
+      });
+      
+      yPos += Math.ceil(metrics.length / 2) * 30 + 15;
+      pdf.setTextColor(0, 0, 0);
+    }
+    
+    // Skills Analysis Section
+    if (topSkills.length > 0) {
+      checkPageBreak(60);
+      
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('⚡ Skills Analysis', margin, yPos);
+      yPos += 15;
+      
+      topSkills.forEach(([skill, count]) => {
+        checkPageBreak(15);
+        
+        // Skill name and count
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(skill, margin, yPos);
+        pdf.text(`${count} mentions`, pageWidth - margin - 30, yPos);
+        
+        yPos += 5;
+        
+        // Progress bar
+        const barWidth = usableWidth - 40;
+        const percentage = (count / stats.totalClips) * 100;
+        const fillWidth = (barWidth * percentage) / 100;
+        
+        // Background bar
+        pdf.setFillColor(229, 231, 235);
+        pdf.rect(margin, yPos, barWidth, 3, 'F');
+        
+        // Fill bar
+        pdf.setFillColor(59, 130, 246);
+        pdf.rect(margin, yPos, fillWidth, 3, 'F');
+        
+        yPos += 10;
+      });
+      
+      yPos += 10;
+    }
+    
+    // Summary Section (Strengths & Development Areas)
+    if (stats.strengths.length > 0 || stats.improvements.length > 0) {
+      checkPageBreak(40);
+      
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('📊 Summary', margin, yPos);
+      yPos += 15;
+      
+      const columnWidth = (usableWidth - 10) / 2;
+      
+      // Strengths column
+      if (stats.strengths.length > 0) {
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(5, 150, 105); // Green
+        pdf.text('✓ Key Strengths', margin, yPos);
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        
+        let strengthsY = yPos + 8;
+        stats.strengths.slice(0, 5).forEach(strength => {
+          pdf.text(`• ${strength}`, margin + 5, strengthsY);
+          strengthsY += 6;
+        });
       }
       
-      // Save PDF
-      pdf.save(`player-${playerNumber}-analysis.pdf`);
-    } finally {
-      // Clean up
-      document.body.removeChild(exportDiv);
+      // Development areas column
+      if (stats.improvements.length > 0) {
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(234, 88, 12); // Orange
+        pdf.text('⚠ Areas to Develop', margin + columnWidth + 5, yPos);
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        
+        let improvementsY = yPos + 8;
+        stats.improvements.slice(0, 5).forEach(improvement => {
+          pdf.text(`• ${improvement}`, margin + columnWidth + 10, improvementsY);
+          improvementsY += 6;
+        });
+      }
+      
+      yPos += Math.max(stats.strengths.length, stats.improvements.length) * 6 + 20;
     }
+    
+    // Detailed Evaluations Section
+    checkPageBreak(30);
+    
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text('📝 Detailed Evaluations', margin, yPos);
+    yPos += 15;
+    
+    evaluations.slice(0, 8).forEach((evaluation, index) => {
+      checkPageBreak(35);
+      
+      // Evaluation header
+      pdf.setFillColor(249, 250, 251); // Very light gray
+      pdf.rect(margin, yPos - 5, usableWidth, 15, 'F');
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(55, 65, 81);
+      pdf.text(`Clip ${index + 1}`, margin + 5, yPos + 5);
+      
+      const confidenceText = `${evaluation.confidence}% confidence`;
+      const timeText = evaluation.timestamp ? `@ ${formatTimestamp(evaluation.timestamp)}` : '';
+      const headerRight = `${timeText} ${confidenceText}`;
+      const headerRightWidth = pdf.getTextWidth(headerRight);
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(107, 114, 128);
+      pdf.text(headerRight, pageWidth - margin - headerRightWidth - 5, yPos + 5);
+      
+      yPos += 15;
+      
+      // Evaluation content
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(75, 85, 99);
+      const textHeight = addWrappedText(evaluation.content, margin + 5, yPos, usableWidth - 10, 10);
+      yPos += textHeight + 10;
+    });
+    
+    // Footer
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(107, 114, 128);
+      pdf.text(`Generated by LacrosseLens AI • Page ${i} of ${totalPages}`, margin, pageHeight - 10);
+      pdf.text(`Report Date: ${new Date().toLocaleDateString()}`, pageWidth - margin - 50, pageHeight - 10);
+    }
+    
+    // Save PDF
+    pdf.save(`player-${playerNumber}-analysis.pdf`);
   };
 
   return (

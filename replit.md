@@ -716,11 +716,11 @@ The database schema is well-designed for detailed play tracking:
 - **Solution**: Created 6 specialized analysis components with tailored layouts for each video type
 - **Components Created**:
   - **GameAnalysis**: Full game footage with expandable sections for overall analysis, player evaluations, face-offs, transitions, key moments, and detailed metrics
-  - **PracticeAnalysis**: Practice sessions with skill development tracking, technique observations, tempo analysis, and execution quality
-  - **HighlightAnalysis**: Personal/team highlights with chronological presentation, memorable plays focus, and recruiting potential emphasis
+  - **PracticeAnalysisEnhanced**: Practice sessions with skill development tracking, technique observations, tempo analysis, and execution quality
+  - **HighlightAnalysisEnhanced**: Personal/team highlights with comprehensive performance metrics, skill analysis, and recruiting evaluation
   - **DrillAnalysis**: Training drills with simplified linear layout, technique breakdown focus, and coaching points emphasis
-  - **ScrimmageAnalysis**: Scrimmage footage with game-readiness assessment, chemistry evaluation, and situational play analysis
-  - **RecruitingAnalysis**: Recruiting tapes with college potential evaluation, position-specific skills, and academic/athletic balance
+  - **ScrimmageAnalysisEnhanced**: Scrimmage footage with game-readiness assessment, chemistry evaluation, and situational play analysis
+  - **RecruitingAnalysisEnhanced**: Recruiting tapes with college potential evaluation, position-specific skills, and academic/athletic balance
 - **Design Approach**:
   - Each component has a unique color scheme and icon system
   - Layouts optimized for the specific coaching needs of each video type
@@ -732,13 +732,40 @@ The database schema is well-designed for detailed play tracking:
   - Removed old drill-specific and game-specific UI code in favor of modular components
 - **Files Created**: 
   - client/src/components/video-type-analysis/game-analysis.tsx
-  - client/src/components/video-type-analysis/practice-analysis.tsx
-  - client/src/components/video-type-analysis/highlight-analysis.tsx
+  - client/src/components/video-type-analysis/practice-analysis-enhanced.tsx
+  - client/src/components/video-type-analysis/highlight-analysis-enhanced.tsx
   - client/src/components/video-type-analysis/drill-analysis.tsx
-  - client/src/components/video-type-analysis/scrimmage-analysis.tsx
-  - client/src/components/video-type-analysis/recruiting-analysis.tsx
+  - client/src/components/video-type-analysis/scrimmage-analysis-enhanced.tsx
+  - client/src/components/video-type-analysis/recruiting-analysis-enhanced.tsx
 - **Files Modified**: client/src/pages/analysis-detail.tsx (complete rewrite)
 - **Status**: All 6 video type-specific analysis components successfully implemented and integrated
+
+### 2025-01-31 - Completely Redesigned Highlight Analysis with Professional Color Scheme and Comprehensive Data Extraction
+- **Issue**: User disliked the design and colors of highlight analysis and requested much more detailed information
+- **Solution**: Complete redesign with professional slate/blue color scheme and extensive data extraction capabilities
+- **Major Enhancements**:
+  - **Professional Color Scheme**: Replaced amber/orange with professional slate, blue, and purple gradients
+  - **Crown/Gem Icons**: Added premium feel with Crown and Gem icons for elite highlight analysis
+  - **Comprehensive Statistics**: Extract goals, assists, saves, dodges, checks, ground balls from AI analysis content
+  - **Skill Analysis Grid**: Progress bars showing skill mentions frequency across 8 categories (shooting, dodging, passing, defense, faceoffs, stick skills, field vision, athleticism)
+  - **Performance Ratings**: Extract and display 1-10 ratings with average, high, low statistics
+  - **Recruiting Level Detection**: Automatically detect D1/D2/D3 potential from analysis content
+  - **Strengths/Weaknesses Cards**: Separate sections with green/orange color coding for positive and development areas
+  - **Elite Moments Timeline**: Enhanced timeline with gradient backgrounds and rating badges
+  - **Coach's Assessment**: Overall summary with recruiting level and confidence metrics
+- **Data Extraction Features**:
+  - Advanced keyword pattern matching for lacrosse-specific actions and skills
+  - Automatic calculation of skill proficiency percentages
+  - Real-time analysis of player strengths and areas for improvement
+  - Recruiting level assessment based on AI analysis content
+- **UI Improvements**:
+  - Professional gradient backgrounds without overwhelming colors
+  - Clear information hierarchy with meaningful icons
+  - Responsive grid layouts optimizing mobile and desktop views
+  - Progress bars for skill visualization
+  - Badge system for ratings and confidence levels
+- **Files Created**: client/src/components/video-type-analysis/highlight-analysis-enhanced.tsx (complete rewrite)
+- **Status**: Highlight analysis now features professional design with comprehensive data extraction maximizing existing database content
 
 ### 2025-01-31 - Added Confidence Score Explanation to Help Users Understand AI Analysis
 - **Issue**: User asked "what is the confidence that is mentioned all over the app how is it determined?"

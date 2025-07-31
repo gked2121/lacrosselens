@@ -1,279 +1,459 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { 
+  Trophy, 
   Star, 
+  User, 
+  Clock, 
   TrendingUp, 
-  Users, 
-  Clock,
-  Award,
+  Sparkles, 
+  AlertCircle, 
   Target,
   Zap,
+  Award,
   Activity,
-  AlertTriangle,
-  CheckCircle,
   BarChart3,
-  Play,
-  Sparkles
+  CheckCircle,
+  XCircle,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  Shield,
+  Crosshair,
+  PlayCircle,
+  Timer,
+  Flame,
+  Gem,
+  Crown
 } from "lucide-react";
 
-interface HighlightAnalysisProps {
+interface HighlightAnalysisEnhancedProps {
   video: any;
   analyses: any[];
   formatTimestamp: (seconds: number | null) => string | null;
 }
 
-export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: HighlightAnalysisProps) {
+export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: HighlightAnalysisEnhancedProps) {
   const overallAnalysis = analyses?.find(a => a.type === 'overall');
   const playerEvaluations = analyses?.filter(a => a.type === 'player_evaluation') || [];
   const keyMoments = analyses?.filter(a => a.type === 'key_moment') || [];
+  const transitions = analyses?.filter(a => a.type === 'transition') || [];
+  const faceoffs = analyses?.filter(a => a.type === 'face_off') || [];
 
-  // Extract highlight-specific metrics
-  const highlightMetrics = {
-    totalClips: playerEvaluations.length + keyMoments.length,
-    avgConfidence: playerEvaluations.length > 0 
-      ? Math.round(playerEvaluations.reduce((sum, p) => sum + p.confidence, 0) / playerEvaluations.length)
-      : 0,
-    standoutPlays: analyses.filter(a => 
-      a.content.toLowerCase().includes('excellent') ||
-      a.content.toLowerCase().includes('outstanding') ||
-      a.content.toLowerCase().includes('impressive') ||
-      a.content.toLowerCase().includes('elite')
-    ).length,
-    skillShowcase: {
-      goals: analyses.filter(a => a.content.toLowerCase().includes('goal') || a.content.toLowerCase().includes('score')).length,
-      assists: analyses.filter(a => a.content.toLowerCase().includes('assist') || a.content.toLowerCase().includes('feed')).length,
-      saves: analyses.filter(a => a.content.toLowerCase().includes('save')).length,
-      dodges: analyses.filter(a => a.content.toLowerCase().includes('dodge') || a.content.toLowerCase().includes('beat')).length,
-      checks: analyses.filter(a => a.content.toLowerCase().includes('check') || a.content.toLowerCase().includes('strip')).length
-    },
-    weaknesses: analyses.filter(a => 
-      a.content.toLowerCase().includes('mistake') ||
-      a.content.toLowerCase().includes('error') ||
-      a.content.toLowerCase().includes('improve') ||
-      a.content.toLowerCase().includes('work on')
-    ).length,
-    competitionLevel: analyses.filter(a => 
-      a.content.toLowerCase().includes('level') ||
-      a.content.toLowerCase().includes('competition') ||
-      a.content.toLowerCase().includes('opponent')
-    ).length
+  // Extract player name from video title (e.g., "Dylan's 2024 Highlights" -> "Dylan")
+  const playerName = video.title?.split(/['s\s]/)[0] || "Player";
+  
+  const totalHighlights = playerEvaluations.length + keyMoments.length;
+  const avgConfidence = playerEvaluations.length > 0 
+    ? Math.round(playerEvaluations.reduce((sum: number, e: any) => sum + e.confidence, 0) / playerEvaluations.length)
+    : 0;
+
+  // Enhanced data extraction from analyses
+  const extractGoals = () => {
+    const goalKeywords = ['goal', 'scores', 'finds the back', 'buries', 'nets', 'finishes'];
+    return analyses.filter(a => 
+      goalKeywords.some(keyword => a.content.toLowerCase().includes(keyword))
+    ).length;
   };
 
-  // Calculate highlight quality ratings
-  const highQualityPlays = analyses.filter(a => a.confidence > 85).length;
-  const mediumQualityPlays = analyses.filter(a => a.confidence >= 70 && a.confidence <= 85).length;
-  const improvementPlays = analyses.filter(a => a.confidence < 70).length;
+  const extractAssists = () => {
+    const assistKeywords = ['assist', 'feeds', 'dishes', 'finds', 'beautiful pass', 'sets up'];
+    return analyses.filter(a => 
+      assistKeywords.some(keyword => a.content.toLowerCase().includes(keyword))
+    ).length;
+  };
 
-  // Determine recruiting potential from highlights
-  const recruitingIndicators = analyses.filter(a => 
-    a.content.toLowerCase().includes('potential') ||
-    a.content.toLowerCase().includes('college') ||
-    a.content.toLowerCase().includes('recruit') ||
-    a.content.toLowerCase().includes('next level')
-  ).length;
+  const extractSaves = () => {
+    const saveKeywords = ['save', 'stops', 'denies', 'blocks', 'kick save', 'stick save'];
+    return analyses.filter(a => 
+      saveKeywords.some(keyword => a.content.toLowerCase().includes(keyword))
+    ).length;
+  };
 
-  const recruitingLevel = recruitingIndicators > 3 ? 'High' : 
-                         recruitingIndicators > 1 ? 'Medium' : 'Developing';
+  const extractDodges = () => {
+    const dodgeKeywords = ['dodge', 'split dodge', 'roll dodge', 'face dodge', 'beats his man'];
+    return analyses.filter(a => 
+      dodgeKeywords.some(keyword => a.content.toLowerCase().includes(keyword))
+    ).length;
+  };
+
+  const extractChecks = () => {
+    const checkKeywords = ['check', 'poke check', 'slap check', 'stick lift', 'strips', 'caused turnover'];
+    return analyses.filter(a => 
+      checkKeywords.some(keyword => a.content.toLowerCase().includes(keyword))
+    ).length;
+  };
+
+  const extractGroundBalls = () => {
+    const gbKeywords = ['ground ball', 'scoops', 'picks up', 'collects', 'controls'];
+    return analyses.filter(a => 
+      gbKeywords.some(keyword => a.content.toLowerCase().includes(keyword))
+    ).length;
+  };
+
+  // Extract performance ratings from analysis content
+  const extractRatings = () => {
+    const ratings = analyses.map(a => {
+      const ratingMatch = a.content.match(/(\d+)\/10/);
+      return ratingMatch ? parseInt(ratingMatch[1]) : null;
+    }).filter(r => r !== null);
+    
+    return {
+      average: ratings.length > 0 ? Math.round(ratings.reduce((sum, r) => sum + r, 0) / ratings.length * 10) / 10 : 0,
+      high: ratings.length > 0 ? Math.max(...ratings) : 0,
+      low: ratings.length > 0 ? Math.min(...ratings) : 0,
+      total: ratings.length
+    };
+  };
+
+  // Extract skill mentions and frequency
+  const extractSkillMentions = () => {
+    const skills = {
+      shooting: ['shot', 'shooting', 'accuracy', 'placement', 'velocity'],
+      dodging: ['dodge', 'split', 'roll', 'face dodge', 'change of pace'],
+      passing: ['pass', 'feed', 'vision', 'accuracy', 'timing'],
+      defense: ['defense', 'check', 'pressure', 'slide', 'positioning'],
+      faceoffs: ['faceoff', 'clamp', 'rake', 'wing', 'possession'],
+      stick_skills: ['stick skills', 'handling', 'protection', 'cradling'],
+      field_vision: ['vision', 'awareness', 'reads', 'anticipation', 'iq'],
+      athleticism: ['speed', 'agility', 'strength', 'explosive', 'athletic']
+    };
+
+    const skillCounts: { [key: string]: number } = {};
+    
+    Object.entries(skills).forEach(([skill, keywords]) => {
+      skillCounts[skill] = analyses.reduce((count, a) => {
+        return count + keywords.reduce((keywordCount, keyword) => {
+          return keywordCount + (a.content.toLowerCase().split(keyword).length - 1);
+        }, 0);
+      }, 0);
+    });
+
+    return skillCounts;
+  };
+
+  // Extract recruiting level mentions
+  const extractRecruitingLevel = () => {
+    const content = analyses.map(a => a.content).join(' ').toLowerCase();
+    if (content.includes('d1') || content.includes('division 1') || content.includes('elite')) return 'D1';
+    if (content.includes('d2') || content.includes('division 2')) return 'D2';
+    if (content.includes('d3') || content.includes('division 3')) return 'D3';
+    return 'Evaluation Needed';
+  };
+
+  // Extract strengths and weaknesses
+  const extractStrengthsWeaknesses = () => {
+    const strengths = analyses.filter(a => 
+      a.content.toLowerCase().includes('excellent') ||
+      a.content.toLowerCase().includes('outstanding') ||
+      a.content.toLowerCase().includes('strong') ||
+      a.content.toLowerCase().includes('good') ||
+      a.content.toLowerCase().includes('effective')
+    ).map(a => a.content);
+
+    const weaknesses = analyses.filter(a => 
+      a.content.toLowerCase().includes('improve') ||
+      a.content.toLowerCase().includes('weakness') ||
+      a.content.toLowerCase().includes('struggle') ||
+      a.content.toLowerCase().includes('poor') ||
+      a.content.toLowerCase().includes('needs work')
+    ).map(a => a.content);
+
+    return { strengths: strengths.slice(0, 5), weaknesses: weaknesses.slice(0, 5) };
+  };
+
+  const goals = extractGoals();
+  const assists = extractAssists();
+  const saves = extractSaves();
+  const dodges = extractDodges();
+  const checks = extractChecks();
+  const groundBalls = extractGroundBalls();
+  const ratings = extractRatings();
+  const skillMentions = extractSkillMentions();
+  const recruitingLevel = extractRecruitingLevel();
+  const { strengths, weaknesses } = extractStrengthsWeaknesses();
 
   return (
     <div className="space-y-6">
-      {/* Highlight Reel Overview */}
-      <Card className="border-yellow-200 dark:border-yellow-800 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 border-b border-yellow-200 dark:border-yellow-800">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-lg">
-              <Play className="w-6 h-6 text-white" />
+      {/* Header Section */}
+      <Card className="border-slate-200 dark:border-slate-700 shadow-xl bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg">
+                <Crown className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-3xl flex items-center gap-2">
+                  {playerName}'s Elite Highlights
+                  <Gem className="w-6 h-6 text-blue-600" />
+                </CardTitle>
+                <p className="text-muted-foreground text-lg mt-1">
+                  Comprehensive Performance Analysis & Recruiting Evaluation
+                </p>
+              </div>
             </div>
-            <CardTitle className="text-xl">Highlight Tape Analysis</CardTitle>
+            <div className="text-right">
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg px-4 py-2">
+                {recruitingLevel} Potential
+              </Badge>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Clips</span>
-              </div>
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{highlightMetrics.totalClips}</p>
-              <p className="text-xs text-blue-600 dark:text-blue-400">{highlightMetrics.avgConfidence}% avg quality</p>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{totalHighlights}</p>
+              <p className="text-sm text-muted-foreground">Total Clips</p>
             </div>
-            
-            <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Star className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">Elite Plays</span>
-              </div>
-              <p className="text-2xl font-bold text-green-900 dark:text-green-100">{highlightMetrics.standoutPlays}</p>
-              <p className="text-xs text-green-600 dark:text-green-400">Standout moments</p>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">{avgConfidence}%</p>
+              <p className="text-sm text-muted-foreground">Avg Confidence</p>
             </div>
-            
-            <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Recruiting Level</span>
-              </div>
-              <p className="text-lg font-bold text-purple-900 dark:text-purple-100">{recruitingLevel}</p>
-              <p className="text-xs text-purple-600 dark:text-purple-400">Potential</p>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-green-700 dark:text-green-300">{ratings.average}/10</p>
+              <p className="text-sm text-muted-foreground">Avg Rating</p>
             </div>
-            
-            <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
-                <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Areas to Work On</span>
-              </div>
-              <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{highlightMetrics.weaknesses}</p>
-              <p className="text-xs text-orange-600 dark:text-orange-400">Improvement areas</p>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-700 dark:text-orange-300">{keyMoments.length}</p>
+              <p className="text-sm text-muted-foreground">Elite Moments</p>
             </div>
-          </div>
-
-          {/* Skill Showcase Breakdown */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Skills Highlighted in Tape
-            </h4>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {Object.entries(highlightMetrics.skillShowcase).map(([skill, count]) => (
-                <div key={skill} className="bg-gray-50 dark:bg-gray-900/20 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium capitalize">{skill}</span>
-                    <Badge variant={count > 0 ? "default" : "outline"}>{count}</Badge>
-                  </div>
-                  <Progress value={Math.min((count / Math.max(...Object.values(highlightMetrics.skillShowcase))) * 100, 100)} className="h-2" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Play Quality Distribution */}
-          <div className="mt-6 space-y-4">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <Target className="w-4 h-4" />
-              Highlight Quality Breakdown
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-700">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium">Elite Clips (85%+)</span>
-                </div>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-100">{highQualityPlays}</p>
-                <p className="text-xs text-green-600 dark:text-green-400">Championship level</p>
-              </div>
-              
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-700">
-                <div className="flex items-center gap-2 mb-2">
-                  <Activity className="w-4 h-4 text-yellow-600" />
-                  <span className="text-sm font-medium">Solid Clips (70-85%)</span>
-                </div>
-                <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">{mediumQualityPlays}</p>
-                <p className="text-xs text-yellow-600 dark:text-yellow-400">Good execution</p>
-              </div>
-              
-              <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-700">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-4 h-4 text-orange-600" />
-                  <span className="text-sm font-medium">Growth Clips (&lt;70%)</span>
-                </div>
-                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{improvementPlays}</p>
-                <p className="text-xs text-orange-600 dark:text-orange-400">Development focus</p>
-              </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-300">{ratings.high}/10</p>
+              <p className="text-sm text-muted-foreground">Peak Rating</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Overall Highlight Analysis */}
-      {overallAnalysis && (
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-b">
+      {/* Performance Statistics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
+          <CardContent className="p-4 text-center">
+            <Target className="w-8 h-8 text-green-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-green-800 dark:text-green-200">{goals}</p>
+            <p className="text-xs text-green-600 dark:text-green-400">Goals Scored</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-4 text-center">
+            <Zap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{assists}</p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">Assists/Feeds</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-orange-200 dark:border-orange-800">
+          <CardContent className="p-4 text-center">
+            <Shield className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-orange-800 dark:text-orange-200">{saves}</p>
+            <p className="text-xs text-orange-600 dark:text-orange-400">Saves Made</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-800">
+          <CardContent className="p-4 text-center">
+            <Activity className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">{dodges}</p>
+            <p className="text-xs text-purple-600 dark:text-purple-400">Successful Dodges</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Skill Analysis Breakdown */}
+      <Card className="shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-slate-100 to-blue-100 dark:from-slate-800 dark:to-blue-900 border-b">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="w-6 h-6 text-blue-600" />
+            <CardTitle className="text-xl">Detailed Skill Analysis</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Object.entries(skillMentions).map(([skill, count]) => {
+              const maxCount = Math.max(...Object.values(skillMentions));
+              const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+              
+              return (
+                <div key={skill} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium capitalize text-slate-700 dark:text-slate-300">
+                      {skill.replace('_', ' ')}
+                    </span>
+                    <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                      {count} mentions
+                    </span>
+                  </div>
+                  <Progress value={percentage} className="h-2" />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>
+                      {percentage >= 80 ? 'Elite' : 
+                       percentage >= 60 ? 'Strong' : 
+                       percentage >= 40 ? 'Developing' : 
+                       percentage >= 20 ? 'Needs Work' : 'Limited Data'}
+                    </span>
+                    <span>{Math.round(percentage)}%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Detailed Player Breakdown */}
+      <Card className="shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-b">
+          <div className="flex items-center gap-3">
+            <User className="w-5 h-5 text-blue-600" />
+            <CardTitle>Clip-by-Clip Performance Analysis</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <PersonalHighlightEvaluations
+            evaluations={playerEvaluations}
+            formatTimestamp={formatTimestamp as (timestamp: number) => string}
+            playerName={playerName}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Elite Moments Timeline */}
+      {keyMoments.length > 0 && (
+        <Card className="border-yellow-200 dark:border-yellow-800 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-b border-yellow-200 dark:border-yellow-800">
             <div className="flex items-center gap-3">
-              <Award className="w-5 h-5 text-blue-600" />
-              <CardTitle>Highlight Reel Overview</CardTitle>
+              <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+              <CardTitle className="text-xl">Elite Moments & Game-Changing Plays</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            <p className="text-muted-foreground leading-relaxed">
-              {overallAnalysis.content}
-            </p>
+            <div className="space-y-6">
+              {keyMoments.map((moment: any, index: number) => {
+                const ratingMatch = moment.content.match(/(\d+)\/10/);
+                const rating = ratingMatch ? parseInt(ratingMatch[1]) : null;
+                
+                return (
+                  <div key={moment.id} className="relative pl-10 pb-6 last:pb-0">
+                    <div className="absolute left-0 top-0 w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-xs text-white font-bold">{index + 1}</span>
+                    </div>
+                    {index < keyMoments.length - 1 && (
+                      <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-gradient-to-b from-yellow-300 to-orange-300"></div>
+                    )}
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/10 dark:to-orange-950/10 rounded-xl p-5 border border-yellow-200 dark:border-yellow-800 shadow-md">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <Badge className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {formatTimestamp(moment.timestamp) || 'N/A'}
+                          </Badge>
+                          {rating && (
+                            <Badge className={`text-white ${
+                              rating >= 9 ? 'bg-gradient-to-r from-green-600 to-emerald-600' :
+                              rating >= 7 ? 'bg-gradient-to-r from-blue-600 to-cyan-600' :
+                              rating >= 5 ? 'bg-gradient-to-r from-yellow-600 to-orange-600' :
+                              'bg-gradient-to-r from-red-600 to-pink-600'
+                            }`}>
+                              <Trophy className="w-3 h-3 mr-1" />
+                              {rating}/10 Elite
+                            </Badge>
+                          )}
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {moment.confidence}% confidence
+                        </Badge>
+                      </div>
+                      <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                        {moment.content}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Individual Highlight Clips */}
-      <Card className="shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20 border-b">
-          <div className="flex items-center gap-3">
-            <Play className="w-5 h-5 text-yellow-600" />
-            <CardTitle>Individual Highlight Breakdowns</CardTitle>
-            <Badge variant="outline">{playerEvaluations.length} clips analyzed</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            {playerEvaluations.map((evaluation, index) => (
-              <div key={evaluation.id} className="bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Badge className="bg-yellow-500 text-white">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {formatTimestamp(evaluation.timestamp) || `Clip ${index + 1}`}
-                    </Badge>
-                    <Badge variant="outline">
-                      {evaluation.confidence}% quality
-                    </Badge>
-                  </div>
-                  {evaluation.confidence > 85 && (
-                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
-                      <Star className="w-3 h-3 mr-1" />
-                      Elite
-                    </Badge>
-                  )}
-                  {evaluation.content.toLowerCase().includes('improve') && (
-                    <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
-                      <AlertTriangle className="w-3 h-3 mr-1" />
-                      Growth Area
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                  {evaluation.content}
-                </p>
+      {/* Strengths & Areas for Development */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Strengths */}
+        {strengths.length > 0 && (
+          <Card className="border-green-200 dark:border-green-800 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-b border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CardTitle className="text-lg text-green-800 dark:text-green-200">Key Strengths</CardTitle>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-3">
+                {strengths.slice(0, 3).map((strength, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <ArrowUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
+                      {strength.substring(0, 200)}...
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Memorable Moments */}
-      {keyMoments.length > 0 && (
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-b">
+        {/* Areas for Development */}
+        {weaknesses.length > 0 && (
+          <Card className="border-orange-200 dark:border-orange-800 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-b border-orange-200 dark:border-orange-800">
+              <div className="flex items-center gap-3">
+                <Target className="w-5 h-5 text-orange-600" />
+                <CardTitle className="text-lg text-orange-800 dark:text-orange-200">Development Areas</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-3">
+                {weaknesses.slice(0, 3).map((weakness, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <ArrowDown className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-orange-800 dark:text-orange-200 leading-relaxed">
+                      {weakness.substring(0, 200)}...
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Overall Analysis Summary */}
+      {overallAnalysis && (
+        <Card className="border-slate-200 dark:border-slate-700 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-slate-100 to-gray-100 dark:from-slate-800 dark:to-gray-800 border-b">
             <div className="flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-purple-600" />
-              <CardTitle>Memorable Moments & Key Plays</CardTitle>
-              <Badge variant="outline">{keyMoments.length} moments</Badge>
+              <Eye className="w-6 h-6 text-slate-600" />
+              <CardTitle className="text-xl">Coach's Overall Assessment</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="space-y-4">
-              {keyMoments.map((moment, index) => (
-                <div key={moment.id} className="bg-purple-50 dark:bg-purple-950/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge className="bg-purple-500 text-white">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {formatTimestamp(moment.timestamp) || `Moment ${index + 1}`}
-                    </Badge>
-                    <Badge variant="outline">
-                      {moment.confidence}% confidence
-                    </Badge>
-                  </div>
-                  <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                    {moment.content}
-                  </p>
-                </div>
-              ))}
+            <div className="prose prose-slate max-w-none">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base">
+                {overallAnalysis.content}
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-4">
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                Recruiting Level: {recruitingLevel}
+              </Badge>
+              <Badge variant="outline">
+                Overall Confidence: {overallAnalysis.confidence}%
+              </Badge>
             </div>
           </CardContent>
         </Card>

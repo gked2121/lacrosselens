@@ -159,7 +159,7 @@ export function DrillAnalysis({ video, analyses, formatTimestamp }: DrillAnalysi
                   {playerEvaluations.length}
                 </p>
               </div>
-              <CheckCircle2 className="w-8 h-8 text-blue-500" />
+              <CheckCircle className="w-8 h-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>

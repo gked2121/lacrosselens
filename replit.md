@@ -752,6 +752,25 @@ The database schema is well-designed for detailed play tracking:
   - docs/confidence-scores-explained.md (documentation update)
 - **Status**: 60% confidence threshold successfully implemented across the entire application
 
+### 2025-01-31 - Fixed AI Generating Fake Player Numbers for Videos Without Jerseys
+- **Issue**: User reported AI was generating fake player numbers for backyard shooting videos where players wore no jerseys
+- **Root Cause**: AI was instructed to evaluate 10-15 players per video, leading to making up numbers when none were visible
+- **Solution**: Strengthened prompts to NEVER make up jersey numbers and use descriptive identifiers instead
+- **Changes Made**:
+  - **Added Critical Rule**: Placed warning at top of prompt to never make up jersey numbers
+  - **Enhanced Player Identification**: Clear instructions to use descriptive identifiers when no numbers visible:
+    - "Player in white shooting" instead of "#12 in white"
+    - "Left-handed player near goal" instead of "#7"
+    - "Taller player with blue helmet" instead of "#23"
+  - **Updated Player Count Guidelines**: Different expectations for organized games vs backyard footage
+  - **Statistical Accuracy**: Reinforced using "unnumbered player" or descriptions, never fake numbers
+- **Key Instructions Added**:
+  - "NEVER make up jersey numbers - especially in backyard/casual footage"
+  - "If NO jersey numbers are visible, DO NOT make up numbers"
+  - "Quality over quantity - better to have 3-5 accurate evaluations than 15 with made-up numbers"
+- **Files Modified**: server/services/gemini.ts (multiple prompt enhancements)
+- **Status**: AI now properly identifies players without making up fake jersey numbers
+
 ### 2025-01-30 - Expanded Analysis Capabilities with Dedicated Face-off and Transition Pages
 - **Issue**: User needed specialized analysis pages for face-offs and transitions to complement the detailed player evaluations
 - **Changes Made**:

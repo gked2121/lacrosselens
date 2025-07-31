@@ -989,3 +989,26 @@ The database schema is well-designed for detailed play tracking:
   - Both filters work together - videos must match both criteria to be displayed
 - **Files Modified**: client/src/pages/video-library.tsx (complete filter implementation)
 - **Status**: Video library filters now fully functional, allowing users to filter by status and search by text
+
+### 2025-01-31 - Enhanced Highlight Tape Analysis with Critical Feedback
+- **Issue**: User requested more detailed and critical analysis for highlight tapes including key clips, goals, errors, and areas for improvement
+- **Changes Made**:
+  - Enhanced PromptEngine highlight context with detailed requirements:
+    - Timestamp EVERY clip transition
+    - Rate each clip 1-10 for impressiveness
+    - Detailed goal breakdown (shot type, distance, defender pressure)
+    - Critical error analysis even in "highlight" clips
+    - Identify what's missing (no defense? no assists? red flags)
+    - Judge competition level honestly
+    - Give realistic recruiting assessment (D1/D2/D3)
+    - List 10+ specific improvements needed
+  - Updated Gemini prompts with critical analysis requirements for highlight tapes
+  - Enhanced HighlightAnalysis UI component:
+    - Added rating badges (color-coded green/yellow/red)
+    - Added "Needs Work" badges for clips with errors
+    - Created new "Areas for Improvement & Critical Feedback" section
+    - Filters analyses for critical feedback keywords
+    - Shows competition level warnings
+  - Focus on honest evaluation to help players improve, not empty praise
+- **Files Modified**: server/services/promptEngine.ts, server/services/gemini.ts, client/src/components/video-type-analysis/highlight-analysis.tsx
+- **Status**: Highlight tape analysis now provides detailed, critical feedback with specific areas for improvement

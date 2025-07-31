@@ -389,12 +389,49 @@ PLAYER COUNT REQUIREMENT: Your analysis MUST include at least 10 different playe
 - Assess player communication and leadership during drills`;
         
       case 'highlight':
-        return `\n\nVIDEO CONTEXT - HIGHLIGHT TAPE:
-- Understand this shows best plays, not complete performance
-- Look for consistency in technique across different highlights
-- Evaluate ceiling/potential based on peak performance shown
-- Identify what makes these plays special or elite
-- Note any gaps or weaknesses not shown in highlights`;
+        return `\n\nVIDEO CONTEXT - HIGHLIGHT TAPE (CRITICAL DETAILED ANALYSIS):
+
+TIMESTAMP EVERY CLIP - Required for highlight tapes:
+- Mark EXACT timestamp when each new clip/play begins (e.g., 0:03, 0:15, 0:27)
+- Describe what happens in each clip with extreme detail
+- Rate each clip 1-10 for impressiveness and explain why
+
+GOALS BREAKDOWN - Be extremely detailed:
+- For EVERY goal: exact shot location, type (overhand/sidearm/underhand), distance, angle
+- Was defender beaten cleanly or just bad defense?
+- Did they create space or was it given?
+- Would this goal happen against D1 defenders?
+- Compare to elite players at their level
+
+CRITICAL ERROR ANALYSIS - Don't ignore mistakes:
+- Point out EVERY bad shot, turnover, or poor decision visible
+- Even in "highlights" identify fundamental flaws
+- Note if they're forcing shots, missing open teammates
+- Identify predictable patterns (always goes to right hand, only one dodge move)
+
+WHAT'S MISSING - Red flags by omission:
+- No defensive highlights? Can't play defense?
+- No assists? Selfish player or poor vision?
+- No ground balls? Lacks hustle?
+- Only transition goals? Can't score settled?
+- No face-offs shown? Not versatile?
+
+COMPETITION LEVEL - Be brutally honest:
+- Are these highlights against top teams or weak JV squads?
+- Would these moves work against elite competition?
+- Grade of competition faced (A through F)
+
+RECRUITING REALITY CHECK:
+- Based on this tape: D1, D2, D3, or not college level?
+- Specific programs that match their level
+- What's holding them back from next level?
+
+SPECIFIC IMPROVEMENTS NEEDED:
+- List 10+ specific technical fixes needed
+- What bad habits are visible even in highlights?
+- Drills to address each weakness
+
+Remember: Parents pay for honest evaluation to help their child improve, not empty praise`;
         
       case 'drill':
         return `\n\nVIDEO CONTEXT - DRILL/TRAINING:

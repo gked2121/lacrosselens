@@ -8,7 +8,8 @@ import {
   TrendingUp, 
   User,
   Clock,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from "lucide-react";
 
 interface HighlightAnalysisProps {
@@ -125,10 +126,36 @@ export function HighlightAnalysis({ video, analyses, formatTimestamp }: Highligh
                   )}
                   <div className="bg-orange-50 dark:bg-orange-950/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge className="bg-orange-500 text-white">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {formatTimestamp(moment.timestamp) || 'N/A'}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-orange-500 text-white">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {formatTimestamp(moment.timestamp) || 'N/A'}
+                        </Badge>
+                        {(() => {
+                          const ratingMatch = moment.content.match(/(\d+)\/10/);
+                          const rating = ratingMatch ? parseInt(ratingMatch[1]) : null;
+                          if (rating) {
+                            return (
+                              <Badge className={
+                                rating >= 8 ? 'bg-green-500 text-white' :
+                                rating >= 6 ? 'bg-yellow-500 text-white' :
+                                'bg-red-500 text-white'
+                              }>
+                                {rating}/10 Rating
+                              </Badge>
+                            );
+                          }
+                          return null;
+                        })()}
+                        {(moment.content.toLowerCase().includes('error') || 
+                          moment.content.toLowerCase().includes('mistake') ||
+                          moment.content.toLowerCase().includes('poor') ||
+                          moment.content.toLowerCase().includes('bad')) && (
+                          <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">
+                            Needs Work
+                          </Badge>
+                        )}
+                      </div>
                       <Badge variant="outline">
                         {moment.confidence}% confidence
                       </Badge>
@@ -141,6 +168,71 @@ export function HighlightAnalysis({ video, analyses, formatTimestamp }: Highligh
           </CardContent>
         </Card>
       )}
+
+      {/* Critical Analysis & Improvements Needed */}
+      <Card className="border-red-200 dark:border-red-800 shadow-lg">
+        <CardHeader className="bg-red-50 dark:bg-red-950/20 border-b border-red-200 dark:border-red-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-500 rounded-lg">
+              <AlertCircle className="w-6 h-6 text-white" />
+            </div>
+            <CardTitle className="text-xl">Areas for Improvement & Critical Feedback</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            {/* Extract critical feedback from analyses */}
+            {analyses.filter(a => 
+              a.content.toLowerCase().includes('improve') ||
+              a.content.toLowerCase().includes('weakness') ||
+              a.content.toLowerCase().includes('error') ||
+              a.content.toLowerCase().includes('mistake') ||
+              a.content.toLowerCase().includes('poor') ||
+              a.content.toLowerCase().includes('lack') ||
+              a.content.toLowerCase().includes('need') ||
+              a.content.match(/\d\/10/) && parseInt(a.content.match(/(\d)\/10/)![1]) < 6
+            ).map((critical, index) => (
+              <div key={critical.id} className="bg-red-50 dark:bg-red-950/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
+                <div className="flex items-start gap-3">
+                  <div className="p-1 bg-red-100 dark:bg-red-900/30 rounded">
+                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium text-red-700 dark:text-red-300">
+                        {formatTimestamp(critical.timestamp)}
+                      </span>
+                      {critical.type === 'player_evaluation' && (
+                        <Badge variant="outline" className="text-xs">
+                          Player Analysis
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {critical.content}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Competition Level Warning */}
+            {overallAnalysis?.content.toLowerCase().includes('competition') && (
+              <div className="bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-yellow-900 dark:text-yellow-100 mb-1">Competition Level Note</h4>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                      Consider the level of competition shown in these highlights when evaluating overall ability.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Highlight Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

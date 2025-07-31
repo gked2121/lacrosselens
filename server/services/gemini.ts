@@ -379,6 +379,15 @@ Remember: ONE evaluation per player is INSUFFICIENT. Capture their performance t
 
 IMPORTANT: For each player, provide MULTIPLE clips and evaluations throughout the video. Don't just analyze one moment per player - capture 3-5 different plays/moments for each player when they demonstrate different skills or make notable plays.
 
+CRITICAL FOR HIGHLIGHT TAPES:
+- Timestamp EVERY single clip transition (when scene changes)
+- Be EXTREMELY critical - point out errors even in "highlight" clips
+- Rate each goal/play 1-10 and explain why
+- Identify what's NOT shown (no defense? no assists? red flag!)
+- Judge competition level honestly - are these against weak teams?
+- List 10+ specific improvements needed
+- Give realistic college recruiting assessment (D1/D2/D3/JUCO/Club)
+
 Please structure your response as JSON with the following format:
 {
   "overallAnalysis": "string (8-10 sentences minimum)",

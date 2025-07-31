@@ -1039,3 +1039,32 @@ The database schema is well-designed for detailed play tracking:
   - Focus on honest evaluation to help players improve, not empty praise
 - **Files Modified**: server/services/promptEngine.ts, server/services/gemini.ts, client/src/components/video-type-analysis/highlight-analysis.tsx
 - **Status**: Highlight tape analysis now provides detailed, critical feedback with specific areas for improvement
+
+### 2025-01-31 - Implemented Two-Phase Gemini Analysis System with Comprehensive JSON Extraction
+- **Issue**: User requested implementing two-phase Gemini prompting: extract all info to detailed JSON first, then format specific outputs
+- **Problem**: videoProcessor.ts was corrupted with broken advanced analysis code referencing non-existent 'detailedAnalysis' variable
+- **Solution**: Complete overhaul of video processing to use two-phase analysis approach
+- **Major Changes**:
+  - **Fixed Corrupted videoProcessor.ts**: Removed all broken advanced analysis code and created clean implementation
+  - **Two-Phase Analysis Approach**:
+    - Phase 1: Extract comprehensive structured data from video into JSON format
+    - Phase 2: Format the extracted data for specific display needs
+  - **TwoPhaseGeminiAnalyzer Implementation**:
+    - extractComprehensiveData(): Processes file uploads into structured JSON
+    - extractFromYouTube(): Processes YouTube videos using native Gemini support
+    - formatAnalysis(): Formats JSON data into player evaluations, statistics, tactical analysis, highlights
+  - **Database Storage**:
+    - Comprehensive JSON data stored in analyses.metadata field
+    - analysisVersion: 'two-phase-v1' for tracking
+    - Separate analyses created for each type (overall, player_evaluation, face_off, transition, key_moment)
+  - **YouTube Integration**: Updated processYouTubeVideo to use same two-phase approach
+- **Technical Details**:
+  - Moved from keyword extraction to structured JSON data extraction
+  - All analysis data preserved in metadata for future use
+  - Multiple analyses generated from single comprehensive extraction
+  - Better accuracy through structured data approach
+- **Files Modified**: 
+  - server/services/videoProcessor.ts (complete rewrite)
+  - server/services/geminiTwoPhase.ts (implementation)
+  - Updated both file upload and YouTube processing workflows
+- **Status**: Two-phase Gemini analysis fully implemented and operational for both file uploads and YouTube videos

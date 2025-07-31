@@ -8,6 +8,7 @@ import { AdvancedVideoAnalyzer } from "./advancedVideoAnalysis";
 import { EnhancedPromptSystem } from "./enhancedPromptSystem";
 import { EnhancedAnalysisProcessor } from "./enhancedAnalysisProcessor";
 import { YouTubeMetadataService } from "./youtubeMetadata";
+import { TwoPhaseGeminiAnalyzer } from "./geminiTwoPhase";
 
 // Configure multer for video uploads
 const uploadDir = "uploads/videos";
@@ -64,265 +65,172 @@ export async function processVideoUpload(
     // Update video status to processing
     await storage.updateVideoStatus(videoId, "processing");
     
-    // Generate thumbnail and get metadata
+    // Get video metadata
+    console.log(`Getting video metadata for ${filePath}`);
+    const metadata = await getVideoMetadata(filePath);
+    const durationInSeconds = Math.round(metadata.duration);
+    
+    // Update video with duration
+    await storage.updateVideo(videoId, {
+      duration: durationInSeconds,
+    });
+    
+    // Generate thumbnail
     try {
-      console.log(`Generating thumbnail and metadata for video ${videoId}`);
-      const [thumbnailUrl, metadata] = await Promise.all([
-        generateVideoThumbnail(filePath, videoId),
-        getVideoMetadata(filePath)
-      ]);
-      
-      // Update video with thumbnail and metadata
+      console.log(`Generating thumbnail for video ${videoId}`);
+      const thumbnailPath = await generateVideoThumbnail(filePath, videoId);
+      const publicThumbnailPath = `/uploads/thumbnails/video-${videoId}.jpg`;
       await storage.updateVideo(videoId, {
-        thumbnailUrl,
-        duration: metadata.duration
+        thumbnailUrl: publicThumbnailPath,
       });
-      console.log(`Thumbnail and metadata updated for video ${videoId}`);
+      console.log(`Thumbnail generated successfully: ${publicThumbnailPath}`);
     } catch (thumbnailError) {
       console.error("Error generating thumbnail:", thumbnailError);
       // Continue processing even if thumbnail generation fails
     }
 
-    // Determine analysis mode based on user preference
-    const useAdvancedAnalysis = analysisOptions?.useAdvancedAnalysis !== false; // Default to true if not specified
+    // Use the new two-phase Gemini analysis approach
+    console.log(`Starting TWO-PHASE Gemini analysis for video ${videoId}`);
     
-    if (useAdvancedAnalysis) {
-      console.log(`Starting ADVANCED multi-pass analysis for video ${videoId}`);
+    try {
+      // Phase 1: Extract comprehensive data from video
+      const comprehensiveData = await TwoPhaseGeminiAnalyzer.extractComprehensiveData(filePath);
       
-      try {
-        // Perform comprehensive multi-pass analysis
-        const detailedAnalysis = await AdvancedVideoAnalyzer.performComprehensiveAnalysis(filePath);
-        
-        // Convert detailed analysis to storage format
-        console.log(`Processing ${detailedAnalysis.segments.length} segments, ${detailedAnalysis.technicalBreakdowns.length} technical breakdowns, ${detailedAnalysis.statisticalData.length} statistical events`);
-        
-        // Store segments as key moments
-        for (const segment of detailedAnalysis.segments) {
-          if (segment.importance === 'high') {
+      console.log(`Phase 1 complete: Extracted ${comprehensiveData.plays?.length || 0} plays, ${comprehensiveData.individualPerformance?.length || 0} player performances`);
+      
+      // Store the raw comprehensive data as an overall analysis with metadata
+      await storage.createAnalysis({
+        videoId,
+        type: "overall", 
+        title: "Comprehensive Video Data",
+        content: "Two-phase analysis complete - see metadata for full data",
+        timestamp: 0,
+        confidence: 100,
+        metadata: {
+          comprehensiveAnalysisData: comprehensiveData,
+          analysisVersion: 'two-phase-v1',
+          analysisTimestamp: new Date().toISOString()
+        }
+      });
+      
+      // Phase 2: Format the data for specific outputs
+      console.log(`Starting Phase 2: Formatting analysis for display`);
+      const [playerEvaluations, statistics, tactical, highlights] = await Promise.all([
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'player_evaluations'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'statistics'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'tactical'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'highlights')
+      ]);
+      
+      console.log(`Phase 2 complete: Generated formatted analyses`);
+      
+      // Store overall analysis
+      if (comprehensiveData.tacticalObservations) {
+        await storage.createAnalysis({
+          videoId,
+          type: "overall",
+          title: "Game Overview",
+          content: tactical,
+          timestamp: 0,
+          confidence: 95,
+          metadata: {
+            comprehensiveData: comprehensiveData.videoMetadata,
+            statistics: statistics
+          }
+        });
+      }
+      
+      // Process and store player evaluations
+      if (typeof playerEvaluations === 'string') {
+        // Parse player evaluations from formatted text
+        const evaluationSections = playerEvaluations.split(/Player #?\d+|Player in \w+/g).filter(Boolean);
+        for (let i = 0; i < comprehensiveData.individualPerformance.length && i < evaluationSections.length; i++) {
+          const player = comprehensiveData.individualPerformance[i];
+          await storage.createAnalysis({
+            videoId,
+            type: "player_evaluation",
+            title: `Player ${player.player}`,
+            content: evaluationSections[i].trim(),
+            timestamp: 0,
+            confidence: 95,
+            metadata: {
+              stats: player.stats,
+              skills: player.skills,
+              athleticism: player.athleticism
+            }
+          });
+        }
+      }
+      
+      // Store highlights as key moments
+      if (typeof highlights === 'string') {
+        const highlightLines = highlights.split('\n').filter(line => line.includes('Timestamp:'));
+        for (const play of comprehensiveData.plays || []) {
+          if (play.result === 'goal' || play.playType === 'fast_break') {
             await storage.createAnalysis({
               videoId,
               type: "key_moment",
-              title: `${segment.playType} - ${segment.players.join(', ')}`,
-              content: segment.description,
-              timestamp: Math.round(segment.startTime),
-              confidence: 95,
+              title: `${play.playType} - ${play.result}`,
+              content: `Play from ${play.startTime}s to ${play.endTime}s`,
+              timestamp: Math.round(play.startTime),
+              confidence: 90,
               metadata: {
-                players: segment.players,
-                playType: segment.playType,
-                duration: segment.endTime - segment.startTime
+                playDetails: play
               }
             });
           }
         }
-        
-        // Store technical breakdowns as player evaluations
-        for (const breakdown of detailedAnalysis.technicalBreakdowns) {
-          await storage.createAnalysis({
-            videoId,
-            type: "player_evaluation",
-            title: `Player ${breakdown.playerNumber || 'Unknown'} - ${breakdown.skillArea}`,
-            content: `BIOMECHANICS: ${breakdown.biomechanics}\n\nDECISION MAKING: ${breakdown.decisionMaking}\n\nIMPROVEMENT: ${breakdown.improvement}`,
-            timestamp: Math.round(breakdown.timestamp),
-            confidence: breakdown.confidence,
-            metadata: {
-              playerNumber: breakdown.playerNumber,
-              skillArea: breakdown.skillArea
-            }
-          });
-        }
-        
-        // Store tactical insights
-        for (const insight of detailedAnalysis.tacticalInsights) {
-          await storage.createAnalysis({
-            videoId,
-            type: "overall",
-            title: `Tactical Analysis - ${insight.situation}`,
-            content: `FORMATION: ${insight.formation}\n\nEXECUTION: ${insight.execution}\n\nALTERNATIVES: ${insight.alternatives}\n\nCOACHING: ${insight.coaching}`,
-            timestamp: Math.round(insight.timestamp),
-            confidence: insight.confidence,
-            metadata: {
-              formation: insight.formation,
-              situation: insight.situation
-            }
-          });
-        }
-        
-        // Process statistical data
-        const statsMap = new Map();
-        for (const stat of detailedAnalysis.statisticalData) {
-          const key = `${stat.playType}-${stat.timestamp}`;
-          if (!statsMap.has(key)) {
-            await storage.createAnalysis({
-              videoId,
-              type: "key_moment",
-              title: `${stat.playType} - ${stat.playerInvolved}`,
-              content: stat.outcome,
-              timestamp: Math.round(stat.timestamp),
-              confidence: 90,
-              metadata: stat.metrics
-            });
-          }
-        }
-        
-        // Create comprehensive overall analysis
-        const overallContent = `COMPREHENSIVE VIDEO ANALYSIS SUMMARY\n\nTotal Segments Analyzed: ${detailedAnalysis.segments.length}\nHigh-Importance Plays: ${detailedAnalysis.segments.filter(s => s.importance === 'high').length}\nTechnical Breakdowns: ${detailedAnalysis.technicalBreakdowns.length}\nTactical Insights: ${detailedAnalysis.tacticalInsights.length}\nStatistical Events: ${detailedAnalysis.statisticalData.length}\n\nThis advanced analysis used multiple AI passes to extract maximum detail from the video, including biomechanical breakdowns, tactical evaluations, and comprehensive statistical tracking.`;
-        
+      }
+      
+      // Store face-off analyses
+      const faceoffs = comprehensiveData.plays?.filter(p => p.playType === 'face_off') || [];
+      for (const faceoff of faceoffs) {
         await storage.createAnalysis({
           videoId,
-          type: "overall",
-          title: "Comprehensive Multi-Pass Analysis Summary",
-          content: overallContent,
-          timestamp: 0,
-          confidence: 95,
+          type: "face_off",
+          title: "Face-off",
+          content: `Face-off at ${faceoff.startTime}s`,
+          timestamp: Math.round(faceoff.startTime),
+          confidence: 85,
           metadata: {
-            totalSegments: detailedAnalysis.segments.length,
-            analysisMethod: "advanced_multi_pass"
+            technique: comprehensiveData.tacticalObservations?.specialSituations?.faceoffs?.technique?.[0] || 'standard'
           }
         });
-        
-        console.log(`Advanced analysis completed successfully for video ${videoId}`);
-        
-        // Update video status to completed after successful advanced analysis
-        await storage.updateVideoStatus(videoId, "completed");
-        console.log(`Video ${videoId} processing completed with advanced analysis`);
-        return; // Exit after successful advanced analysis
-        
-      } catch (advancedError) {
-        console.error("Advanced analysis failed, falling back to standard analysis:", advancedError);
-        // Continue with standard analysis below
       }
+      
+      // Store transition analyses
+      const transitions = comprehensiveData.plays?.filter(p => p.playType === 'clear' || p.playType === 'ride') || [];
+      for (const transition of transitions) {
+        await storage.createAnalysis({
+          videoId,
+          type: "transition",
+          title: transition.playType === 'clear' ? "Clear" : "Ride",
+          content: `${transition.playType} from ${transition.startTime}s to ${transition.endTime}s`,
+          timestamp: Math.round(transition.startTime),
+          confidence: 85,
+          metadata: {
+            result: transition.result,
+            formations: transition.formations
+          }
+        });
+      }
+      
+      console.log(`Successfully stored analyses from two-phase Gemini processing`);
+      
+    } catch (analysisError) {
+      console.error("Error during two-phase analysis:", analysisError);
+      // Update video status to failed on error
+      await storage.updateVideoStatus(videoId, "failed");
+      throw analysisError;
     }
     
-    // Standard single-pass analysis (or fallback from advanced)
-    console.log(`Starting standard Gemini analysis for video ${videoId}`);
-    const standardAnalysisOptions = {
-      playerNumber: analysisOptions?.playerNumber,
-      teamName: analysisOptions?.teamName,
-      position: analysisOptions?.position,
-      level: analysisOptions?.level,
-      videoType: analysisOptions?.videoType
-    };
-    const analysis = await analyzeLacrosseVideo(filePath, title, userPrompt, standardAnalysisOptions);
-    console.log(`Standard analysis completed for video ${videoId}`);
-    
-    // Log analysis details for debugging
-    console.log(`Analysis contains:
-    - Overall Analysis: ${analysis.overallAnalysis.length} characters
-    - Player Evaluations: ${analysis.playerEvaluations.length} players
-    - Face-off Analyses: ${analysis.faceOffAnalysis.length} analyses
-    - Transition Analyses: ${analysis.transitionAnalysis.length} analyses
-    - Key Moments: ${analysis.keyMoments.length} moments`);
-
-    // Use Enhanced Analysis Processor for comprehensive data storage
-    console.log("Using Enhanced Analysis Processor for detailed data extraction and storage");
-    
-    // Store overall analysis with enhanced processing
-    await EnhancedAnalysisProcessor.processAndStoreAnalysis(
-      videoId,
-      "overall",
-      analysis.overallAnalysis,
-      { 
-        type: "overall",
-        videoType: analysisOptions?.videoType,
-        level: analysisOptions?.level 
-      },
-      0,
-      95
-    );
-
-    // Process player evaluations with detailed player profiles
-    for (const playerEval of analysis.playerEvaluations) {
-      // Skip analyses with confidence below 60%
-      if (playerEval.confidence < 60) {
-        console.log(`Skipping player evaluation with low confidence (${playerEval.confidence}%)`);
-        continue;
-      }
-      
-      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
-        videoId,
-        "player_evaluation",
-        playerEval.evaluation,
-        { 
-          playerNumber: playerEval.playerNumber,
-          timestamp: playerEval.timestamp 
-        },
-        playerEval.timestamp ? Math.round(playerEval.timestamp) : undefined,
-        Math.round(playerEval.confidence)
-      );
-    }
-
-    // Process face-off analysis with detailed breakdowns
-    for (const faceOff of analysis.faceOffAnalysis) {
-      // Skip analyses with confidence below 60%
-      if (faceOff.confidence < 60) {
-        console.log(`Skipping face-off analysis with low confidence (${faceOff.confidence}%)`);
-        continue;
-      }
-      
-      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
-        videoId,
-        "face_off",
-        faceOff.analysis,
-        { 
-          winProbability: faceOff.winProbability,
-          timestamp: faceOff.timestamp
-        },
-        faceOff.timestamp ? Math.round(faceOff.timestamp) : undefined,
-        Math.round(faceOff.confidence)
-      );
-    }
-
-    // Process transition analysis with tactical details
-    for (const transition of analysis.transitionAnalysis) {
-      // Skip analyses with confidence below 60%
-      if (transition.confidence < 60) {
-        console.log(`Skipping transition analysis with low confidence (${transition.confidence}%)`);
-        continue;
-      }
-      
-      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
-        videoId,
-        "transition",
-        transition.analysis,
-        { 
-          successProbability: transition.successProbability,
-          timestamp: transition.timestamp
-        },
-        transition.timestamp ? Math.round(transition.timestamp) : undefined,
-        Math.round(transition.confidence)
-      );
-    }
-
-    // Process key moments with play-by-play details
-    for (const moment of analysis.keyMoments) {
-      // Skip analyses with confidence below 60%
-      if (moment.confidence < 60) {
-        console.log(`Skipping key moment with low confidence (${moment.confidence}%)`);
-        continue;
-      }
-      
-      await EnhancedAnalysisProcessor.processAndStoreAnalysis(
-        videoId,
-        "key_moment",
-        moment.description,
-        { 
-          momentType: moment.type,
-          timestamp: moment.timestamp
-        },
-        moment.timestamp ? Math.round(moment.timestamp) : undefined,
-        Math.round(moment.confidence)
-      );
-    }
-
-    console.log(`Enhanced analysis processing completed for video ${videoId}`);
-
     // Update video status to completed
     await storage.updateVideoStatus(videoId, "completed");
-    console.log(`Video processing completed successfully for video ${videoId}`);
+    console.log(`Video ${videoId} processing completed successfully`);
+    
   } catch (error) {
-    console.error(`Error processing video ${videoId}:`, error);
-    console.error(`Full error details:`, error instanceof Error ? error.message : error);
-    console.error(`Stack trace:`, error instanceof Error ? error.stack : 'No stack trace');
+    console.error("Error processing video:", error);
+    // Update video status to failed
     await storage.updateVideoStatus(videoId, "failed");
     throw error;
   }
@@ -383,114 +291,147 @@ export async function processYouTubeVideo(
       title: finalTitle,
       description: finalDescription,
       thumbnailUrl,
-      metadata: {
-        source: 'youtube',
-        originalUrl: youtubeUrl,
-        thumbnailGenerated: true,
-        youtubeMetadata: youtubeMetadata ? {
-          originalTitle: youtubeMetadata.title,
-          channelTitle: youtubeMetadata.channelTitle,
-          duration: youtubeMetadata.duration,
-          publishedAt: youtubeMetadata.publishedAt,
-          viewCount: youtubeMetadata.viewCount
-        } : null
+    });
+    
+    console.log(`Updated video ${videoId} with enhanced title, description, and thumbnail`);
+
+    // Use the new two-phase Gemini analysis approach for YouTube videos
+    console.log(`Starting TWO-PHASE Gemini analysis for YouTube video ${videoId}`);
+    
+    try {
+      // Phase 1: Extract comprehensive data from YouTube video
+      const comprehensiveData = await TwoPhaseGeminiAnalyzer.extractFromYouTube(youtubeUrl);
+      
+      console.log(`Phase 1 complete: Extracted ${comprehensiveData.plays?.length || 0} plays, ${comprehensiveData.individualPerformance?.length || 0} player performances`);
+      
+      // Store the raw comprehensive data as an overall analysis with metadata
+      await storage.createAnalysis({
+        videoId,
+        type: "overall", 
+        title: "Comprehensive YouTube Video Data",
+        content: "Two-phase analysis complete - see metadata for full data",
+        timestamp: 0,
+        confidence: 100,
+        metadata: {
+          comprehensiveAnalysisData: comprehensiveData,
+          analysisVersion: 'two-phase-v1',
+          analysisTimestamp: new Date().toISOString(),
+          source: 'youtube'
+        }
+      });
+      
+      // Phase 2: Format the data for specific outputs
+      console.log(`Starting Phase 2: Formatting analysis for display`);
+      const [playerEvaluations, statistics, tactical, highlights] = await Promise.all([
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'player_evaluations'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'statistics'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'tactical'),
+        TwoPhaseGeminiAnalyzer.formatAnalysis(comprehensiveData, 'highlights')
+      ]);
+      
+      console.log(`Phase 2 complete: Generated formatted analyses`);
+      
+      // Store overall analysis
+      if (comprehensiveData.tacticalObservations) {
+        await storage.createAnalysis({
+          videoId,
+          type: "overall",
+          title: "Game Overview",
+          content: tactical,
+          timestamp: 0,
+          confidence: 95,
+          metadata: {
+            comprehensiveData: comprehensiveData.videoMetadata,
+            statistics: statistics,
+            source: 'youtube'
+          }
+        });
       }
-    });
-    
-    console.log(`Updated video ${videoId} with enhanced title, description, thumbnail and metadata`);
-
-    // Analyze YouTube video with Gemini using custom prompt
-    const youtubeAnalysisOptions = {
-      playerNumber: analysisOptions?.playerNumber,
-      teamName: analysisOptions?.teamName,
-      position: analysisOptions?.position,
-      level: analysisOptions?.level,
-      videoType: analysisOptions?.videoType
-    };
-    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, finalTitle, userPrompt, youtubeAnalysisOptions);
-    console.log(`YouTube analysis completed for video ${videoId}`);
-    
-    // Log analysis details for debugging
-    console.log(`YouTube Analysis contains:
-    - Overall Analysis: ${analysis.overallAnalysis.length} characters
-    - Player Evaluations: ${analysis.playerEvaluations.length} players
-    - Face-off Analyses: ${analysis.faceOffAnalysis.length} analyses
-    - Transition Analyses: ${analysis.transitionAnalysis.length} analyses
-    - Key Moments: ${analysis.keyMoments.length} moments`);
-
-    // Store analysis results from YouTube video
-    await storage.createAnalysis({
-      videoId,
-      type: "overall",
-      title: "Overall Game Analysis",
-      content: analysis.overallAnalysis,
-      timestamp: null,
-      confidence: 95,
-      metadata: { 
-        type: "overall",
-        source: "youtube" 
-      },
-    });
-
-    // Store other analyses...
-    for (const playerEval of analysis.playerEvaluations) {
-      await storage.createAnalysis({
-        videoId,
-        type: "player_evaluation",
-        title: `Player Evaluation ${playerEval.playerNumber ? `- #${playerEval.playerNumber}` : ""}`,
-        content: playerEval.evaluation,
-        timestamp: playerEval.timestamp ? Math.round(playerEval.timestamp) : null,
-        confidence: Math.round(playerEval.confidence),
-        metadata: { 
-          type: "player_evaluation",
-          playerNumber: playerEval.playerNumber 
-        },
-      });
-    }
-
-    for (const faceOff of analysis.faceOffAnalysis) {
-      await storage.createAnalysis({
-        videoId,
-        type: "face_off",
-        title: "Face-Off Analysis",
-        content: faceOff.analysis,
-        timestamp: faceOff.timestamp ? Math.round(faceOff.timestamp) : null,
-        confidence: Math.round(faceOff.confidence),
-        metadata: { 
+      
+      // Process and store player evaluations
+      if (typeof playerEvaluations === 'string') {
+        // Parse player evaluations from formatted text
+        const evaluationSections = playerEvaluations.split(/Player #?\d+|Player in \w+/g).filter(Boolean);
+        for (let i = 0; i < comprehensiveData.individualPerformance.length && i < evaluationSections.length; i++) {
+          const player = comprehensiveData.individualPerformance[i];
+          await storage.createAnalysis({
+            videoId,
+            type: "player_evaluation",
+            title: `Player ${player.player}`,
+            content: evaluationSections[i].trim(),
+            timestamp: 0,
+            confidence: 95,
+            metadata: {
+              stats: player.stats,
+              skills: player.skills,
+              athleticism: player.athleticism,
+              source: 'youtube'
+            }
+          });
+        }
+      }
+      
+      // Store highlights as key moments
+      if (typeof highlights === 'string') {
+        const highlightLines = highlights.split('\n').filter(line => line.includes('Timestamp:'));
+        for (const play of comprehensiveData.plays || []) {
+          if (play.result === 'goal' || play.playType === 'fast_break') {
+            await storage.createAnalysis({
+              videoId,
+              type: "key_moment",
+              title: `${play.playType} - ${play.result}`,
+              content: `Play from ${play.startTime}s to ${play.endTime}s`,
+              timestamp: Math.round(play.startTime),
+              confidence: 90,
+              metadata: {
+                playDetails: play,
+                source: 'youtube'
+              }
+            });
+          }
+        }
+      }
+      
+      // Store face-off analyses
+      const faceoffs = comprehensiveData.plays?.filter(p => p.playType === 'face_off') || [];
+      for (const faceoff of faceoffs) {
+        await storage.createAnalysis({
+          videoId,
           type: "face_off",
-          winProbability: faceOff.winProbability 
-        },
-      });
-    }
-
-    for (const transition of analysis.transitionAnalysis) {
-      await storage.createAnalysis({
-        videoId,
-        type: "transition",
-        title: "Transition Intelligence",
-        content: transition.analysis,
-        timestamp: transition.timestamp ? Math.round(transition.timestamp) : null,
-        confidence: Math.round(transition.confidence),
-        metadata: { 
+          title: "Face-off",
+          content: `Face-off at ${faceoff.startTime}s`,
+          timestamp: Math.round(faceoff.startTime),
+          confidence: 85,
+          metadata: {
+            technique: comprehensiveData.tacticalObservations?.specialSituations?.faceoffs?.technique?.[0] || 'standard',
+            source: 'youtube'
+          }
+        });
+      }
+      
+      // Store transition analyses
+      const transitions = comprehensiveData.plays?.filter(p => p.playType === 'clear' || p.playType === 'ride') || [];
+      for (const transition of transitions) {
+        await storage.createAnalysis({
+          videoId,
           type: "transition",
-          successProbability: transition.successProbability 
-        },
-      });
-    }
-
-    for (const moment of analysis.keyMoments) {
-      await storage.createAnalysis({
-        videoId,
-        type: "key_moment",
-        title: `Key Moment: ${moment.type}`,
-        content: moment.description,
-        timestamp: moment.timestamp ? Math.round(moment.timestamp) : null,
-        confidence: Math.round(moment.confidence),
-        metadata: { 
-          type: "key_moment",
-          momentType: moment.type 
-        },
-      });
+          title: transition.playType === 'clear' ? "Clear" : "Ride",
+          content: `${transition.playType} from ${transition.startTime}s to ${transition.endTime}s`,
+          timestamp: Math.round(transition.startTime),
+          confidence: 85,
+          metadata: {
+            result: transition.result,
+            formations: transition.formations,
+            source: 'youtube'
+          }
+        });
+      }
+      
+      console.log(`Successfully stored analyses from two-phase Gemini processing for YouTube video`);
+      
+    } catch (analysisError) {
+      console.error("Error during two-phase YouTube analysis:", analysisError);
+      throw analysisError;
     }
 
     // Update video status to completed
@@ -503,5 +444,3 @@ export async function processYouTubeVideo(
     throw error;
   }
 }
-
-

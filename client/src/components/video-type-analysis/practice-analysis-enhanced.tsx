@@ -25,29 +25,21 @@ export function PracticeAnalysisEnhanced({ video, analyses, formatTimestamp }: P
   const playerEvaluations = analyses?.filter(a => a.type === 'player_evaluation') || [];
   const keyMoments = analyses?.filter(a => a.type === 'key_moment') || [];
 
-  // Extract practice metrics from real data
+  // Extract practice metrics from actual database fields
   const practiceMetrics = {
     totalPlayers: playerEvaluations.length,
     avgConfidence: playerEvaluations.length > 0 
-      ? Math.round(playerEvaluations.reduce((sum, p) => sum + p.confidence, 0) / playerEvaluations.length)
+      ? Math.round(playerEvaluations.reduce((sum, p) => sum + (p.confidence || 0), 0) / playerEvaluations.length)
       : 0,
-    skillDrills: keyMoments.filter(m => 
-      m.content.toLowerCase().includes('drill') ||
-      m.content.toLowerCase().includes('shooting') ||
-      m.content.toLowerCase().includes('passing') ||
-      m.content.toLowerCase().includes('practice')
-    ).length,
-    coachingPoints: analyses.filter(a => 
-      a.content.toLowerCase().includes('improve') ||
-      a.content.toLowerCase().includes('work on') ||
-      a.content.toLowerCase().includes('focus')
-    ).length,
-    workEthic: playerEvaluations.filter(p => 
-      p.content.toLowerCase().includes('hustle') ||
-      p.content.toLowerCase().includes('effort') ||
-      p.content.toLowerCase().includes('work') ||
-      p.content.toLowerCase().includes('intensity')
-    ).length
+    keyMoments: keyMoments.length,
+    totalAnalyses: analyses.length,
+    // Use actual analysis types instead of keyword searches
+    evaluationTypes: {
+      player: playerEvaluations.length,
+      overall: analyses.filter(a => a.type === 'overall').length,
+      tactical: analyses.filter(a => a.type === 'tactical').length,
+      coaching: analyses.filter(a => a.type === 'coaching_point').length
+    }
   };
 
   // Extract skill development areas
@@ -101,19 +93,19 @@ export function PracticeAnalysisEnhanced({ video, analyses, formatTimestamp }: P
             <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">Skill Drills</span>
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">Key Moments</span>
               </div>
-              <p className="text-2xl font-bold text-green-900 dark:text-green-100">{practiceMetrics.skillDrills}</p>
-              <p className="text-xs text-green-600 dark:text-green-400">Focus: {maxSkillArea.skill}</p>
+              <p className="text-2xl font-bold text-green-900 dark:text-green-100">{practiceMetrics.keyMoments}</p>
+              <p className="text-xs text-green-600 dark:text-green-400">Important plays</p>
             </div>
             
             <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
               <div className="flex items-center gap-2 mb-2">
                 <Brain className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Coaching Points</span>
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Total Analyses</span>
               </div>
-              <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{practiceMetrics.coachingPoints}</p>
-              <p className="text-xs text-purple-600 dark:text-purple-400">Development areas</p>
+              <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{practiceMetrics.totalAnalyses}</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400">Generated insights</p>
             </div>
             
             <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">

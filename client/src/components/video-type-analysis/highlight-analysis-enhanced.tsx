@@ -164,12 +164,38 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
     return { strengths: strengths.slice(0, 5), weaknesses: weaknesses.slice(0, 5) };
   };
 
-  const goals = extractGoals();
-  const assists = extractAssists();
-  const saves = extractSaves();
-  const dodges = extractDodges();
-  const checks = extractChecks();
-  const groundBalls = extractGroundBalls();
+  // Use actual data from analyses
+  const goals = keyMoments.filter(k => 
+    k.content.toLowerCase().includes('goal') || 
+    k.title.toLowerCase().includes('goal')
+  ).length;
+  
+  const assists = keyMoments.filter(k => 
+    k.content.toLowerCase().includes('assist') || 
+    k.title.toLowerCase().includes('assist')
+  ).length;
+  
+  const saves = analyses.filter(a => 
+    a.content.toLowerCase().includes('save') && 
+    (a.type === 'key_moment' || a.type === 'player_evaluation')
+  ).length;
+  
+  // Use metadata if available, otherwise count mentions
+  const dodges = analyses.reduce((count, a) => {
+    if (a.metadata?.dodges) return count + a.metadata.dodges;
+    return count + (a.content.toLowerCase().includes('dodge') ? 1 : 0);
+  }, 0);
+  
+  const checks = analyses.reduce((count, a) => {
+    if (a.metadata?.checks) return count + a.metadata.checks;
+    return count + (a.content.toLowerCase().includes('check') ? 1 : 0);
+  }, 0);
+  
+  const groundBalls = analyses.reduce((count, a) => {
+    if (a.metadata?.groundBalls) return count + a.metadata.groundBalls;
+    return count + (a.content.toLowerCase().includes('ground ball') ? 1 : 0);
+  }, 0);
+  
   const ratings = extractRatings();
   const skillMentions = extractSkillMentions();
   const recruitingLevel = extractRecruitingLevel();

@@ -100,6 +100,8 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
   const [expandedPassingItems, setExpandedPassingItems] = useState<Set<number>>(new Set());
   const [expandedStrengths, setExpandedStrengths] = useState<Set<number>>(new Set());
   const [expandedWeaknesses, setExpandedWeaknesses] = useState<Set<number>>(new Set());
+  const [isStrengthsExpanded, setIsStrengthsExpanded] = useState(true);
+  const [isWeaknessesExpanded, setIsWeaknessesExpanded] = useState(true);
 
   // Helper function for toggling expansion
   const toggleExpansion = (itemIndex: number, expandedSet: Set<number>, setExpandedSet: (set: Set<number>) => void) => {
@@ -1028,13 +1030,24 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
         {/* Strengths */}
         {strengths.length > 0 && (
           <Card className="border-green-200 dark:border-green-800 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-b border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <CardTitle className="text-lg text-green-800 dark:text-green-200">Key Strengths</CardTitle>
+            <CardHeader 
+              className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-b border-green-200 dark:border-green-800 cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => setIsStrengthsExpanded(!isStrengthsExpanded)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CardTitle className="text-lg text-green-800 dark:text-green-200">Key Strengths</CardTitle>
+                </div>
+                {isStrengthsExpanded ? (
+                  <ChevronUp className="w-5 h-5 text-green-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-green-600" />
+                )}
               </div>
             </CardHeader>
-            <CardContent className="pt-4">
+            {isStrengthsExpanded && (
+              <CardContent className="pt-4">
               <div className="space-y-3">
                 {strengths.slice(0, 3).map((strength, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -1051,19 +1064,31 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 ))}
               </div>
             </CardContent>
+            )}
           </Card>
         )}
 
         {/* Areas for Development */}
         {weaknesses.length > 0 && (
           <Card className="border-orange-200 dark:border-orange-800 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-b border-orange-200 dark:border-orange-800">
-              <div className="flex items-center gap-3">
-                <Target className="w-5 h-5 text-orange-600" />
-                <CardTitle className="text-lg text-orange-800 dark:text-orange-200">Development Areas</CardTitle>
+            <CardHeader 
+              className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-b border-orange-200 dark:border-orange-800 cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => setIsWeaknessesExpanded(!isWeaknessesExpanded)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Target className="w-5 h-5 text-orange-600" />
+                  <CardTitle className="text-lg text-orange-800 dark:text-orange-200">Development Areas</CardTitle>
+                </div>
+                {isWeaknessesExpanded ? (
+                  <ChevronUp className="w-5 h-5 text-orange-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-orange-600" />
+                )}
               </div>
             </CardHeader>
-            <CardContent className="pt-4">
+            {isWeaknessesExpanded && (
+              <CardContent className="pt-4">
               <div className="space-y-3">
                 {weaknesses.slice(0, 3).map((weakness, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
@@ -1080,6 +1105,7 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 ))}
               </div>
             </CardContent>
+            )}
           </Card>
         )}
       </div>

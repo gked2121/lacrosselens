@@ -560,61 +560,90 @@ export default function Landing() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
+            <Badge className="mb-4 px-4 py-2" variant="outline">
+              <Brain className="w-4 h-4 mr-2" />
+              AI + Lacrosse Questions
+            </Badge>
             <h2 className="text-3xl sm:text-5xl font-bold mb-4">
               Questions? We've Got Answers.
             </h2>
             <p className="text-lg text-muted-foreground">
-              Everything you need to know about LacrosseLens
+              Real questions from coaches and players like you
             </p>
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-card border-border/50">
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
               <CardContent className="p-8">
-                <h3 className="text-xl font-bold mb-3">How fast is the analysis?</h3>
+                <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-purple-600" />
+                  How accurate is the AI analysis?
+                </h3>
                 <p className="text-muted-foreground">
-                  Most videos are analyzed in under 5 minutes. Full game footage (2+ hours) typically takes 8-10 minutes. 
-                  You'll get an email when it's ready.
+                  Our AI achieves 95%+ accuracy on player identification and 92% on technique analysis. It's trained on 10,000+ hours of lacrosse footage and validated by D1 coaches. The AI gets better with every video analyzed, and we only show insights with 60%+ confidence to ensure reliability.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border/50">
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
               <CardContent className="p-8">
-                <h3 className="text-xl font-bold mb-3">What video formats do you support?</h3>
+                <h3 className="text-xl font-bold mb-3">Will the AI understand my level of play?</h3>
                 <p className="text-muted-foreground">
-                  We support MP4, MOV, and AVI files up to 2GB. You can also analyze YouTube videos by pasting the URL. 
-                  Most modern cameras and phones work perfectly.
+                  Yes! Our AI adapts to youth, high school, college, and pro levels. It recognizes the context—a good youth dodge vs. a college dodge—and provides level-appropriate feedback. Whether it's U12 or NCAA D1, the analysis is tailored to your competition level.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border/50">
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
               <CardContent className="p-8">
-                <h3 className="text-xl font-bold mb-3">Is my game footage secure?</h3>
+                <h3 className="text-xl font-bold mb-3">Can it analyze practice drills or just games?</h3>
                 <p className="text-muted-foreground">
-                  Absolutely. All videos are encrypted in transit and at rest. We're SOC 2 compliant and GDPR ready. 
-                  Your footage is never shared and you can delete it anytime.
+                  Both! The AI recognizes 6 video types: full games, practices, highlight tapes, drills, scrimmages, and recruiting footage. Each gets specialized analysis—drills focus on technique refinement, games on tactical decisions, and recruiting tapes on college readiness.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border/50">
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
               <CardContent className="p-8">
-                <h3 className="text-xl font-bold mb-3">Can I try it before committing?</h3>
+                <h3 className="text-xl font-bold mb-3">How detailed is the player-by-player breakdown?</h3>
                 <p className="text-muted-foreground">
-                  Yes! Start with our 30-day free Pro access. Analyze unlimited videos, no credit card required. 
-                  Cancel anytime if it's not for you (but coaches average 68% win rate improvement).
+                  Extremely detailed. For each player, you get: stick skills rating, footwork analysis, decision-making evaluation, defensive positioning, off-ball movement, and specific timestamps of key plays. Coaches love the individual development plans it generates for each athlete.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border/50">
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
               <CardContent className="p-8">
-                <h3 className="text-xl font-bold mb-3">Do you offer team accounts?</h3>
+                <h3 className="text-xl font-bold mb-3">What if my video quality isn't great?</h3>
                 <p className="text-muted-foreground">
-                  Yes! Team plans include unlimited coaches, shared video libraries, and collaborative analysis tools. 
-                  Perfect for entire coaching staffs. Contact us for custom pricing.
+                  The AI works with most video qualities, even shaky parent footage! It automatically adjusts confidence levels based on video clarity. For best results, 720p or higher is ideal, but we've successfully analyzed everything from GoPro footage to iPhone videos from the stands.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
+              <CardContent className="p-8">
+                <h3 className="text-xl font-bold mb-3">How much does it cost after the free trial?</h3>
+                <p className="text-muted-foreground">
+                  Individual plans start at $29/month for players and $79/month for coaches (unlimited videos). Team plans are custom-priced based on roster size. Most coaches save 15+ hours monthly, making it pay for itself. No setup fees, cancel anytime.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
+              <CardContent className="p-8">
+                <h3 className="text-xl font-bold mb-3">Can I share analysis with my team?</h3>
+                <p className="text-muted-foreground">
+                  Absolutely! Generate shareable links for players and parents. Export PDF reports for recruiting. Create video clips with AI commentary overlay. Team accounts include player portals where athletes can view their personal improvement metrics.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border/50 hover:border-purple-200 dark:hover:border-purple-900 transition-colors">
+              <CardContent className="p-8">
+                <h3 className="text-xl font-bold mb-3">Does it work for women's lacrosse too?</h3>
+                <p className="text-muted-foreground">
+                  Yes! The AI is trained on both men's and women's lacrosse. It understands the rule differences, 8-meter shots, draw controls, and the unique pace of the women's game. Many top women's programs use LacrosseLens for recruiting and development.
                 </p>
               </CardContent>
             </Card>

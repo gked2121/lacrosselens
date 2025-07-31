@@ -96,8 +96,15 @@ export default function Navigation() {
             
             <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-md flex items-center justify-center relative overflow-hidden">
+                  {/* Lacrosse stick SVG */}
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 2C7 2 6 3 6 5C6 7 7 8 7 8L16 17C16 17 17 18 19 18C21 18 22 17 22 17L17 12C17 12 16 11 16 9C16 7 17 6 17 6L12 2C12 2 11 1 9 1C7 1 7 2 7 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 22L7 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="19" cy="5" r="2" fill="currentColor"/>
+                  </svg>
+                  {/* Subtle shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
                 </div>
                 <span className="font-semibold text-lg text-gray-900 dark:text-white hidden sm:inline">
                   LacrosseLens

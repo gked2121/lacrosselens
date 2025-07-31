@@ -695,9 +695,7 @@ export default function Landing() {
             </div>
           </div>
           
-          <p className="text-sm text-muted-foreground">
-            <strong>68% average win rate improvement</strong> across all LacrosseLens teams
-          </p>
+          
         </div>
       </section>
       {/* Footer */}

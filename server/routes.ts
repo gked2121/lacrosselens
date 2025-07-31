@@ -683,22 +683,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const videos = await storage.getUserVideos(userId);
-      const teams = await storage.getUserTeams(userId);
 
       const completedVideos = videos.filter(v => v.status === 'completed');
       const processingVideos = videos.filter(v => v.status === 'processing');
 
-      // Calculate real stats from user data
+      // Get all analyses for completed videos to calculate meaningful metrics
+      let totalPlayerEvaluations = 0;
+      let totalFaceoffs = 0;
+      let totalKeyMoments = 0;
+      let totalTransitions = 0;
+      let averageConfidence = 0;
+      let totalConfidenceCount = 0;
+
+      // Calculate detailed metrics from all analyses
+      for (const video of completedVideos) {
+        const analyses = await storage.getVideoAnalyses(video.id);
+        
+        // Count different types of analyses
+        totalPlayerEvaluations += analyses.filter(a => a.type === 'player_evaluation').length;
+        totalFaceoffs += analyses.filter(a => a.type === 'face_off').length;
+        totalKeyMoments += analyses.filter(a => a.type === 'key_moment').length;
+        totalTransitions += analyses.filter(a => a.type === 'transition').length;
+        
+        // Calculate average confidence
+        analyses.forEach(analysis => {
+          if (analysis.confidence && analysis.confidence >= 60) {
+            averageConfidence += analysis.confidence;
+            totalConfidenceCount++;
+          }
+        });
+      }
+
+      // Calculate final average confidence
+      if (totalConfidenceCount > 0) {
+        averageConfidence = Math.round(averageConfidence / totalConfidenceCount);
+      } else {
+        averageConfidence = 0;
+      }
+
+      // Calculate meaningful stats for coaches
       const stats = {
         videosAnalyzed: completedVideos.length,
         videosProcessing: processingVideos.length,
-        totalVideos: videos.length,
-        totalTeams: teams.length,
-        // Calculate average confidence from completed analyses
-        analysisAccuracy: completedVideos.length > 0 ? 
-          await calculateAverageConfidence(completedVideos.map(v => v.id)) : 0,
-        // Each video saves approximately 45 minutes of manual analysis
-        hoursSaved: Math.floor(completedVideos.length * 0.75),
+        playerEvaluations: totalPlayerEvaluations,
+        faceoffsAnalyzed: totalFaceoffs,
+        keyMomentsFound: totalKeyMoments,
+        transitionsTracked: totalTransitions,
+        averageConfidence: averageConfidence,
+        totalInsights: totalPlayerEvaluations + totalFaceoffs + totalKeyMoments + totalTransitions
       };
 
       res.json(stats);

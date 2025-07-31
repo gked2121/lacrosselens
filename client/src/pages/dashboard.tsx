@@ -8,7 +8,7 @@ import EnhancedVideoUpload from "@/components/enhanced-video-upload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Video, Users, Target, Clock, Download, Plus, Play, LoaderPinwheel, CloudUpload, Sparkles, TrendingUp, Activity, BarChart3, ArrowRight, Eye, Calendar, FileVideo, Zap } from "lucide-react";
+import { Video, Users, Target, Clock, Download, Plus, Play, LoaderPinwheel, CloudUpload, Sparkles, TrendingUp, Activity, BarChart3, ArrowRight, Eye, Calendar, FileVideo, Zap, Trophy } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Dashboard() {
@@ -100,13 +100,15 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                   <Video className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm font-medium">+12%</span>
-                </div>
+                {(stats as any)?.videosProcessing > 0 && (
+                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                    <Activity className="w-4 h-4 animate-pulse" />
+                    <span className="text-sm font-medium">{(stats as any)?.videosProcessing} processing</span>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Videos Analyzed</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Game Film Analyzed</p>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {statsLoading ? (
                     <div className="w-16 h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
@@ -116,43 +118,43 @@ export default function Dashboard() {
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Processing active</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Ready for analysis</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Processing Queue */}
+          {/* Player Evaluations */}
           <Card className="group relative overflow-hidden bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 dark:from-amber-400/5 dark:to-orange-400/5"></div>
             <CardContent className="relative p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                  <Activity className="w-6 h-6 text-white" />
+                  <Users className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-sm font-medium">Active</span>
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm font-medium">AI</span>
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Processing Queue</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Player Evaluations</p>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {statsLoading ? (
-                    <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                    <div className="w-16 h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
                   ) : (
-                    (stats as any)?.videosProcessing || 0
+                    (stats as any)?.playerEvaluations || 0
                   )}
                 </p>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce"></div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Videos in queue</span>
+                  <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Individual breakdowns</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Analysis Insights */}
+          {/* Face-offs Analyzed */}
           <Card className="group relative overflow-hidden bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 dark:from-emerald-400/5 dark:to-teal-400/5"></div>
             <CardContent className="relative p-6">
@@ -161,51 +163,52 @@ export default function Dashboard() {
                   <Target className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-medium">AI</span>
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-sm font-medium">FOGO</span>
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Avg Confidence</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Face-offs Analyzed</p>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {statsLoading ? (
                     <div className="w-16 h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
                   ) : (
-                    `${Math.round((stats as any)?.averageConfidence || 0)}%`
+                    (stats as any)?.faceoffsAnalyzed || 0
                   )}
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Analysis quality</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Technique insights</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Teams */}
+          {/* Key Moments */}
           <Card className="group relative overflow-hidden bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 dark:from-purple-400/5 dark:to-pink-400/5"></div>
             <CardContent className="relative p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                  <Users className="w-6 h-6 text-white" />
+                  <Zap className="w-6 h-6 text-white" />
                 </div>
-                <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
-                  Soon
-                </Badge>
+                <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-sm font-medium">Plays</span>
+                </div>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Teams</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Key Moments Found</p>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {statsLoading ? (
-                    <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                    <div className="w-16 h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
                   ) : (
-                    (stats as any)?.totalTeams || 0
+                    (stats as any)?.keyMomentsFound || 0
                   )}
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Coming soon</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Game-changing plays</span>
                 </div>
               </div>
             </CardContent>

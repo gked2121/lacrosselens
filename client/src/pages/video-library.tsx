@@ -107,7 +107,7 @@ export default function VideoLibrary() {
             <div className="space-y-1">
               <h1 className="text-3xl font-bold text-gray-900">Video Library</h1>
               <p className="text-lg text-gray-600">
-                AI-powered lacrosse video analysis hub
+                Game film breakdown and scouting reports
               </p>
             </div>
             

@@ -894,3 +894,24 @@ The database schema is well-designed for detailed play tracking:
   - server/services/gemini.ts (NCAA-level terminology and analysis requirements)
   - client/src/components/detailed-analysis-view.tsx (enhanced analytics dashboard with authentic terminology)
 - **Status**: Comprehensive NCAA-level defensive and offensive metrics system fully implemented with authentic lacrosse terminology and advanced coaching analytics
+
+### 2025-01-31 - Enhanced AI Analysis with Authentic In-Game Communication and Field Talk
+- **Issue**: User requested more authentic lacrosse vocabulary from ESPN commentators, college scouts, and professional coaches
+- **Research**: Compiled authentic lacrosse terminology from broadcasts, scouting reports, and coaching clinics
+- **Major Vocabulary Enhancements**:
+  - **Field Communication**: Added authentic defensive calls ("Hot!", "Two/Fill!", "Check up!", "Body!", "Got ball!", "Man on!", "Coma!", "Adjacent!"), offensive calls ("Iso!", "Motion!", "Wheel!", "Mumbo!", "Diamond!", "Feed the hole!"), transition calls ("Clear!", "Ride!", "Numbers!", "Break!", "Slow it down!", "Push transition!")
+  - **Goalie Communication**: "Outside!", "Left pipe!", "Top right!", "Turn him!", "Step down!"
+  - **Leadership Phrases**: "Here we go boys!", "Lock in!", "Find your man!", "Talk on D!"
+  - **UI Terminology Updates**: Replaced generic sports language with authentic lacrosse terminology throughout the interface:
+    * "AI-powered analytics" → "Film breakdown and scouting intelligence"
+    * "Game footage" → "Game film"
+    * "Hockey assists" → "Feed assists" (more lacrosse-specific)
+    * "Dodges" → "Dodge moves"
+- **Gemini AI Prompts Enhanced**: Updated COMMUNICATION TRACKING section with extensive authentic field talk vocabulary
+- **Files Modified**:
+  - server/services/gemini.ts (enhanced communication tracking vocabulary)
+  - client/src/pages/dashboard.tsx (updated UI terminology)
+  - client/src/pages/landing.tsx (updated marketing copy with authentic language)
+  - client/src/pages/video-library.tsx (updated descriptions)
+  - client/src/components/detailed-analysis-view.tsx (updated metric labels)
+- **Status**: Authentic lacrosse communication and terminology fully integrated throughout the application

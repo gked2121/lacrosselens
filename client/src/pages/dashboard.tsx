@@ -68,7 +68,7 @@ export default function Dashboard() {
                     Dashboard
                   </h1>
                   <p className="text-slate-600 dark:text-slate-400 text-lg">
-                    AI-powered lacrosse analytics at your fingertips
+                    Film breakdown and scouting intelligence
                   </p>
                 </div>
               </div>
@@ -225,7 +225,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Upload your game footage and get AI-powered insights in minutes.
+                  Upload game film and get professional scouting breakdown in minutes.
                 </p>
                 <div className="space-y-3">
                   <Link href="/videos">

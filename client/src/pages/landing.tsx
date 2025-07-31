@@ -53,7 +53,7 @@ export default function Landing() {
           
           <h1 className="text-5xl sm:text-7xl font-black mb-6 leading-tight">
             Turn Game Film Into
-            <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Championship Insights</span>
+            <span className="block" style={{ color: 'hsl(259 100% 65%)' }}>Elite Scouting Reports</span>
           </h1>
           <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Elite programs use AI for player development, opponent scouting, and recruiting. Join 500+ coaches who save 
@@ -171,7 +171,7 @@ export default function Landing() {
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Win 74% More Face-Offs</h3>
                 <p className="text-muted-foreground mb-4 text-lg">
-                  Our AI breaks down every clamp, counter, and exit move. Turn your FOGO into a possession machine.
+                  AI breaks down every clamp, counter move, and wing play. Turn your FOGO specialists into possession machines.
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">

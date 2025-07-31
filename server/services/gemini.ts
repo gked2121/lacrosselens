@@ -173,11 +173,12 @@ MANDATORY TRACKING CATEGORIES:
    - Endurance indicators (performance drop-off)
    - Explosive movements (first step, shot velocity)
 
-6. COMMUNICATION TRACKING:
-   - Defensive calls ("Hot", "Check up", "Slide")
-   - Offensive play calls
-   - Transition organization
-   - Leadership moments
+6. COMMUNICATION TRACKING - AUTHENTIC FIELD TALK:
+   - Defensive calls: "Hot!", "Two/Fill!", "Check up!", "Body!", "Got ball!", "Man on!", "Coma!", "Adjacent!"
+   - Offensive calls: "Iso!", "Motion!", "Wheel!", "Mumbo!", "Diamond!", "Feed the hole!"
+   - Transition calls: "Clear!", "Ride!", "Numbers!", "Break!", "Slow it down!", "Push transition!"
+   - Goalie communication: "Outside!", "Left pipe!", "Top right!", "Turn him!", "Step down!"
+   - Leadership phrases: "Here we go boys!", "Lock in!", "Find your man!", "Talk on D!"
 
 7. GAME FLOW DETAILS:
    - Possession time for each team
@@ -218,24 +219,28 @@ TACTICAL ANALYSIS:
 - Transition play: fast breaks, clears, rides, and redefending scenarios
 - Set plays: EMO/man-down, face-offs, and special situations
 
-COACHING VOCABULARY TO USE:
-- Face-off terms: clamp, FOGO, wing control, possession battles
-- Dodging: split dodge, face dodge, bull dodge, roll dodge, top-side vs fading
-- Field areas: X (behind goal), alley, GLE (goal line extended), crease, restraining line
-- Shooting: top cheddar, worm burner, crank shots, bouncer, five-hole
-- Defense: D-pole work, check-up calls, slide packages, hot/not hot communication
-- Transition: fast break opportunities, carry situations, outlet passes, numbers advantages
-- Stick work: ATW (around the world), BTB (behind the back), cradle mechanics
+AUTHENTIC COACHING & COMMENTARY VOCABULARY:
+- Face-off: clamp, FOGO, wing play, "got ball", rake, counter move, fast whistle
+- Dodging: split dodge, face dodge, bull dodge, roll dodge, topside, question mark dodge, re-dodge
+- Field positions: X, hole/cougar, alley, GLE, crease, topside, backside, island
+- Shooting: top cheddar/shelf, bar down, laser, rip, twister, worm burner, bouncer, pipe city, time and room
+- Defense: D-pole, slide package, "you're hot", coma slide, check-up, body positioning, trail check
+- Transition: clear, ride, gilman clear, fast break, unsettled, wheels, numbers up
+- Stick skills: spoon, crosse, wall ball, quick stick, BTB, ATW, one-timer, dish, feed, dime
+- Player evaluation: lacrosse IQ, versatility, gamer, clutch factor, field vision, coachability
+- Commentary phrases: "scoop and score", "ground ball scrum", "yard sale", "brick wall in cage"
 
-PLAYER EVALUATION FOCUS:
+PLAYER EVALUATION - SCOUT'S PERSPECTIVE:
 - EVALUATE EVERY PLAYER VISIBLE: Analyze ALL players who appear on screen, not just 1-2
-- Include both teams - attackers, defenders, midfielders, goalies, FOGOs
+- Include both teams - attackers, defenders, midfielders, goalies, FOGOs, LSMs
 - Even brief appearances warrant evaluation if technique is visible
-- Technical execution under pressure
-- Field vision and anticipation
-- Communication and leadership
-- Coachability and effort level
-- Situational decision-making
+- Technical execution under pressure - "performs in clutch moments"
+- Field vision and anticipation - "sees the field", "two steps ahead"
+- Communication and leadership - "field general", "vocal leader"
+- Coachability indicators - "high lacrosse IQ", "student of the game"
+- Versatility assessment - "can play multiple positions", "Swiss army knife"
+- Competitive level projection - "D1 caliber", "mid-major prospect", "high ceiling"
+- Character evaluation - "gamer mentality", "team-first attitude", "relentless motor"
 
 PLAYER IDENTIFICATION PRIORITY - NEVER MAKE UP NUMBERS:
 1. Players with CLEARLY VISIBLE jersey numbers - include the exact number you can see

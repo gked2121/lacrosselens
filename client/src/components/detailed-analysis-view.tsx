@@ -133,7 +133,7 @@ export function DetailedAnalysisView({ videoId }: DetailedAnalysisViewProps) {
               <div className="grid grid-cols-4 gap-2 text-sm">
                 {/* Offensive Metrics */}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Dodges:</span>
+                  <span className="text-muted-foreground">Dodge Moves:</span>
                   <span className="font-medium">{data.actions.dodges || 0}</span>
                 </div>
                 <div className="flex justify-between">
@@ -159,7 +159,7 @@ export function DetailedAnalysisView({ videoId }: DetailedAnalysisViewProps) {
                   <span className="font-medium">{data.actions.slidesDrawn || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Hockey Assists:</span>
+                  <span className="text-muted-foreground">Feed Assists:</span>
                   <span className="font-medium">{data.actions.hockeyAssists || 0}</span>
                 </div>
                 <div className="flex justify-between">

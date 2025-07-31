@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
@@ -15,7 +16,9 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-  Info
+  Info,
+  FileText,
+  Target
 } from "lucide-react";
 import { useState } from "react";
 
@@ -26,8 +29,7 @@ interface GameAnalysisProps {
 }
 
 export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisProps) {
-  const [expandedSections, setExpandedSections] = useState(new Set<string>());
-  const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const overallAnalysis = analyses?.find(a => a.type === 'overall');
   const playerEvaluations = analyses?.filter(a => a.type === 'player_evaluation') || [];

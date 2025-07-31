@@ -5,15 +5,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
-import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
-import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
-import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
+
 import { DrillAnalysis } from "@/components/video-type-analysis/drill-analysis";
 import { HighlightAnalysisEnhanced } from "@/components/video-type-analysis/highlight-analysis-enhanced";
 import { RecruitingAnalysisEnhanced } from "@/components/video-type-analysis/recruiting-analysis-enhanced";
 import { PracticeAnalysisEnhanced } from "@/components/video-type-analysis/practice-analysis-enhanced";
 import { ScrimmageAnalysisEnhanced } from "@/components/video-type-analysis/scrimmage-analysis-enhanced";
-import { GameAnalysis } from "@/components/video-type-analysis/game-analysis";
+import { GameAnalysisMinimal } from "@/components/video-type-analysis/game-analysis-minimal";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -322,7 +320,7 @@ export default function AnalysisDetail() {
                   return <ScrimmageAnalysisEnhanced video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
                 case 'game':
                 default:
-                  return <GameAnalysis video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
+                  return <GameAnalysisMinimal video={video as any} analyses={analyses as any[]} formatTimestamp={formatTimestamp} />;
               }
             })()}
           </div>

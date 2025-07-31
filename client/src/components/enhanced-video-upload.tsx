@@ -81,7 +81,7 @@ export default function EnhancedVideoUpload() {
     onSuccess: () => {
       toast({
         title: "Analysis Started",
-        description: "Your YouTube video is being analyzed. Check back in a few minutes for results.",
+        description: "Fetching video metadata and analyzing content. Check back in a few minutes for results.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
     },
@@ -393,9 +393,10 @@ export default function EnhancedVideoUpload() {
                 <div className="flex gap-2">
                   <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-medium text-blue-800 dark:text-blue-200 mb-1">YouTube Video Analysis</p>
+                    <p className="font-medium text-blue-800 dark:text-blue-200 mb-1">Smart YouTube Analysis</p>
                     <p className="text-blue-700 dark:text-blue-300">
-                      Gemini AI will analyze the YouTube video directly, including team colors, player movements, and game statistics. This may take a bit longer than file uploads.
+                      We automatically fetch the video title, description, and metadata from YouTube. 
+                      Leave the title blank to use the original YouTube title, or provide your own custom title.
                     </p>
                   </div>
                 </div>
@@ -419,14 +420,17 @@ export default function EnhancedVideoUpload() {
                 </div>
 
                 <div>
-                  <Label htmlFor="ytTitle">Give it a title (optional)</Label>
+                  <Label htmlFor="ytTitle">Custom title (optional)</Label>
                   <Input
                     id="ytTitle"
-                    placeholder="e.g., Championship Game Highlights"
+                    placeholder="Leave blank to use original YouTube title"
                     value={youtubeData.title}
                     onChange={(e) => setYoutubeData({ ...youtubeData, title: e.target.value })}
                     className="mt-2"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    We'll automatically use the YouTube video's title if you don't provide one
+                  </p>
                 </div>
               </div>
 

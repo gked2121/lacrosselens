@@ -7,6 +7,7 @@ import { generateVideoThumbnail, getVideoMetadata, getYouTubeThumbnail } from ".
 import { AdvancedVideoAnalyzer } from "./advancedVideoAnalysis";
 import { EnhancedPromptSystem } from "./enhancedPromptSystem";
 import { EnhancedAnalysisProcessor } from "./enhancedAnalysisProcessor";
+import { YouTubeMetadataService } from "./youtubeMetadata";
 
 // Configure multer for video uploads
 const uploadDir = "uploads/videos";
@@ -323,16 +324,56 @@ async function processYouTubeVideo(
     // Update video status to processing
     await storage.updateVideoStatus(videoId, "processing");
     
-    // For YouTube videos, get thumbnail from YouTube API
-    try {
-      const thumbnailUrl = getYouTubeThumbnail(youtubeUrl);
-      await storage.updateVideo(videoId, {
-        thumbnailUrl
-      });
-    } catch (thumbnailError) {
-      console.error("Error getting YouTube thumbnail:", thumbnailError);
-      // Continue processing even if thumbnail fails
+    // Extract video ID from URL
+    const ytVideoId = YouTubeMetadataService.extractVideoId(youtubeUrl);
+    if (!ytVideoId) {
+      throw new Error("Invalid YouTube URL format");
     }
+    
+    // Get YouTube metadata
+    console.log(`Fetching YouTube metadata for video ID: ${ytVideoId}`);
+    const youtubeMetadata = await YouTubeMetadataService.getVideoMetadata(ytVideoId);
+    
+    // Use YouTube metadata if user didn't provide title/description
+    let finalTitle = title;
+    let finalDescription = "";
+    
+    if (youtubeMetadata) {
+      // If user didn't provide a title or gave a generic one, use YouTube title
+      if (!title || title.trim() === "" || title === "YouTube Video Analysis") {
+        finalTitle = YouTubeMetadataService.createEnhancedTitle(youtubeMetadata);
+        console.log(`Using YouTube title: ${finalTitle}`);
+      }
+      
+      // Always use enhanced description with metadata
+      finalDescription = YouTubeMetadataService.createEnhancedDescription(youtubeMetadata);
+      console.log(`Generated enhanced description from YouTube metadata`);
+    }
+    
+    // Get thumbnail URL (prefer from metadata, fallback to static)
+    const thumbnailUrl = youtubeMetadata?.thumbnailUrl || getYouTubeThumbnail(youtubeUrl);
+    console.log(`Using thumbnail URL: ${thumbnailUrl}`);
+    
+    // Update video with enhanced metadata
+    await storage.updateVideo(videoId, {
+      title: finalTitle,
+      description: finalDescription,
+      thumbnailUrl,
+      metadata: {
+        source: 'youtube',
+        originalUrl: youtubeUrl,
+        thumbnailGenerated: true,
+        youtubeMetadata: youtubeMetadata ? {
+          originalTitle: youtubeMetadata.title,
+          channelTitle: youtubeMetadata.channelTitle,
+          duration: youtubeMetadata.duration,
+          publishedAt: youtubeMetadata.publishedAt,
+          viewCount: youtubeMetadata.viewCount
+        } : null
+      }
+    });
+    
+    console.log(`Updated video ${videoId} with enhanced title, description, thumbnail and metadata`);
 
     // Analyze YouTube video with Gemini using custom prompt
     const youtubeAnalysisOptions = {
@@ -342,7 +383,7 @@ async function processYouTubeVideo(
       level: analysisOptions?.level,
       videoType: analysisOptions?.videoType
     };
-    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, title, userPrompt, youtubeAnalysisOptions);
+    const analysis = await analyzeLacrosseVideoFromYouTube(youtubeUrl, finalTitle, userPrompt, youtubeAnalysisOptions);
     console.log(`YouTube analysis completed for video ${videoId}`);
     
     // Log analysis details for debugging

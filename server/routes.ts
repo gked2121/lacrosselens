@@ -158,7 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const video = await storage.createVideo(videoData);
 
-      // Process YouTube video asynchronously with custom options
+      // Process YouTube video asynchronously with metadata enhancement
       const analysisOptions = { 
         playerNumber, 
         teamName, 
@@ -169,7 +169,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       processYouTubeVideo(video.id, youtubeUrl, video.title, userPrompt, analysisOptions).catch(console.error);
 
-      res.json(video);
+      res.json({ 
+        ...video, 
+        message: "YouTube video upload started - automatically fetching video metadata" 
+      });
     } catch (error) {
       console.error("Error processing YouTube video:", error);
       res.status(500).json({ message: "Failed to process YouTube video" });

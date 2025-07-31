@@ -27,7 +27,9 @@ import {
   Zap,
   UserCheck,
   Settings,
-  ChevronDown
+  ChevronDown,
+  MessageCircle,
+  ClipboardList
 } from "lucide-react";
 
 interface NavItem {
@@ -65,6 +67,8 @@ export default function Navigation() {
         { href: "/analysis/players", label: "Player Evaluation", icon: UserCheck },
       ]
     },
+    { href: "/ai-chat", label: "AI Chat", icon: MessageCircle, comingSoon: true },
+    { href: "/practice-plans", label: "Practice Plan & Workout Builder", icon: ClipboardList, comingSoon: true },
   ];
 
   const isActive = (href: string) => {

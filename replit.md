@@ -470,6 +470,36 @@ The database schema is well-designed for detailed play tracking:
   - server/services/videoProcessor.ts (integrated enhanced processing)
 - **Status**: Enhanced database schema deployed and integrated, providing the most detailed lacrosse analytics possible from AI video analysis
 
+### 2025-01-31 - Implemented YouTube Metadata Auto-Extraction for Enhanced Video Information
+- **Issue**: User requested "make sure we get title of youtube video and description and add that as our title if the user doesn't put one in - use metadata from youtube if user doesn't name video etc"
+- **Solution**: Built comprehensive YouTube Data API integration with intelligent fallback system
+- **New Features**:
+  - **YouTubeMetadataService**: Full-featured service for extracting video metadata including title, description, channel info, duration, view count, and thumbnail URLs
+  - **Smart Title Selection**: Uses YouTube's original title when user doesn't provide custom title or uses generic placeholder
+  - **Enhanced Descriptions**: Automatically creates rich descriptions with channel info, publish date, and original description
+  - **Metadata Storage**: Stores comprehensive YouTube metadata in video records for future reference
+  - **Fallback System**: Uses YouTube oEmbed API when main API unavailable, with final fallback to basic info
+- **Technical Implementation**:
+  - **URL Pattern Matching**: Supports all YouTube URL formats (youtube.com/watch, youtu.be, embed links)
+  - **API Integration**: YouTube Data API v3 with graceful degradation to oEmbed service
+  - **Duration Parsing**: Converts YouTube's PT format durations to readable time stamps
+  - **View Count Formatting**: Smart formatting for view counts (1.2M, 45K, etc.)
+  - **Enhanced Titles**: Combines original titles with duration and view count metadata
+- **Frontend Enhancements**:
+  - Updated upload form messaging to inform users about automatic metadata fetching
+  - Clear guidance that leaving title blank will use YouTube's original title
+  - Enhanced success messages mentioning metadata extraction
+- **Database Integration**:
+  - Stores original YouTube metadata alongside enhanced versions
+  - Updates video records with rich metadata during processing
+  - Maintains compatibility with existing video processing pipeline
+- **Files Created/Modified**:
+  - server/services/youtubeMetadata.ts (new comprehensive metadata service)
+  - server/services/videoProcessor.ts (integrated metadata extraction)
+  - server/routes.ts (enhanced upload response messaging)
+  - client/src/components/enhanced-video-upload.tsx (improved user guidance)
+- **Status**: YouTube metadata auto-extraction fully implemented with intelligent title/description enhancement
+
 ### 2025-01-24 - Multiple Redesigns of Enhanced Video Upload Component
 - **Issue**: User repeatedly reported upload form was "awful", "confusing and hard to use" despite multiple redesign attempts
 - **Multiple Redesign Attempts**:

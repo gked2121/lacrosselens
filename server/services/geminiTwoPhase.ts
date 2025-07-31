@@ -136,13 +136,16 @@ export interface ComprehensiveLacrosseData {
 }
 
 // Phase 1: Extract all data into comprehensive JSON
-const PHASE1_EXTRACTION_PROMPT = `You are an advanced lacrosse video analysis AI. Extract EVERY piece of observable data from this video into a structured JSON format.
+const PHASE1_EXTRACTION_PROMPT = `You are an advanced lacrosse video analysis AI. Extract ONLY what you can ACTUALLY SEE in this video.
 
-CRITICAL RULES:
-1. NEVER make up data - only record what you can actually observe
-2. If jersey numbers aren't visible, use descriptive identifiers (e.g., "tall player in white", "lefty attackman")
-3. Record exact timestamps for every action
-4. Include confidence levels for uncertain observations
+CRITICAL RULES - FOLLOW THESE EXACTLY:
+1. NEVER make up team names, player names, or any information not visible in the video
+2. NEVER assume this is a college game - many videos are high school, youth, or club lacrosse
+3. If you cannot see jersey numbers clearly, use descriptions like "player in white #7" or "attackman in blue"
+4. If you cannot determine the level of play, mark it as "unknown" - DO NOT GUESS
+5. Record exact timestamps for every observable action
+6. For highlight tapes, focus on the featured player if one is evident
+7. ONLY report what you can directly observe - no assumptions or fabrications
 
 Return a JSON object with this exact structure:
 {
@@ -155,26 +158,36 @@ Return a JSON object with this exact structure:
   "coachingInsights": { ... }
 }
 
-For each play, track:
-- Every pass (who to who, type, success)
-- Every dodge (type, defender, outcome)
-- Every shot (location, type, velocity, result)
-- Every defensive action (checks, slides, recoveries)
-- Every ground ball (winner, contested/uncontested)
-- Formation changes
-- Off-ball movement
+For each play, track ONLY what you can see:
+- Passes (describe players by jersey color/number if visible)
+- Dodges (type and outcome if clear)
+- Shots (location and result)
+- Defensive actions (if visible)
+- Ground balls (if observable)
+- DO NOT make up formations or strategies you cannot see
+- DO NOT assume team names or player identities
 
-Be extremely detailed. This data will be used for comprehensive statistical analysis.`;
+Be accurate, not creative. Only report observable facts.`;
 
 // Phase 2: Format extracted data into specific analysis types
 const PHASE2_FORMATTING_PROMPTS = {
-  playerEvaluation: `Given the extracted JSON data, create detailed player evaluations focusing on:
-- Technical skills assessment
-- Decision-making analysis
-- Physical attributes
-- Areas for improvement
-- College/recruiting potential
-Format as narrative evaluations with specific examples and timestamps.`,
+  playerEvaluation: `Given the extracted JSON data, create detailed player evaluations.
+
+STRICT RULES:
+- ONLY evaluate players you can actually see in the video
+- NEVER make up player names, numbers, or teams
+- If this is a highlight tape, focus primarily on the featured player
+- Use exact descriptions from the JSON data (e.g., "player in white #23" not "Syracuse #23")
+- Include specific timestamps and observable actions
+- For recruiting potential, be appropriate to the actual level shown (high school, club, etc.)
+- If you cannot determine something, say "cannot be determined from video"
+
+Focus on:
+- Observable technical skills
+- Decision-making visible in the clips
+- Physical attributes you can actually see
+- Areas for improvement based on what's shown
+- Appropriate level recruiting potential`,
   
   statistics: `Given the extracted JSON data, calculate and format comprehensive statistics:
 - Individual player stats (goals, assists, shots, shooting %, ground balls, caused turnovers)
@@ -183,12 +196,20 @@ Format as narrative evaluations with specific examples and timestamps.`,
 - Advanced metrics (points per possession, defensive efficiency)
 Include both raw numbers and percentages.`,
   
-  tactical: `Given the extracted JSON data, provide tactical analysis:
-- Offensive system identification and effectiveness
-- Defensive scheme analysis
-- Transition patterns
-- Special teams performance
-- Strategic recommendations`,
+  tactical: `Given the extracted JSON data, provide tactical analysis ONLY for what you can observe:
+
+STRICT RULES:
+- DO NOT make up team names (no "Syracuse", "Johns Hopkins", etc. unless clearly visible)
+- DO NOT assume college-level tactics for what might be high school play
+- ONLY describe formations and strategies you can actually see
+- Use generic terms like "attacking team" or "team in white jerseys"
+- If this is a highlight reel, note that tactical analysis is limited
+
+Focus on observable patterns:
+- Offensive movements you can see
+- Defensive positioning that's visible
+- Transition play if shown
+- Only recommend strategies based on actual observed play`,
   
   highlights: `Given the extracted JSON data, identify and describe:
 - Top 10 plays with timestamps
@@ -206,7 +227,7 @@ export class TwoPhaseGeminiAnalyzer {
       const videoBytes = fs.readFileSync(videoPath);
       
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-latest",
+        model: "gemini-2.5-pro",
         config: {
           responseMimeType: "application/json",
         },
@@ -234,7 +255,7 @@ export class TwoPhaseGeminiAnalyzer {
       console.log("Phase 1: Extracting comprehensive data from YouTube video...");
       
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-latest",
+        model: "gemini-2.5-pro",
         config: {
           responseMimeType: "application/json",
         },
@@ -263,7 +284,7 @@ export class TwoPhaseGeminiAnalyzer {
       const dataContext = `Here is the extracted video data:\n${JSON.stringify(extractedData, null, 2)}\n\n${prompt}`;
       
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-latest",
+        model: "gemini-2.5-pro",
         config: {
           responseMimeType: analysisType === 'statistics' ? "application/json" : "text/plain",
         },

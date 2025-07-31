@@ -303,17 +303,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         playerEvaluations: analyses
           .filter(a => a.type === 'player_evaluation')
           .map(a => ({
-            playerNumber: a.metadata?.playerNumber as string || undefined,
+            playerNumber: (a.metadata?.playerNumber as string) || undefined,
             evaluation: a.content,
             timestamp: a.timestamp || 0,
-            confidence: a.confidence
+            confidence: a.confidence || 0
           })),
         faceOffAnalysis: analyses
           .filter(a => a.type === 'face_off')
           .map(a => ({
             analysis: a.content,
             timestamp: a.timestamp || 0,
-            winProbability: a.metadata?.winProbability as number || undefined,
+            winProbability: (a.metadata?.winProbability as number) || undefined,
             confidence: a.confidence
           })),
         transitionAnalysis: analyses
@@ -321,7 +321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map(a => ({
             analysis: a.content,
             timestamp: a.timestamp || 0,
-            successProbability: a.metadata?.successProbability as number || undefined,
+            successProbability: (a.metadata?.successProbability as number) || undefined,
             confidence: a.confidence
           })),
         keyMoments: analyses
@@ -329,7 +329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map(a => ({
             description: a.content,
             timestamp: a.timestamp || 0,
-            type: a.metadata?.momentType as string || 'general',
+            type: (a.metadata?.momentType as string) || 'general',
             confidence: a.confidence
           }))
       };
@@ -364,10 +364,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const lacrosseAnalysis = {
           overallAnalysis: '',
           playerEvaluations: playerEvaluations.map(a => ({
-            playerNumber: a.metadata?.playerNumber as string || undefined,
+            playerNumber: (a.metadata?.playerNumber as string) || undefined,
             evaluation: a.content,
             timestamp: a.timestamp || 0,
-            confidence: a.confidence
+            confidence: a.confidence || 0
           })),
           faceOffAnalysis: [],
           transitionAnalysis: [],

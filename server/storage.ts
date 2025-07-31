@@ -40,10 +40,14 @@ export interface IStorage {
   createAnalysis(analysis: InsertAnalysis): Promise<Analysis>;
   getVideoAnalyses(videoId: number): Promise<Analysis[]>;
   getAnalysis(id: number): Promise<Analysis | undefined>;
+  deleteVideoAnalyses(videoId: number): Promise<void>;
   
   // Player operations
   createPlayer(player: InsertPlayer): Promise<Player>;
   getTeamPlayers(teamId: number): Promise<Player[]>;
+  
+  // Delete operations
+  deleteVideo(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -145,6 +149,15 @@ export class DatabaseStorage implements IStorage {
 
   async getTeamPlayers(teamId: number): Promise<Player[]> {
     return await db.select().from(players).where(eq(players.teamId, teamId));
+  }
+
+  // Delete operations
+  async deleteVideoAnalyses(videoId: number): Promise<void> {
+    await db.delete(analyses).where(eq(analyses.videoId, videoId));
+  }
+
+  async deleteVideo(id: number): Promise<void> {
+    await db.delete(videos).where(eq(videos.id, id));
   }
 }
 

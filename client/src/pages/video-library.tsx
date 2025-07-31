@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Video, Search, Filter, Plus, Play, LoaderPinwheel, Calendar, Clock, RefreshCw } from "lucide-react";
+import { Video, Search, Filter, Plus, Play, LoaderPinwheel, Calendar, Clock, RefreshCw, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 
@@ -57,6 +57,28 @@ export default function VideoLibrary() {
       toast({
         title: "Retry Failed",
         description: error.message || "Failed to retry video processing",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteVideoMutation = useMutation({
+    mutationFn: async (videoId: number) => {
+      return await apiRequest(`/api/videos/${videoId}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Video Deleted",
+        description: "The video has been removed from your library.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete video",
         variant: "destructive",
       });
     },
@@ -293,6 +315,25 @@ export default function VideoLibrary() {
                           </Button>
                         </div>
                       )}
+                    </div>
+
+                    {/* Delete button */}
+                    <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (window.confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
+                            deleteVideoMutation.mutate(video.id);
+                          }
+                        }}
+                        disabled={deleteVideoMutation.isPending}
+                        className="bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
 
                     {/* Mobile-Optimized Duration Badge */}

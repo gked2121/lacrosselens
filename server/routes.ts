@@ -833,6 +833,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete a video
+  app.delete('/api/videos/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const videoId = parseInt(req.params.id);
+      const video = await storage.getVideo(videoId);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+
+      // Check if user owns the video
+      const userId = req.user.claims.sub;
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Delete all analyses for this video first
+      await storage.deleteVideoAnalyses(videoId);
+
+      // Delete the video record
+      await storage.deleteVideo(videoId);
+
+      res.json({ message: "Video deleted successfully", videoId });
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      res.status(500).json({ message: "Failed to delete video" });
+    }
+  });
+
   // Analytics routes
   app.use("/api/analytics", analyticsRouter);
 

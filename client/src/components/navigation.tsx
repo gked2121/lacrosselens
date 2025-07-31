@@ -97,11 +97,25 @@ export default function Navigation() {
             <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer">
                 <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-md flex items-center justify-center relative overflow-hidden">
-                  {/* Lacrosse stick SVG */}
+                  {/* Combined Clipboard, Eye/Magnifying Glass, and AI Logo */}
                   <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 2C7 2 6 3 6 5C6 7 7 8 7 8L16 17C16 17 17 18 19 18C21 18 22 17 22 17L17 12C17 12 16 11 16 9C16 7 17 6 17 6L12 2C12 2 11 1 9 1C7 1 7 2 7 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 22L7 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="19" cy="5" r="2" fill="currentColor"/>
+                    {/* Clipboard base */}
+                    <rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                    <rect x="8" y="1" width="8" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.3"/>
+                    
+                    {/* Magnifying glass with eye */}
+                    <circle cx="12" cy="11" r="4" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                    <path d="M15 14L17.5 16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    
+                    {/* Eye inside magnifying glass */}
+                    <ellipse cx="12" cy="11" rx="2" ry="1.5" fill="currentColor"/>
+                    <circle cx="12" cy="11" r="0.75" fill="currentColor"/>
+                    
+                    {/* AI circuit dots */}
+                    <circle cx="8" cy="17" r="0.5" fill="currentColor"/>
+                    <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+                    <circle cx="16" cy="17" r="0.5" fill="currentColor"/>
+                    <path d="M8 17L12 17M12 17L16 17" stroke="currentColor" strokeWidth="0.5" opacity="0.6"/>
                   </svg>
                   {/* Subtle shine effect */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>

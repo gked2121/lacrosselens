@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { 
@@ -26,7 +28,9 @@ import {
   Timer,
   Flame,
   Gem,
-  Crown
+  Crown,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface HighlightAnalysisEnhancedProps {
@@ -36,6 +40,73 @@ interface HighlightAnalysisEnhancedProps {
 }
 
 export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: HighlightAnalysisEnhancedProps) {
+  // State for expandable sections
+  const [expandedShootingItems, setExpandedShootingItems] = useState<Set<number>>(new Set());
+  const [expandedDodgingItems, setExpandedDodgingItems] = useState<Set<number>>(new Set());
+  const [expandedPassingItems, setExpandedPassingItems] = useState<Set<number>>(new Set());
+  const [expandedStrengths, setExpandedStrengths] = useState<Set<number>>(new Set());
+  const [expandedWeaknesses, setExpandedWeaknesses] = useState<Set<number>>(new Set());
+
+  // Helper functions for expanding/collapsing content
+  const toggleExpansion = (itemIndex: number, expandedSet: Set<number>, setExpandedSet: (set: Set<number>) => void) => {
+    const newSet = new Set(expandedSet);
+    if (newSet.has(itemIndex)) {
+      newSet.delete(itemIndex);
+    } else {
+      newSet.add(itemIndex);
+    }
+    setExpandedSet(newSet);
+  };
+
+  // Expandable text component
+  const ExpandableText = ({ 
+    content, 
+    index, 
+    expandedSet, 
+    setExpandedSet, 
+    truncateLength = 150,
+    className = ""
+  }: {
+    content: string;
+    index: number;
+    expandedSet: Set<number>;
+    setExpandedSet: (set: Set<number>) => void;
+    truncateLength?: number;
+    className?: string;
+  }) => {
+    const isExpanded = expandedSet.has(index);
+    const shouldTruncate = content.length > truncateLength;
+    const displayContent = isExpanded || !shouldTruncate 
+      ? content 
+      : `${content.substring(0, truncateLength)}...`;
+
+    return (
+      <div className={className}>
+        <p className="leading-relaxed">{displayContent}</p>
+        {shouldTruncate && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => toggleExpansion(index, expandedSet, setExpandedSet)}
+            className="mt-2 p-0 h-auto text-xs hover:bg-transparent"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="w-3 h-3 mr-1" />
+                Show less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-3 h-3 mr-1" />
+                Show more
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+    );
+  };
+
   const overallAnalysis = analyses?.find(a => a.type === 'overall');
   const playerEvaluations = analyses?.filter(a => a.type === 'player_evaluation') || [];
   const keyMoments = analyses?.filter(a => a.type === 'key_moment') || [];
@@ -365,9 +436,14 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               {analysis.confidence}%
                             </Badge>
                           </div>
-                          <p className="text-xs text-green-800 dark:text-green-200 leading-relaxed">
-                            {analysis.content.substring(0, 150)}...
-                          </p>
+                          <ExpandableText
+                            content={analysis.content}
+                            index={idx}
+                            expandedSet={expandedShootingItems}
+                            setExpandedSet={setExpandedShootingItems}
+                            truncateLength={150}
+                            className="text-xs text-green-800 dark:text-green-200"
+                          />
                         </div>
                       ));
                     })()}
@@ -405,9 +481,14 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               {analysis.confidence}%
                             </Badge>
                           </div>
-                          <p className="text-xs text-purple-800 dark:text-purple-200 leading-relaxed">
-                            {analysis.content.substring(0, 150)}...
-                          </p>
+                          <ExpandableText
+                            content={analysis.content}
+                            index={idx}
+                            expandedSet={expandedDodgingItems}
+                            setExpandedSet={setExpandedDodgingItems}
+                            truncateLength={150}
+                            className="text-xs text-purple-800 dark:text-purple-200"
+                          />
                         </div>
                       ));
                     })()}
@@ -445,9 +526,14 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               {analysis.confidence}%
                             </Badge>
                           </div>
-                          <p className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed">
-                            {analysis.content.substring(0, 150)}...
-                          </p>
+                          <ExpandableText
+                            content={analysis.content}
+                            index={idx}
+                            expandedSet={expandedPassingItems}
+                            setExpandedSet={setExpandedPassingItems}
+                            truncateLength={150}
+                            className="text-xs text-blue-800 dark:text-blue-200"
+                          />
                         </div>
                       ));
                     })()}
@@ -630,9 +716,14 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 {strengths.slice(0, 3).map((strength, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
                     <ArrowUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
-                      {strength.substring(0, 200)}...
-                    </p>
+                    <ExpandableText
+                      content={strength}
+                      index={index}
+                      expandedSet={expandedStrengths}
+                      setExpandedSet={setExpandedStrengths}
+                      truncateLength={200}
+                      className="text-sm text-green-800 dark:text-green-200"
+                    />
                   </div>
                 ))}
               </div>
@@ -654,9 +745,14 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 {weaknesses.slice(0, 3).map((weakness, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                     <ArrowDown className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-orange-800 dark:text-orange-200 leading-relaxed">
-                      {weakness.substring(0, 200)}...
-                    </p>
+                    <ExpandableText
+                      content={weakness}
+                      index={index}
+                      expandedSet={expandedWeaknesses}
+                      setExpandedSet={setExpandedWeaknesses}
+                      truncateLength={200}
+                      className="text-sm text-orange-800 dark:text-orange-200"
+                    />
                   </div>
                 ))}
               </div>

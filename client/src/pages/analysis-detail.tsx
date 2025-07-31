@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
@@ -37,6 +37,7 @@ export default function AnalysisDetail() {
   const { isAuthenticated, isLoading } = useAuth();
   const { id } = useParams();
   const [location] = useLocation();
+  const queryClient = useQueryClient();
   
   // Extract tab from query parameters
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
@@ -62,13 +63,26 @@ export default function AnalysisDetail() {
     queryKey: [`/api/videos/${id}`],
     enabled: !!id,
     retry: false,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
 
   const { data: analyses, isLoading: analysesLoading } = useQuery({
     queryKey: [`/api/videos/${id}/analyses`],
     enabled: !!id,
     retry: false,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
+
+  // Force refresh when id changes
+  useEffect(() => {
+    if (id) {
+      // Invalidate queries when navigating to a new video
+      queryClient.invalidateQueries({ queryKey: [`/api/videos/${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/videos/${id}/analyses`] });
+    }
+  }, [id, queryClient]);
 
   // Fetch video statistics
   // Removed statistics query as it was showing misleading aggregated data
@@ -103,6 +117,16 @@ export default function AnalysisDetail() {
   const faceOffAnalyses = (analyses as any[])?.filter(a => a.type === 'face_off') || [];
   const transitionAnalyses = (analyses as any[])?.filter(a => a.type === 'transition') || [];
   const keyMoments = (analyses as any[])?.filter(a => a.type === 'key_moment') || [];
+
+  // Debug log to check the data
+  useEffect(() => {
+    if (video && analyses && overallAnalysis) {
+      console.log(`Video ${id} - Title:`, (video as any).title);
+      console.log(`Overall Analysis Content Preview:`, overallAnalysis.content.substring(0, 200));
+      console.log(`Total analyses:`, (analyses as any[]).length);
+      console.log(`Player evaluations:`, playerEvaluations.length);
+    }
+  }, [video, analyses, overallAnalysis, id, playerEvaluations.length]);
 
   const formatTimestamp = (seconds: number | null) => {
     if (!seconds) return null;

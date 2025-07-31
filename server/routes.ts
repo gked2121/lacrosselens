@@ -333,6 +333,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get aggregated player stats across all videos
+  app.get('/api/player-stats/aggregate', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const videos = await storage.getUserVideos(userId);
+      
+      // Get all player evaluations across all videos
+      const playerStatsMap = new Map<string, any>();
+      
+      for (const video of videos.filter(v => v.status === 'completed')) {
+        const analyses = await storage.getVideoAnalyses(video.id);
+        const playerEvaluations = analyses.filter(a => a.type === 'player_evaluation');
+        
+        // Import the detailed analysis extractor
+        const { DetailedAnalysisExtractor } = await import("./services/detailedAnalysisExtractor");
+        
+        // Reconstruct the LacrosseAnalysis format
+        const lacrosseAnalysis = {
+          overallAnalysis: '',
+          playerEvaluations: playerEvaluations.map(a => ({
+            playerNumber: a.metadata?.playerNumber as string || undefined,
+            evaluation: a.content,
+            timestamp: a.timestamp || 0,
+            confidence: a.confidence
+          })),
+          faceOffAnalysis: [],
+          transitionAnalysis: [],
+          keyMoments: []
+        };
+        
+        // Extract detailed metrics
+        const detailedMetrics = DetailedAnalysisExtractor.extractDetailedMetrics(lacrosseAnalysis);
+        
+        // Aggregate player metrics
+        Object.entries(detailedMetrics.playerMetrics).forEach(([playerKey, metrics]: [string, any]) => {
+          if (!playerStatsMap.has(playerKey)) {
+            playerStatsMap.set(playerKey, {
+              playerName: playerKey,
+              totalClips: 0,
+              totalVideos: new Set(),
+              averageConfidence: 0,
+              totalActions: {
+                dodges: 0,
+                shots: 0,
+                passes: 0,
+                defensivePlays: 0,
+                groundBalls: 0,
+                goals: 0,
+                assists: 0,
+                saves: 0,
+                causedTurnovers: 0
+              },
+              skillsObserved: new Set(),
+              videoAppearances: [],
+              positions: new Set(),
+              teams: new Set()
+            });
+          }
+          
+          const playerStats = playerStatsMap.get(playerKey);
+          
+          // Update aggregated stats
+          playerStats.totalClips += metrics.totalClips;
+          playerStats.totalVideos.add(video.id);
+          playerStats.averageConfidence = 
+            (playerStats.averageConfidence * (playerStats.totalClips - metrics.totalClips) + 
+             metrics.averageConfidence * metrics.totalClips) / playerStats.totalClips;
+          
+          // Aggregate actions
+          Object.entries(metrics.actions).forEach(([action, count]) => {
+            playerStats.totalActions[action] = (playerStats.totalActions[action] || 0) + (count as number);
+          });
+          
+          // Collect skills
+          metrics.skillsObserved.forEach((skill: string) => playerStats.skillsObserved.add(skill));
+          
+          // Add video appearance
+          playerStats.videoAppearances.push({
+            videoId: video.id,
+            videoTitle: video.title,
+            clipCount: metrics.totalClips,
+            timeRange: metrics.timeRange,
+            confidence: metrics.averageConfidence
+          });
+          
+          // Extract position and team from evaluations
+          playerEvaluations.forEach(evaluation => {
+            const content = evaluation.content.toLowerCase();
+            
+            // Extract position
+            const positions = ['attack', 'midfield', 'defense', 'goalie', 'fogo', 'lsm'];
+            positions.forEach(pos => {
+              if (content.includes(pos)) {
+                playerStats.positions.add(pos);
+              }
+            });
+            
+            // Extract team
+            if (content.includes('white')) playerStats.teams.add('white');
+            if (content.includes('dark') || content.includes('blue') || content.includes('red')) {
+              playerStats.teams.add('dark');
+            }
+          });
+        });
+      }
+      
+      // Convert Map to array and process Sets
+      const aggregatedStats = Array.from(playerStatsMap.values()).map(stats => ({
+        ...stats,
+        totalVideos: stats.totalVideos.size,
+        skillsObserved: Array.from(stats.skillsObserved),
+        positions: Array.from(stats.positions),
+        teams: Array.from(stats.teams),
+        averageConfidence: Math.round(stats.averageConfidence),
+        videoAppearances: stats.videoAppearances.sort((a: any, b: any) => b.clipCount - a.clipCount)
+      }));
+      
+      // Sort by total clips
+      aggregatedStats.sort((a, b) => b.totalClips - a.totalClips);
+      
+      res.json(aggregatedStats);
+    } catch (error) {
+      console.error("Error fetching aggregated player stats:", error);
+      res.status(500).json({ message: "Failed to fetch aggregated player stats" });
+    }
+  });
+
   // Get all transition analyses for a user
   app.get('/api/transition-analyses', isAuthenticated, async (req: any, res) => {
     try {

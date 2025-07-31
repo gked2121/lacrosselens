@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
+import PlayerBoxScore from "@/components/player-box-score";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -155,6 +156,15 @@ export default function PlayerEvaluation() {
               Elite Scouting View
             </Badge>
           </div>
+        </div>
+
+        {/* Player Box Score Summary */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-primary" />
+            Player Box Scores - All Videos Combined
+          </h2>
+          <PlayerBoxScore />
         </div>
 
         {/* Summary Statistics */}

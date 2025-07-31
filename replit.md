@@ -44,7 +44,8 @@ The system emphasizes a clean, modern aesthetic with a mobile-first approach. UI
     - Comprehensive Enhanced Database Schema for granular lacrosse analytics, including specialized tables for player profiles, play events, face-off details, and tactical formations.
     - Automatic video processing retry mechanism with timeout detection for reliability.
     - AI analysis adheres to a 60% confidence threshold filter, ensuring only reliable insights are displayed.
-    - AI is specifically prompted to use authentic lacrosse terminology, in-game communication, and NCAA-level metrics (e.g., Caused Turnover definition, Slides Drawn). It is also trained to avoid generating fake player numbers.
+    - AI is specifically prompted to use authentic lacrosse terminology, in-game communication, and NCAA-level metrics (e.g., Caused Turnover definition, Slides Drawn).
+    - **CRITICAL**: AI now strictly analyzes only visible content - no fake team names (Syracuse, Johns Hopkins) unless actually shown in video. Uses descriptive identifiers like "player in white #7" when names aren't visible.
     - PDF Export functionality using jspdf and html2canvas to generate clean, formatted PDFs matching the web UI design for both individual player stat sheets and full video analysis reports.
 
 ### Project Structure

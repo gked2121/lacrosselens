@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Play, Target, Users, Zap, BarChart3, Clock, Shield, CheckCircle, Star, TrendingUp, Award, ArrowRight, Video, Sparkles, Brain } from "lucide-react";
+import { Play, Target, Users, Zap, BarChart3, Clock, Shield, CheckCircle, Star, TrendingUp, Award, ArrowRight, Video, Sparkles, Brain, CloudUpload } from "lucide-react";
 
 export default function Landing() {
   const handleLogin = () => {
@@ -665,15 +665,35 @@ export default function Landing() {
           <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto"> Don't get left behind with outdated film sessions.</p>
           
           <div className="flex flex-col items-center gap-6 mb-8">
-            <Button 
-              size="lg" 
-              onClick={handleLogin} 
-              className="btn-primary text-xl px-12 py-8 shadow-2xl hover:shadow-3xl transform hover:scale-105"
-            >
-              <Video className="w-6 h-6 mr-3" />
-              Start Winning More Games
-              <ArrowRight className="w-6 h-6 ml-3" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <Button 
+                size="lg" 
+                onClick={handleLogin} 
+                className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xl px-10 py-7 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 rounded-2xl font-bold"
+              >
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <div className="relative flex items-center gap-3">
+                  <Video className="w-7 h-7" />
+                  <span>Start Winning More Games</span>
+                  <ArrowRight className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Button>
+              
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-px bg-gray-300 dark:bg-gray-700 hidden sm:block"></div>
+                <span className="text-gray-500 dark:text-gray-400 hidden sm:block">or</span>
+                <Button
+                  size="lg"
+                  onClick={handleLogin}
+                  className="group relative overflow-hidden bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border-2 border-gray-200 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500 px-8 py-7 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-2xl font-semibold"
+                >
+                  <div className="flex items-center gap-3">
+                    <CloudUpload className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    <span>Upload Your First Video</span>
+                  </div>
+                </Button>
+              </div>
+            </div>
             
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
               <div className="flex items-center gap-2">

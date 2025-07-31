@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -17,6 +17,8 @@ import { queryClient } from "@/lib/queryClient";
 export default function VideoLibrary() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -96,6 +98,24 @@ export default function VideoLibrary() {
     }
   };
 
+  // Filter videos based on status and search query
+  const filteredVideos = Array.isArray(videos) ? videos.filter((video: any) => {
+    // Apply status filter
+    if (statusFilter !== 'all' && video.status !== statusFilter) {
+      return false;
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const title = video.title?.toLowerCase() || '';
+      const description = video.description?.toLowerCase() || '';
+      return title.includes(query) || description.includes(query);
+    }
+    
+    return true;
+  }) : [];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -146,9 +166,11 @@ export default function VideoLibrary() {
                 <Input 
                   placeholder="Search by title, team, or player..." 
                   className="pl-12 pr-4 py-2.5 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white border-gray-300 hover:bg-gray-50 transition-colors">
                   <Filter className="w-4 h-4 mr-2 text-gray-600" />
                   <SelectValue placeholder="All Videos" />
@@ -194,9 +216,9 @@ export default function VideoLibrary() {
                 </Card>
               ))}
             </div>
-          ) : Array.isArray(videos) && videos.length > 0 ? (
+          ) : filteredVideos.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(videos as any[]).map((video: any) => (
+              {filteredVideos.map((video: any) => (
                 <div key={video.id} className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
                   {/* Enhanced Thumbnail Section */}
                   <div className="relative aspect-video bg-gray-100">
@@ -327,17 +349,37 @@ export default function VideoLibrary() {
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Video className="w-10 h-10 text-blue-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Start Your Analysis Journey</h3>
-                <p className="text-gray-600 mb-8 text-lg">
-                  Upload your first lacrosse video to unlock AI-powered insights and elevate your game.
-                </p>
-                <Button 
-                  onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="btn-primary shadow-md hover:shadow-lg transition-all text-lg px-8 py-3"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Upload Your First Video
-                </Button>
+                {statusFilter !== 'all' || searchQuery ? (
+                  <>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">No Videos Found</h3>
+                    <p className="text-gray-600 mb-8 text-lg">
+                      No videos match your current filters. Try adjusting your search or filter settings.
+                    </p>
+                    <Button 
+                      onClick={() => {
+                        setStatusFilter('all');
+                        setSearchQuery('');
+                      }}
+                      className="btn-secondary shadow-md hover:shadow-lg transition-all"
+                    >
+                      Clear Filters
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Start Your Analysis Journey</h3>
+                    <p className="text-gray-600 mb-8 text-lg">
+                      Upload your first lacrosse video to unlock AI-powered insights and elevate your game.
+                    </p>
+                    <Button 
+                      onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="btn-primary shadow-md hover:shadow-lg transition-all text-lg px-8 py-3"
+                    >
+                      <Plus className="w-5 h-5 mr-2" />
+                      Upload Your First Video
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           )}

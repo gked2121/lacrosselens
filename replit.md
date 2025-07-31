@@ -942,3 +942,21 @@ The database schema is well-designed for detailed play tracking:
   - Maintained separate description logic for game footage vs drill videos
 - **Files Modified**: client/src/pages/analysis-detail.tsx (drill description updates)
 - **Status**: Drill videos now display appropriate descriptions that match their training/practice context
+
+### 2025-01-31 - Fixed Non-Functional Video Library Filters
+- **Issue**: User reported "the filter buttons don't work" - the status filter dropdown and search box were not actually filtering videos
+- **Solution**: Implemented complete filter functionality with state management
+- **Changes Made**:
+  - Added useState hooks for statusFilter and searchQuery state management
+  - Created filteredVideos computed array that applies both status and search filters
+  - Connected filter UI components (Select dropdown and Input) to state with onChange handlers
+  - Updated video grid to display filteredVideos instead of original videos array
+  - Enhanced empty state to show different messages when filters return no results vs no videos exist
+  - Added "Clear Filters" button when no results found with active filters
+  - Search now filters by title and description content (case-insensitive)
+- **Technical Implementation**:
+  - Status filter: Compares video.status with selected filter value (all, completed, processing, failed)
+  - Search filter: Uses toLowerCase() and includes() for fuzzy text matching
+  - Both filters work together - videos must match both criteria to be displayed
+- **Files Modified**: client/src/pages/video-library.tsx (complete filter implementation)
+- **Status**: Video library filters now fully functional, allowing users to filter by status and search by text

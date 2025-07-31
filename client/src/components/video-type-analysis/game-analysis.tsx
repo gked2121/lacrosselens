@@ -26,7 +26,7 @@ interface GameAnalysisProps {
 }
 
 export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisProps) {
-  const [expandedSections, setExpandedSections] = useState(new Set(['overview']));
+  const [expandedSections, setExpandedSections] = useState(new Set<string>());
   const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
 
   const overallAnalysis = analyses?.find(a => a.type === 'overall');
@@ -250,55 +250,7 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
         </CardContent>
       </Card>
 
-      {/* Confidence Score Info */}
-      <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
-        <CardHeader 
-          className="cursor-pointer p-3 sm:p-4"
-          onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
-              <CardTitle className="text-sm sm:text-base">What are Confidence Scores?</CardTitle>
-            </div>
-            {showConfidenceInfo ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            )}
-          </div>
-        </CardHeader>
-        {showConfidenceInfo && (
-          <CardContent className="pt-0 pb-4">
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Confidence scores (60-100%) indicate how certain our AI is about each analysis based on video quality and visibility.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-green-500 text-white">90-100%</Badge>
-                  <span className="text-xs">Crystal clear visibility</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-500 text-white">75-89%</Badge>
-                  <span className="text-xs">Good visibility</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-amber-500 text-white">60-74%</Badge>
-                  <span className="text-xs">Average visibility</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-gray-500 text-white">Below 60%</Badge>
-                  <span className="text-xs">Not shown (filtered)</span>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground italic">
-                Note: Analyses with confidence below 60% are automatically filtered out to ensure reliability.
-              </p>
-            </div>
-          </CardContent>
-        )}
-      </Card>
+
 
       {/* Analysis Summary */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

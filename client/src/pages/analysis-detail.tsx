@@ -28,7 +28,8 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
-  Activity
+  Activity,
+  Info
 } from "lucide-react";
 
 interface AnalysisSection {
@@ -49,6 +50,7 @@ export default function AnalysisDetail() {
   const queryClient = useQueryClient();
   
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview']));
+  const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
 
   // Extract tab from query parameters
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
@@ -280,6 +282,60 @@ export default function AnalysisDetail() {
             </div>
           </Card>
         )}
+
+        {/* Confidence Score Info */}
+        <div className="mb-6">
+          <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
+            <CardHeader 
+              className="cursor-pointer p-3 sm:p-4"
+              onClick={() => setShowConfidenceInfo(!showConfidenceInfo)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+                  <CardTitle className="text-sm sm:text-base">What are Confidence Scores?</CardTitle>
+                </div>
+                {showConfidenceInfo ? (
+                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+            {showConfidenceInfo && (
+              <CardContent className="pt-0 px-3 sm:px-4 pb-3 sm:pb-4">
+                <div className="space-y-3 text-sm">
+                  <p className="text-muted-foreground text-xs sm:text-sm">
+                    Confidence scores (0-100%) show how certain the AI is about each analysis based on video quality and visibility.
+                  </p>
+                  <div className="grid gap-2">
+                    <div className="flex items-start gap-2">
+                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs">90-100%</Badge>
+                      <span className="text-xs text-muted-foreground">Crystal clear view, all details visible</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs">75-89%</Badge>
+                      <span className="text-xs text-muted-foreground">Good visibility, minor details unclear</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 text-xs">60-74%</Badge>
+                      <span className="text-xs text-muted-foreground">Minimum acceptable visibility</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 p-2 bg-red-50 dark:bg-red-950/20 rounded-md border border-red-200 dark:border-red-800">
+                    <p className="text-xs text-red-700 dark:text-red-300 font-medium">
+                      <AlertCircle className="inline w-3 h-3 mr-1" />
+                      Note: Analyses with confidence below 60% are automatically filtered out to ensure reliability.
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Higher confidence means better video quality, clearer jersey numbers, and optimal camera angles.
+                  </p>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </div>
 
         {/* Analysis Content */}
         {(video as any).status === 'completed' ? (

@@ -711,6 +711,47 @@ The database schema is well-designed for detailed play tracking:
   - client/src/pages/analysis-detail.tsx (integrated highlight detection)
 - **Status**: Personal highlight videos now properly track and group the main player's appearances separately
 
+### 2025-01-31 - Added Confidence Score Explanation to Help Users Understand AI Analysis
+- **Issue**: User asked "what is the confidence that is mentioned all over the app how is it determined?"
+- **Solution**: Created comprehensive documentation and in-app UI explanation for confidence scores
+- **Key Information Provided**:
+  - **What It Is**: Confidence scores (0-100%) represent how certain the Gemini AI model is about each analysis
+  - **How It's Determined**: Based on video quality factors including resolution, camera angle, lighting, and observable details
+  - **Score Ranges**:
+    - 90-100%: Crystal clear video, perfect visibility, all details observable
+    - 75-89%: Good visibility with minor unclear details
+    - 60-74%: Average visibility requiring some interpretation
+    - Below 60%: Poor visibility with significant uncertainty
+  - **Factors Affecting Confidence**: Jersey number visibility, ball tracking clarity, camera distance, weather conditions, lighting quality
+- **UI Enhancement**: Added collapsible info card on analysis detail page explaining confidence scores with visual badges
+- **Documentation**: Created comprehensive guide at docs/confidence-scores-explained.md
+- **Files Created/Modified**:
+  - docs/confidence-scores-explained.md (new comprehensive documentation)
+  - client/src/pages/analysis-detail.tsx (added confidence score info section)
+- **Status**: Users now have clear understanding of what confidence scores mean and how they're calculated
+
+### 2025-01-31 - Implemented 60% Confidence Threshold Filter for Analysis Reliability
+- **Issue**: User requested "dont show anything with a confidence lower than 50 no decisions or correlations less than 60 should be shown to user"
+- **Solution**: Implemented automatic filtering of all analyses with confidence scores below 60%
+- **Changes Made**:
+  - **API Level Filtering**: Updated `/api/videos/:id/analyses` endpoint to filter out analyses with confidence < 60%
+  - **Storage Level Prevention**: Modified video processor to skip storing analyses below 60% confidence entirely
+  - **Analysis Types Filtered**: Player evaluations, face-off analyses, transition analyses, and key moments
+  - **Console Logging**: Added logging when skipping low-confidence analyses for debugging
+  - **UI Update**: Enhanced confidence info card to show that analyses below 60% are automatically filtered
+  - **Documentation Update**: Updated confidence score guide to reflect filtering policy
+- **Technical Implementation**:
+  - Added confidence checks before `EnhancedAnalysisProcessor.processAndStoreAnalysis` calls
+  - Implemented filtering in API response to handle existing data
+  - Maintains backward compatibility for analyses without confidence scores
+- **User Impact**: Only high-quality, reliable analyses are shown, improving trust in AI insights
+- **Files Modified**:
+  - server/routes.ts (API filtering)
+  - server/services/videoProcessor.ts (storage prevention)
+  - client/src/pages/analysis-detail.tsx (UI notification)
+  - docs/confidence-scores-explained.md (documentation update)
+- **Status**: 60% confidence threshold successfully implemented across the entire application
+
 ### 2025-01-30 - Expanded Analysis Capabilities with Dedicated Face-off and Transition Pages
 - **Issue**: User needed specialized analysis pages for face-offs and transitions to complement the detailed player evaluations
 - **Changes Made**:

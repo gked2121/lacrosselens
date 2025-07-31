@@ -232,6 +232,12 @@ export async function processVideoUpload(
 
     // Process player evaluations with detailed player profiles
     for (const playerEval of analysis.playerEvaluations) {
+      // Skip analyses with confidence below 60%
+      if (playerEval.confidence < 60) {
+        console.log(`Skipping player evaluation with low confidence (${playerEval.confidence}%)`);
+        continue;
+      }
+      
       await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
         "player_evaluation",
@@ -247,6 +253,12 @@ export async function processVideoUpload(
 
     // Process face-off analysis with detailed breakdowns
     for (const faceOff of analysis.faceOffAnalysis) {
+      // Skip analyses with confidence below 60%
+      if (faceOff.confidence < 60) {
+        console.log(`Skipping face-off analysis with low confidence (${faceOff.confidence}%)`);
+        continue;
+      }
+      
       await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
         "face_off",
@@ -262,6 +274,12 @@ export async function processVideoUpload(
 
     // Process transition analysis with tactical details
     for (const transition of analysis.transitionAnalysis) {
+      // Skip analyses with confidence below 60%
+      if (transition.confidence < 60) {
+        console.log(`Skipping transition analysis with low confidence (${transition.confidence}%)`);
+        continue;
+      }
+      
       await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
         "transition",
@@ -277,6 +295,12 @@ export async function processVideoUpload(
 
     // Process key moments with play-by-play details
     for (const moment of analysis.keyMoments) {
+      // Skip analyses with confidence below 60%
+      if (moment.confidence < 60) {
+        console.log(`Skipping key moment with low confidence (${moment.confidence}%)`);
+        continue;
+      }
+      
       await EnhancedAnalysisProcessor.processAndStoreAnalysis(
         videoId,
         "key_moment",

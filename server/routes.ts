@@ -228,7 +228,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const analyses = await storage.getVideoAnalyses(videoId);
-      res.json(analyses);
+      
+      // Filter out analyses with confidence below 60%
+      const filteredAnalyses = analyses.filter((analysis: any) => {
+        // If no confidence score, include it (for backward compatibility)
+        if (analysis.confidence === null || analysis.confidence === undefined) {
+          return true;
+        }
+        // Only include analyses with confidence >= 60
+        return analysis.confidence >= 60;
+      });
+      
+      res.json(filteredAnalyses);
     } catch (error) {
       console.error("Error fetching analyses:", error);
       res.status(500).json({ message: "Failed to fetch analyses" });

@@ -259,6 +259,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch statistics" });
     }
   });
+  
+  // Detailed video metrics endpoint
+  app.get("/api/videos/:id/detailed-metrics", isAuthenticated, async (req: any, res) => {
+    try {
+      const videoId = parseInt(req.params.id);
+      const video = await storage.getVideo(videoId);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+
+      // Check if user owns the video
+      const userId = req.user.claims.sub;
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get all analyses for the video
+      const analyses = await storage.getVideoAnalyses(videoId);
+      
+      if (!analyses || analyses.length === 0) {
+        return res.json(null);
+      }
+      
+      // Import the detailed analysis extractor
+      const { DetailedAnalysisExtractor } = await import("./services/detailedAnalysisExtractor");
+      
+      // Reconstruct the LacrosseAnalysis format from database analyses
+      const lacrosseAnalysis = {
+        overallAnalysis: analyses.find(a => a.type === 'overall')?.content || '',
+        playerEvaluations: analyses
+          .filter(a => a.type === 'player_evaluation')
+          .map(a => ({
+            playerNumber: a.metadata?.playerNumber as string || undefined,
+            evaluation: a.content,
+            timestamp: a.timestamp || 0,
+            confidence: a.confidence
+          })),
+        faceOffAnalysis: analyses
+          .filter(a => a.type === 'face_off')
+          .map(a => ({
+            analysis: a.content,
+            timestamp: a.timestamp || 0,
+            winProbability: a.metadata?.winProbability as number || undefined,
+            confidence: a.confidence
+          })),
+        transitionAnalysis: analyses
+          .filter(a => a.type === 'transition')
+          .map(a => ({
+            analysis: a.content,
+            timestamp: a.timestamp || 0,
+            successProbability: a.metadata?.successProbability as number || undefined,
+            confidence: a.confidence
+          })),
+        keyMoments: analyses
+          .filter(a => a.type === 'key_moment')
+          .map(a => ({
+            description: a.content,
+            timestamp: a.timestamp || 0,
+            type: a.metadata?.momentType as string || 'general',
+            confidence: a.confidence
+          }))
+      };
+      
+      // Extract detailed metrics
+      const detailedMetrics = DetailedAnalysisExtractor.extractDetailedMetrics(lacrosseAnalysis);
+      
+      res.json(detailedMetrics);
+    } catch (error) {
+      console.error("Error fetching detailed metrics:", error);
+      res.status(500).json({ message: "Failed to fetch detailed metrics" });
+    }
+  });
 
   // Get all transition analyses for a user
   app.get('/api/transition-analyses', isAuthenticated, async (req: any, res) => {

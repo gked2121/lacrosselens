@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
+import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,8 @@ import {
   BarChart3,
   Sparkles,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Activity
 } from "lucide-react";
 
 interface AnalysisSection {
@@ -176,6 +178,15 @@ export default function AnalysisDetail() {
       color: 'text-orange-600',
       bgColor: 'bg-orange-500/5',
       borderColor: 'border-orange-500/10'
+    },
+    {
+      id: 'detailed',
+      title: 'Detailed Metrics',
+      icon: Activity,
+      count: playerEvaluations.length > 0 ? 1 : 0,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-500/5',
+      borderColor: 'border-purple-500/10'
     }
   ];
 
@@ -508,6 +519,11 @@ export default function AnalysisDetail() {
                             </Card>
                           ))}
                         </div>
+                      )}
+                      
+                      {/* Detailed Metrics */}
+                      {section.id === 'detailed' && (
+                        <DetailedAnalysisView videoId={parseInt(id || '0')} />
                       )}
                     </CardContent>
                   )}

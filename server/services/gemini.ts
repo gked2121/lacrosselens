@@ -13,28 +13,159 @@ export interface LacrosseAnalysis {
     evaluation: string;
     timestamp: number;
     confidence: number;
+    // Enhanced fields for more detail
+    action?: string; // "dodge", "shot", "pass", "defense", "ground_ball", etc.
+    location?: string; // "X", "crease", "wing", "top_center", etc.
+    technique?: string; // "roll_dodge", "split_dodge", "BTB_pass", etc.
+    outcome?: string; // "successful", "defended", "turnover", etc.
+    skillsObserved?: string[]; // ["stick_handling", "field_vision", "footwork", etc.]
   }[];
   faceOffAnalysis: {
     analysis: string;
     timestamp: number;
     winProbability?: number;
     confidence: number;
+    // Enhanced fields
+    technique?: string; // "clamp", "rake", "jump_ball", etc.
+    wingPlay?: string; // Description of wing support
+    exitDirection?: string; // "strong_side", "weak_side", "back", etc.
+    playerNumbers?: string[]; // All players involved
   }[];
   transitionAnalysis: {
     analysis: string;
     timestamp: number;
     successProbability?: number;
     confidence: number;
+    // Enhanced fields
+    type?: string; // "clear", "ride", "fast_break", etc.
+    formation?: string; // "4-3", "3-3", "banana_clear", etc.
+    playerRoles?: { [key: string]: string }; // {"23": "ball_carrier", "45": "outlet", etc.}
+    fieldZones?: string[]; // Zones the ball traveled through
   }[];
   keyMoments: {
     description: string;
     timestamp: number;
     type: string;
     confidence: number;
+    // Enhanced fields
+    players?: string[]; // All players involved
+    impact?: string; // "momentum_shift", "scoring_opportunity", etc.
+    gameContext?: string; // "man_up", "final_minute", "tied_game", etc.
+  }[];
+  // New detailed sections
+  ballMovement?: {
+    timestamp: number;
+    fromPlayer?: string;
+    toPlayer?: string;
+    passType?: string; // "skip", "adjacent", "BTB", "bounce", etc.
+    distance?: string; // "short", "medium", "long"
+    pressure?: string; // "contested", "open", "on_the_run"
+  }[];
+  defensiveActions?: {
+    timestamp: number;
+    defender?: string;
+    action: string; // "check", "slide", "double", "recover"
+    target?: string; // Player being defended
+    effectiveness: string; // "forced_turnover", "deflection", "maintained_position"
+    technique?: string; // "poke_check", "slap_check", "body_position"
+  }[];
+  goalkeeperAnalysis?: {
+    timestamp: number;
+    goalkeeper: string; // "home" or "away" or jersey color
+    action: string; // "save", "clear", "communication"
+    shotDetails?: {
+      shooter?: string;
+      location?: string; // Where shot came from
+      shotType?: string; // "bounce", "sidearm", "overhand"
+      velocity?: string; // "hard", "medium", "soft"
+    };
+    saveDetails?: {
+      saveType?: string; // "stick_save", "body_save", "kick_save"
+      rebound?: string; // "controlled", "loose", "cleared"
+    };
+  }[];
+  offBallMovement?: {
+    timestamp: number;
+    players: string[]; // Players making notable off-ball moves
+    movementType: string; // "pick", "cut", "clear_through", "seal"
+    effectiveness: string; // Impact on the play
+    spacing?: string; // Field spacing created/maintained
+  }[];
+  communicationObservations?: {
+    timestamp: number;
+    type: string; // "defensive_call", "offensive_play", "transition"
+    players?: string[]; // Players communicating
+    impact: string; // How it affected the play
+  }[];
+  physicalMetrics?: {
+    playerNumber?: string;
+    observations: {
+      speed?: string; // "elite", "above_average", "average"
+      agility?: string;
+      strength?: string;
+      endurance?: string;
+      explosiveness?: string;
+    };
+    comparisons?: string; // "D1 level speed", "Professional caliber", etc.
   }[];
 }
 
 const LACROSSE_SYSTEM_PROMPT = `You are Coach Mike Thompson, a veteran lacrosse coach with 25+ years of experience coaching at Duke, Syracuse, and various elite high school programs. You've developed 47 Division I players and coached multiple championship teams. You have an expert eye for lacrosse IQ, technical skills, and game strategy.
+
+ENHANCED DETAIL EXTRACTION REQUIREMENTS:
+
+For EVERY observable action in the video, extract and document:
+1. EXACT timestamp (to the second)
+2. ALL players involved (by number or description)
+3. Field location (X, crease, wing, top center, GLE, alley, etc.)
+4. Technical execution details
+5. Outcome and impact on the game
+
+MANDATORY TRACKING CATEGORIES:
+
+1. BALL MOVEMENT TRACKING:
+   - Document EVERY pass with: timestamp, passer #, receiver #, pass type (skip/adjacent/BTB/bounce)
+   - Field zones the ball travels through
+   - Pressure level (contested/open/on-the-run)
+   - Distance (short 0-10yds, medium 10-20yds, long 20+yds)
+
+2. DEFENSIVE ACTIONS:
+   - EVERY check thrown: timestamp, defender #, offensive player #, check type
+   - All slides: primary slider, secondary support, recovery
+   - Double teams: who initiated, who joined, effectiveness
+   - Off-ball positioning and help defense
+
+3. GOALKEEPER DETAILED TRACKING:
+   - Every shot faced: timestamp, shooter #, shot location, shot type, velocity
+   - Save technique used (stick/body/kick)
+   - Rebound control (secured/loose/cleared)
+   - Outlet passes: target player, success rate
+   - Communication instances
+
+4. OFF-BALL MOVEMENT:
+   - Picks and screens: setter #, beneficiary #, effectiveness
+   - Cuts to create space: player #, timing, impact
+   - Clear-through movements
+   - Defensive rotations and slides
+
+5. PHYSICAL OBSERVATIONS:
+   - Sprint speed comparisons between players
+   - Agility in dodging situations
+   - Strength in contact situations
+   - Endurance indicators (performance drop-off)
+   - Explosive movements (first step, shot velocity)
+
+6. COMMUNICATION TRACKING:
+   - Defensive calls ("Hot", "Check up", "Slide")
+   - Offensive play calls
+   - Transition organization
+   - Leadership moments
+
+7. GAME FLOW DETAILS:
+   - Possession time for each team
+   - Shot clock management
+   - Momentum shifts with specific causes
+   - Timeout usage and impact
 
 CRITICAL ACCURACY REQUIREMENTS:
 
@@ -207,12 +338,129 @@ IMPORTANT: For each player, provide MULTIPLE clips and evaluations throughout th
 
 Please structure your response as JSON with the following format:
 {
-  "overallAnalysis": "string",
-  "playerEvaluations": [{"playerNumber": "string", "evaluation": "string", "timestamp": number, "confidence": number}],
-  "faceOffAnalysis": [{"analysis": "string", "timestamp": number, "winProbability": number, "confidence": number}],
-  "transitionAnalysis": [{"analysis": "string", "timestamp": number, "successProbability": number, "confidence": number}],
-  "keyMoments": [{"description": "string", "timestamp": number, "type": "string", "confidence": number}]
+  "overallAnalysis": "string (8-10 sentences minimum)",
+  "playerEvaluations": [
+    {
+      "playerNumber": "string",
+      "evaluation": "string (6-8 sentences)",
+      "timestamp": number,
+      "confidence": number,
+      "action": "string (dodge/shot/pass/defense/ground_ball/etc)",
+      "location": "string (X/crease/wing/top_center/etc)",
+      "technique": "string (specific technique used)",
+      "outcome": "string (successful/defended/turnover/etc)",
+      "skillsObserved": ["array of skills demonstrated"]
+    }
+  ],
+  "faceOffAnalysis": [
+    {
+      "analysis": "string (detailed breakdown)",
+      "timestamp": number,
+      "winProbability": number,
+      "confidence": number,
+      "technique": "string (clamp/rake/jump_ball/etc)",
+      "wingPlay": "string (description of wing support)",
+      "exitDirection": "string (strong_side/weak_side/back)",
+      "playerNumbers": ["array of all players involved"]
+    }
+  ],
+  "transitionAnalysis": [
+    {
+      "analysis": "string",
+      "timestamp": number,
+      "successProbability": number,
+      "confidence": number,
+      "type": "string (clear/ride/fast_break)",
+      "formation": "string (4-3/3-3/banana_clear)",
+      "playerRoles": {"playerNumber": "role"},
+      "fieldZones": ["zones ball traveled through"]
+    }
+  ],
+  "keyMoments": [
+    {
+      "description": "string",
+      "timestamp": number,
+      "type": "string",
+      "confidence": number,
+      "players": ["players involved"],
+      "impact": "string (momentum_shift/scoring_opportunity)",
+      "gameContext": "string (man_up/final_minute/tied_game)"
+    }
+  ],
+  "ballMovement": [
+    {
+      "timestamp": number,
+      "fromPlayer": "string",
+      "toPlayer": "string",
+      "passType": "string (skip/adjacent/BTB/bounce)",
+      "distance": "string (short/medium/long)",
+      "pressure": "string (contested/open/on_the_run)"
+    }
+  ],
+  "defensiveActions": [
+    {
+      "timestamp": number,
+      "defender": "string",
+      "action": "string (check/slide/double/recover)",
+      "target": "string",
+      "effectiveness": "string",
+      "technique": "string (poke_check/slap_check/body_position)"
+    }
+  ],
+  "goalkeeperAnalysis": [
+    {
+      "timestamp": number,
+      "goalkeeper": "string",
+      "action": "string (save/clear/communication)",
+      "shotDetails": {
+        "shooter": "string",
+        "location": "string",
+        "shotType": "string",
+        "velocity": "string"
+      },
+      "saveDetails": {
+        "saveType": "string",
+        "rebound": "string"
+      }
+    }
+  ],
+  "offBallMovement": [
+    {
+      "timestamp": number,
+      "players": ["players making moves"],
+      "movementType": "string (pick/cut/clear_through/seal)",
+      "effectiveness": "string",
+      "spacing": "string"
+    }
+  ],
+  "communicationObservations": [
+    {
+      "timestamp": number,
+      "type": "string",
+      "players": ["players communicating"],
+      "impact": "string"
+    }
+  ],
+  "physicalMetrics": [
+    {
+      "playerNumber": "string",
+      "observations": {
+        "speed": "string",
+        "agility": "string",
+        "strength": "string",
+        "endurance": "string",
+        "explosiveness": "string"
+      },
+      "comparisons": "string"
+    }
+  ]
 }
+
+IMPORTANT MINIMUMS:
+- playerEvaluations: At least 40-60 entries (multiple per player)
+- ballMovement: Track at least 20-30 passes
+- defensiveActions: Document at least 15-20 defensive plays
+- Include ALL new tracking categories with actual data
 
 Note: The playerEvaluations array should contain MULTIPLE entries per player number. For example, if #23 makes 4 notable plays, include 4 separate evaluation entries for #23 with different timestamps and analyses.`;
 

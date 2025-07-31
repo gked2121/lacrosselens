@@ -732,3 +732,30 @@ The database schema is well-designed for detailed play tracking:
   - client/src/components/player-evaluations-grouped.tsx (added stat sheet integration)
   - client/src/pages/player-evaluation.tsx (created dedicated player evaluation page)
 - **Status**: Multiple clips per player and stat sheets fully implemented and functional
+
+### 2025-01-31 - Implemented Detailed Analysis Extraction System for Maximum Video Information
+- **Issue**: User priority - "Keep adding more detail to how much info is pulled from videos"
+- **Solution**: Created comprehensive detailed analysis extraction system that mines granular data from AI analysis
+- **New Service**: DetailedAnalysisExtractor - Extracts extensive metrics from existing AI analysis:
+  - **Player Metrics**: Tracks actions (dodges, shots, passes, defense, ground balls, goals, assists, saves), skills observed, time ranges, and confidence scores for each player
+  - **Team Metrics**: Aggregates face-off wins/losses, transition opportunities, clear/ride success rates by team
+  - **Game Flow Analysis**: Identifies momentum shifts, critical periods, and impactful plays
+  - **Communication Tracking**: Counts defensive calls, offensive sets, and leadership moments
+  - **Physical Performance**: Tracks sprint counts, explosive plays, and fatigue indicators
+- **UI Component**: Created DetailedAnalysisView component with:
+  - Player Activity Overview showing top players with detailed action counts
+  - Team Performance Metrics with progress bars for visual comparison
+  - Physical Performance Indicators dashboard
+  - Game Flow Analysis with momentum shift tracking
+- **API Integration**: Added /api/videos/:id/detailed-metrics endpoint to serve extracted data
+- **Technical Implementation**:
+  - Service reconstructs analysis data from database and extracts structured metrics
+  - Pattern matching identifies specific actions and skills from AI text
+  - Aggregates data by player and team for comprehensive views
+  - TypeScript interfaces ensure type safety throughout the system
+- **Files Created/Modified**:
+  - server/services/detailedAnalysisExtractor.ts (new extraction service)
+  - client/src/components/detailed-analysis-view.tsx (new UI component)
+  - server/routes.ts (added detailed metrics endpoint)
+  - client/src/pages/analysis-detail.tsx (integrated detailed metrics section)
+- **Status**: Detailed analysis extraction system fully implemented, extracting maximum information from videos

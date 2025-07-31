@@ -117,30 +117,59 @@ export function DetailedAnalysisView({ videoId }: DetailedAnalysisViewProps) {
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-2 text-sm">
+              <div className="grid grid-cols-4 gap-2 text-sm">
+                {/* Offensive Metrics */}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Dodges:</span>
-                  <span className="font-medium">{data.actions.dodges}</span>
+                  <span className="font-medium">{data.actions.dodges || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shots:</span>
-                  <span className="font-medium">{data.actions.shots}</span>
+                  <span className="font-medium">{data.actions.shots || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Passes:</span>
-                  <span className="font-medium">{data.actions.passes}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Defense:</span>
-                  <span className="font-medium">{data.actions.defensivePlays}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Ground Balls:</span>
-                  <span className="font-medium">{data.actions.groundBalls}</span>
+                  <span className="font-medium">{data.actions.passes || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Goals:</span>
-                  <span className="font-medium">{data.actions.goals}</span>
+                  <span className="font-medium">{data.actions.goals || 0}</span>
+                </div>
+                
+                {/* Advanced Offensive Metrics */}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Assists:</span>
+                  <span className="font-medium">{data.actions.assists || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Slides Drawn:</span>
+                  <span className="font-medium">{data.actions.slidesDrawn || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Hockey Assists:</span>
+                  <span className="font-medium">{data.actions.hockeyAssists || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Ground Balls:</span>
+                  <span className="font-medium">{data.actions.groundBalls || 0}</span>
+                </div>
+                
+                {/* Defensive Metrics */}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Checks Thrown:</span>
+                  <span className="font-medium">{data.actions.checksThrown || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Successful Checks:</span>
+                  <span className="font-medium">{data.actions.successfulChecks || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Caused Turnovers:</span>
+                  <span className="font-medium">{data.actions.causedTurnovers || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Times Beaten:</span>
+                  <span className="font-medium">{data.actions.timesDodgedOn || 0}</span>
                 </div>
               </div>
               
@@ -199,6 +228,78 @@ export function DetailedAnalysisView({ videoId }: DetailedAnalysisViewProps) {
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* Advanced NCAA Lacrosse Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5" />
+            NCAA-Level Lacrosse Analytics
+          </CardTitle>
+          <CardDescription>Professional-grade defensive and offensive metrics tracking</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Defensive Analytics */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg flex items-center gap-2">
+                <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                Defensive Analytics
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold text-red-700">{advancedStats?.defensiveMetrics?.totalChecksThrown || 0}</div>
+                  <div className="text-sm text-red-600">Total Checks</div>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold text-red-700">{advancedStats?.defensiveMetrics?.checkSuccessRate?.toFixed(1) || 0}%</div>
+                  <div className="text-sm text-red-600">Check Success</div>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold text-red-700">{advancedStats?.defensiveMetrics?.aggressiveCheckCount || 0}</div>
+                  <div className="text-sm text-red-600">Disruptions</div>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold text-red-700">{advancedStats?.defensiveMetrics?.timesBeaten || 0}</div>
+                  <div className="text-sm text-red-600">Times Beaten</div>
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Defensive aggression: {advancedStats?.defensiveMetrics?.checkSuccessRate > 60 ? "Aggressive" : advancedStats?.defensiveMetrics?.checkSuccessRate > 40 ? "Balanced" : "Conservative"}
+              </div>
+            </div>
+            
+            {/* Offensive Analytics */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg flex items-center gap-2">
+                <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                Offensive Analytics
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">{advancedStats?.offensiveMetrics?.totalSlidesDrawn || 0}</div>
+                  <div className="text-sm text-blue-600">Slides Drawn</div>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">{advancedStats?.offensiveMetrics?.hockeyAssistTotal || 0}</div>
+                  <div className="text-sm text-blue-600">Hockey Assists</div>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">{advancedStats?.offensiveMetrics?.creativePlays || 0}</div>
+                  <div className="text-sm text-blue-600">Creative Plays</div>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">{advancedStats?.offensiveMetrics?.dodgeSuccessRate?.toFixed(1) || 0}%</div>
+                  <div className="text-sm text-blue-600">Dodge Success</div>
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Offensive style: {advancedStats?.offensiveMetrics?.totalSlidesDrawn > 5 ? "Aggressive Driver" : advancedStats?.offensiveMetrics?.creativePlays > 3 ? "Creative Playmaker" : "Ball Mover"}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

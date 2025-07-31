@@ -129,11 +129,13 @@ MANDATORY TRACKING CATEGORIES:
    - Pressure level (contested/open/on-the-run)
    - Distance (short 0-10yds, medium 10-20yds, long 20+yds)
 
-2. DEFENSIVE ACTIONS:
-   - EVERY check thrown: timestamp, defender #, offensive player #, check type
-   - All slides: primary slider, secondary support, recovery
-   - Double teams: who initiated, who joined, effectiveness
-   - Off-ball positioning and help defense
+2. ENHANCED DEFENSIVE TRACKING:
+   - EVERY check thrown: timestamp, defender #, offensive player #, check type (poke/slap/body), success
+   - Track aggressive vs passive defensive approach and timing quality
+   - Document caused turnovers: defensive pressure that DIRECTLY leads to possession change
+   - Times beaten/dodged on: when offensive player successfully beats defender
+   - All slides: primary slider, help defender, recovery time, effectiveness
+   - Clear tracking: successful outlet passes after defensive possession
 
 3. GOALKEEPER DETAILED TRACKING:
    - Every shot faced: timestamp, shooter #, shot location, shot type, velocity
@@ -142,11 +144,13 @@ MANDATORY TRACKING CATEGORIES:
    - Outlet passes: target player, success rate
    - Communication instances
 
-4. OFF-BALL MOVEMENT:
-   - Picks and screens: setter #, beneficiary #, effectiveness
-   - Cuts to create space: player #, timing, impact
-   - Clear-through movements
-   - Defensive rotations and slides
+4. ENHANCED OFFENSIVE TRACKING:
+   - Slides drawn: when offensive player beats initial defender and FORCES help defense
+   - Hockey assists: pass to the player who makes the assist (secondary assist)
+   - Dodge success rate: completed dodges vs attempts, including dodge type
+   - Creative plays: behind-the-back passes, no-look feeds, trick shots
+   - Ball movement: skip passes, adjacent passes, tempo changes
+   - Off-ball cuts: backdoor cuts, pick plays, clear-throughs
 
 5. PHYSICAL OBSERVATIONS:
    - Sprint speed comparisons between players
@@ -247,17 +251,25 @@ MAXIMUM DETAIL ANALYSIS REQUIREMENTS:
 - Use sophisticated lacrosse terminology and tactical analysis throughout
 - Include game situation context and how it affects technique and decision-making
 
-STATISTICAL TRACKING - ACCURACY OVER QUANTITY:
+STATISTICAL TRACKING - ACCURACY OVER QUANTITY WITH ENHANCED DEFENSIVE AND OFFENSIVE METRICS:
 - ONLY report statistics you can directly observe and verify:
   * Goals: Must see ball enter net with clear timestamp
-  * Assists: Must see the pass leading directly to a goal
+  * Assists: Must see the pass leading directly to a goal  
+  * Hockey Assists: Must see pass to the player who makes the assist
   * Saves: Must see goalie stop a shot on goal
   * Ground balls: Must see player clearly pick up loose ball
   * Face-offs: Must see clear possession after draw
+  * Checks Thrown: Count every check attempt (poke, slap, body)
+  * Successful Checks: Checks that disrupt possession or strip ball
+  * Slides Drawn: When offensive player beats defender and forces help
+  * Caused Turnovers: Defensive pressure directly creating possession change
+  * Times Beaten: When offensive player successfully dodges past defender
 - Use exact language:
   * "At 3:42, #23 in white scores a goal" (if clearly visible)
-  * "Player in blue (number not visible) causes turnover at 5:15"
-  * "Face-off won by red team at 7:30" (only if possession is clear)
+  * "Player in blue draws slide with split dodge at 2:15"
+  * "#15 throws poke check, strips ball causing turnover at 4:30"
+  * "Secondary assist by #12 to #8 who feeds #23 for goal at 6:45"
+  * "Defender #25 beaten on roll dodge, forces slide at 5:20"
 - NEVER report:
   * Estimated statistics or percentages not directly calculated
   * Player numbers you can't clearly see

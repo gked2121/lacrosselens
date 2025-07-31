@@ -6,15 +6,25 @@ export interface DetailedAnalysisMetrics {
     [playerNumber: string]: {
       totalClips: number;
       actions: {
+        // Offensive metrics
         dodges: number;
         shots: number;
         passes: number;
-        defensivePlays: number;
-        groundBalls: number;
         assists: number;
         goals: number;
-        saves: number;
+        slidesDrawn: number; // Times beat defender and drew help defense
+        hockeyAssists: number; // Pass to player who made assist
         turnovers: number;
+        
+        // Defensive metrics
+        checksThrown: number; // Total defensive contact attempts
+        successfulChecks: number; // Checks that disrupted opponent
+        causedTurnovers: number; // Direct turnovers from defensive pressure
+        timesDodgedOn: number; // Times beaten by offensive player
+        timesSlid: number; // Times provided help defense
+        groundBalls: number;
+        saves: number; // For goalies
+        clears: number; // Successfully moving ball out of defensive zone
       };
       locations: string[];
       techniques: string[];
@@ -70,16 +80,25 @@ export interface DetailedAnalysisMetrics {
       behindTheBackFrequency: number;
     };
     defensiveMetrics: {
+      totalChecksThrown: number;
+      checkSuccessRate: number; // successful checks / total checks
+      causedTurnoverRate: number; // turnovers / defensive possessions
       slidesPerPossession: number;
-      checksThrown: number;
-      causedTurnovers: number;
+      averageSlideRecoveryTime: number;
+      clearingSuccessRate: number;
       groundBallsWon: number;
+      aggressiveCheckCount: number; // Well-timed aggressive checks
+      timesBeaten: number; // Times defenders were beaten
     };
     offensiveMetrics: {
       dodgeSuccessRate: number;
       assistToGoalRatio: number;
       shotAccuracy: number;
       timeOfPossession: number;
+      totalSlidesDrawn: number; // Times offensive players beat defender and drew help
+      hockeyAssistTotal: number; // Secondary assists (pass to assist player)
+      creativePlays: number; // Behind-the-back, no-look passes, etc.
+      ballMovementEfficiency: number; // Passes per goal scored
     };
   };
   
@@ -118,16 +137,25 @@ export class DetailedAnalysisExtractor {
           behindTheBackFrequency: 0
         },
         defensiveMetrics: {
+          totalChecksThrown: 0,
+          checkSuccessRate: 0,
+          causedTurnoverRate: 0,
           slidesPerPossession: 0,
-          checksThrown: 0,
-          causedTurnovers: 0,
-          groundBallsWon: 0
+          averageSlideRecoveryTime: 0,
+          clearingSuccessRate: 0,
+          groundBallsWon: 0,
+          aggressiveCheckCount: 0,
+          timesBeaten: 0
         },
         offensiveMetrics: {
           dodgeSuccessRate: 0,
           assistToGoalRatio: 0,
           shotAccuracy: 0,
-          timeOfPossession: 0
+          timeOfPossession: 0,
+          totalSlidesDrawn: 0,
+          hockeyAssistTotal: 0,
+          creativePlays: 0,
+          ballMovementEfficiency: 0
         }
       },
       communicationTracking: {
@@ -152,15 +180,25 @@ export class DetailedAnalysisExtractor {
         metrics.playerMetrics[playerKey] = {
           totalClips: 0,
           actions: {
+            // Offensive metrics
             dodges: 0,
             shots: 0,
             passes: 0,
-            defensivePlays: 0,
-            groundBalls: 0,
             assists: 0,
             goals: 0,
+            slidesDrawn: 0,
+            hockeyAssists: 0,
+            turnovers: 0,
+            
+            // Defensive metrics
+            checksThrown: 0,
+            successfulChecks: 0,
+            causedTurnovers: 0,
+            timesDodgedOn: 0,
+            timesSlid: 0,
+            groundBalls: 0,
             saves: 0,
-            turnovers: 0
+            clears: 0
           },
           locations: [],
           techniques: [],
@@ -180,17 +218,30 @@ export class DetailedAnalysisExtractor {
       player.timeRange.firstAppearance = Math.min(player.timeRange.firstAppearance, evaluation.timestamp);
       player.timeRange.lastAppearance = Math.max(player.timeRange.lastAppearance, evaluation.timestamp);
       
-      // Extract actions from evaluation text
+      // Extract actions from evaluation text with enhanced defensive and offensive tracking
       const evalText = evaluation.evaluation.toLowerCase();
-      if (evalText.includes("dodge")) player.actions.dodges++;
-      if (evalText.includes("shot") || evalText.includes("shoot")) player.actions.shots++;
-      if (evalText.includes("pass") || evalText.includes("feed")) player.actions.passes++;
-      if (evalText.includes("check") || evalText.includes("defend")) player.actions.defensivePlays++;
-      if (evalText.includes("ground ball")) player.actions.groundBalls++;
-      if (evalText.includes("assist")) player.actions.assists++;
-      if (evalText.includes("goal") && evalText.includes("score")) player.actions.goals++;
-      if (evalText.includes("save")) player.actions.saves++;
-      if (evalText.includes("turnover") || evalText.includes("lost")) player.actions.turnovers++;
+      
+      // Offensive metrics
+      if (evalText.includes("dodge") || evalText.includes("split") || evalText.includes("roll")) player.actions.dodges++;
+      if (evalText.includes("shot") || evalText.includes("shoot") || evalText.includes("rip")) player.actions.shots++;
+      if (evalText.includes("pass") || evalText.includes("feed") || evalText.includes("dish")) player.actions.passes++;
+      if (evalText.includes("assist") && !evalText.includes("hockey")) player.actions.assists++;
+      if (evalText.includes("goal") && (evalText.includes("score") || evalText.includes("net"))) player.actions.goals++;
+      if (evalText.includes("turnover") || evalText.includes("lost possession") || evalText.includes("stripped")) player.actions.turnovers++;
+      
+      // Advanced offensive metrics
+      if (evalText.includes("drew slide") || evalText.includes("beat defender") || evalText.includes("forced help")) player.actions.slidesDrawn++;
+      if (evalText.includes("hockey assist") || evalText.includes("secondary assist") || evalText.includes("pass to assist")) player.actions.hockeyAssists++;
+      
+      // Defensive metrics
+      if (evalText.includes("check") || evalText.includes("poke") || evalText.includes("stick check")) player.actions.checksThrown++;
+      if (evalText.includes("successful check") || evalText.includes("disrupted") || evalText.includes("stripped ball")) player.actions.successfulChecks++;
+      if (evalText.includes("caused turnover") || evalText.includes("forced turnover") || evalText.includes("defensive pressure")) player.actions.causedTurnovers++;
+      if (evalText.includes("beaten") || evalText.includes("dodged on") || evalText.includes("got by")) player.actions.timesDodgedOn++;
+      if (evalText.includes("slide") || evalText.includes("help defense") || evalText.includes("provided support")) player.actions.timesSlid++;
+      if (evalText.includes("ground ball") || evalText.includes("scoop") || evalText.includes("loose ball")) player.actions.groundBalls++;
+      if (evalText.includes("save") || evalText.includes("stop")) player.actions.saves++;
+      if (evalText.includes("clear") || evalText.includes("outlet") || evalText.includes("moved ball out")) player.actions.clears++;
       
       // Extract locations
       const locations = ["X", "crease", "wing", "top center", "GLE", "alley"];
@@ -308,7 +359,47 @@ export class DetailedAnalysisExtractor {
       }
     });
     
+    // Calculate advanced metrics from extracted data
+    this.calculateAdvancedMetrics(metrics);
+    
     return metrics;
+  }
+  
+  private static calculateAdvancedMetrics(metrics: DetailedAnalysisMetrics): void {
+    // Calculate defensive metrics
+    let totalChecks = 0;
+    let successfulChecks = 0;
+    let totalCausedTurnovers = 0;
+    let totalSlidesDrawn = 0;
+    let totalHockeyAssists = 0;
+    
+    Object.values(metrics.playerMetrics).forEach(player => {
+      totalChecks += player.actions.checksThrown;
+      successfulChecks += player.actions.successfulChecks;
+      totalCausedTurnovers += player.actions.causedTurnovers;
+      totalSlidesDrawn += player.actions.slidesDrawn;
+      totalHockeyAssists += player.actions.hockeyAssists;
+    });
+    
+    // Update advanced defensive metrics
+    metrics.advancedStats.defensiveMetrics.totalChecksThrown = totalChecks;
+    metrics.advancedStats.defensiveMetrics.checkSuccessRate = totalChecks > 0 ? (successfulChecks / totalChecks) * 100 : 0;
+    metrics.advancedStats.defensiveMetrics.aggressiveCheckCount = successfulChecks;
+    
+    // Update advanced offensive metrics
+    metrics.advancedStats.offensiveMetrics.totalSlidesDrawn = totalSlidesDrawn;
+    metrics.advancedStats.offensiveMetrics.hockeyAssistTotal = totalHockeyAssists;
+    
+    // Calculate creative plays (BTB, behind-the-back passes, etc.)
+    let creativePlays = 0;
+    Object.values(metrics.playerMetrics).forEach(player => {
+      player.techniques.forEach(tech => {
+        if (tech.includes("BTB") || tech.includes("behind") || tech.includes("no-look")) {
+          creativePlays++;
+        }
+      });
+    });
+    metrics.advancedStats.offensiveMetrics.creativePlays = creativePlays;
   }
   
   static generateDetailedSummary(metrics: DetailedAnalysisMetrics): string {

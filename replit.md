@@ -711,6 +711,35 @@ The database schema is well-designed for detailed play tracking:
   - client/src/pages/analysis-detail.tsx (integrated highlight detection)
 - **Status**: Personal highlight videos now properly track and group the main player's appearances separately
 
+### 2025-01-31 - Implemented Video Type-Specific Analysis UI Components
+- **Issue**: User required unique UI, format, and data display for each of the 6 video types (Full Game, Practice, Highlights, Drill, Scrimmage, Recruiting)
+- **Solution**: Created 6 specialized analysis components with tailored layouts for each video type
+- **Components Created**:
+  - **GameAnalysis**: Full game footage with expandable sections for overall analysis, player evaluations, face-offs, transitions, key moments, and detailed metrics
+  - **PracticeAnalysis**: Practice sessions with skill development tracking, technique observations, tempo analysis, and execution quality
+  - **HighlightAnalysis**: Personal/team highlights with chronological presentation, memorable plays focus, and recruiting potential emphasis
+  - **DrillAnalysis**: Training drills with simplified linear layout, technique breakdown focus, and coaching points emphasis
+  - **ScrimmageAnalysis**: Scrimmage footage with game-readiness assessment, chemistry evaluation, and situational play analysis
+  - **RecruitingAnalysis**: Recruiting tapes with college potential evaluation, position-specific skills, and academic/athletic balance
+- **Design Approach**:
+  - Each component has a unique color scheme and icon system
+  - Layouts optimized for the specific coaching needs of each video type
+  - Consistent formatting functions and responsive design across all components
+  - Expandable/collapsible sections for better information management
+- **Integration Changes**:
+  - Updated analysis-detail.tsx to use a switch statement routing to appropriate component based on video type
+  - Video type determined from metadata.videoType or title analysis
+  - Removed old drill-specific and game-specific UI code in favor of modular components
+- **Files Created**: 
+  - client/src/components/video-type-analysis/game-analysis.tsx
+  - client/src/components/video-type-analysis/practice-analysis.tsx
+  - client/src/components/video-type-analysis/highlight-analysis.tsx
+  - client/src/components/video-type-analysis/drill-analysis.tsx
+  - client/src/components/video-type-analysis/scrimmage-analysis.tsx
+  - client/src/components/video-type-analysis/recruiting-analysis.tsx
+- **Files Modified**: client/src/pages/analysis-detail.tsx (complete rewrite)
+- **Status**: All 6 video type-specific analysis components successfully implemented and integrated
+
 ### 2025-01-31 - Added Confidence Score Explanation to Help Users Understand AI Analysis
 - **Issue**: User asked "what is the confidence that is mentioned all over the app how is it determined?"
 - **Solution**: Created comprehensive documentation and in-app UI explanation for confidence scores

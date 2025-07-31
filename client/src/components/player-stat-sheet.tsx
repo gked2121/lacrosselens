@@ -14,8 +14,12 @@ import {
   Award,
   Star,
   UserCheck,
-  Video
+  Video,
+  Download
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface PlayerEvaluation {
   id: number;
@@ -115,6 +119,151 @@ export default function PlayerStatSheet({
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
 
+  // Export functionality
+  const handleExport = async () => {
+    const playerNumber = evaluations[0]?.metadata?.playerNumber || 
+                        playerKey.match(/#?(\d+)/)?.[1] || 
+                        playerKey;
+    
+    // Create a hidden div to render the content
+    const exportDiv = document.createElement('div');
+    exportDiv.style.position = 'absolute';
+    exportDiv.style.left = '-9999px';
+    exportDiv.style.width = '800px';
+    exportDiv.style.backgroundColor = 'white';
+    exportDiv.style.padding = '40px';
+    exportDiv.style.fontFamily = 'Arial, sans-serif';
+    document.body.appendChild(exportDiv);
+    
+    // Build the HTML content matching the web UI style
+    exportDiv.innerHTML = `
+      <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">
+          Player #${playerNumber} Analysis Report
+        </h1>
+        <p style="color: #6b7280; font-size: 14px;">
+          ${position} • ${stats.totalClips} clips analyzed • ${stats.avgConfidence}% avg confidence
+        </p>
+        ${stats.timeRange ? `<p style="color: #6b7280; font-size: 12px;">Time Range: ${formatTimestamp(stats.timeRange.start)} - ${formatTimestamp(stats.timeRange.end)}</p>` : ''}
+      </div>
+      
+      ${Array.from(stats.actions.entries()).length > 0 ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Performance Metrics</h2>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            ${Array.from(stats.actions.entries()).slice(0, 4).map(([action, count]) => `
+              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${count}</div>
+                <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">${action}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      
+      ${topSkills.length > 0 ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Skills Analysis</h2>
+          ${topSkills.map(([skill, count]) => `
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span style="color: #4b5563;">${skill}</span>
+                <span style="color: #6b7280; font-size: 14px;">${count} mentions</span>
+              </div>
+              <div style="background-color: #e5e7eb; height: 8px; border-radius: 4px;">
+                <div style="background-color: #3b82f6; height: 100%; width: ${(count / stats.totalClips) * 100}%; border-radius: 4px;"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      
+      <div style="margin-bottom: 30px;">
+        <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Detailed Evaluations</h2>
+        ${evaluations.slice(0, 10).map((evaluation, index) => `
+          <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-weight: bold; color: #374151;">Clip ${index + 1}</span>
+              <span style="color: #6b7280; font-size: 14px;">
+                ${evaluation.timestamp ? `@ ${formatTimestamp(evaluation.timestamp)}` : ''} • ${evaluation.confidence}% confidence
+              </span>
+            </div>
+            <p style="color: #4b5563; line-height: 1.6;">${evaluation.content}</p>
+          </div>
+        `).join('')}
+        ${evaluations.length > 10 ? `<p style="color: #6b7280; font-style: italic;">... and ${evaluations.length - 10} more clips</p>` : ''}
+      </div>
+      
+      ${stats.strengths.length > 0 || stats.improvements.length > 0 ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Summary</h2>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            ${stats.strengths.length > 0 ? `
+              <div>
+                <h3 style="font-size: 16px; font-weight: bold; color: #059669; margin-bottom: 10px;">Key Strengths</h3>
+                <ul style="list-style: none; padding: 0;">
+                  ${stats.strengths.map(strength => `
+                    <li style="margin-bottom: 5px; color: #4b5563;">• ${strength}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            ` : ''}
+            ${stats.improvements.length > 0 ? `
+              <div>
+                <h3 style="font-size: 16px; font-weight: bold; color: #ea580c; margin-bottom: 10px;">Areas to Develop</h3>
+                <ul style="list-style: none; padding: 0;">
+                  ${stats.improvements.map(improvement => `
+                    <li style="margin-bottom: 5px; color: #4b5563;">• ${improvement}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      ` : ''}
+    `;
+    
+    try {
+      // Convert HTML to canvas
+      const canvas = await html2canvas(exportDiv, {
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+      
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageHeight = 295; // A4 height in mm
+      let heightLeft = imgHeight;
+      let position = 0;
+      
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      // Add additional pages if needed
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      // Save PDF
+      pdf.save(`player-${playerNumber}-analysis.pdf`);
+    } finally {
+      // Clean up
+      document.body.removeChild(exportDiv);
+    }
+  };
+
   return (
     <Card className="shadow-soft hover:shadow-glow transition-all">
       {/* Player Header */}
@@ -134,7 +283,16 @@ export default function PlayerStatSheet({
               </p>
             </div>
           </div>
-          <div className="text-right">
+          <div className="flex flex-col items-end gap-2">
+            <Button 
+              onClick={handleExport}
+              size="sm"
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </Button>
             <Badge variant="outline" className="text-xs">
               <Timer className="w-3 h-3 mr-1" />
               {stats.timeRange && `${formatTimestamp(stats.timeRange.start)} - ${formatTimestamp(stats.timeRange.end)}`}

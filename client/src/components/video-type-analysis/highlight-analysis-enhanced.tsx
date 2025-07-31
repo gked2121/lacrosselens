@@ -101,7 +101,7 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
   const [expandedStrengths, setExpandedStrengths] = useState<Set<number>>(new Set());
   const [expandedWeaknesses, setExpandedWeaknesses] = useState<Set<number>>(new Set());
 
-  // Helper functions for expanding/collapsing content
+  // Helper function for toggling expansion
   const toggleExpansion = (itemIndex: number, expandedSet: Set<number>, setExpandedSet: (set: Set<number>) => void) => {
     const newSet = new Set(expandedSet);
     if (newSet.has(itemIndex)) {
@@ -959,6 +959,9 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 </CardContent>
               </Card>
             </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Elite Moments Timeline */}
       {keyMoments.length > 0 && (

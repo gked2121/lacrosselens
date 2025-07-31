@@ -7,7 +7,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import Navigation from "@/components/navigation";
 
 import { DrillAnalysis } from "@/components/video-type-analysis/drill-analysis";
-import { HighlightAnalysisEnhanced } from "@/components/video-type-analysis/highlight-analysis-temp";
+import { HighlightAnalysisEnhanced } from "@/components/video-type-analysis/highlight-analysis-enhanced";
 import { RecruitingAnalysisEnhanced } from "@/components/video-type-analysis/recruiting-analysis-enhanced";
 import { PracticeAnalysisEnhanced } from "@/components/video-type-analysis/practice-analysis-enhanced";
 import { ScrimmageAnalysisEnhanced } from "@/components/video-type-analysis/scrimmage-analysis-enhanced";
@@ -38,6 +38,8 @@ import {
   Info,
   Zap
 } from "lucide-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface AnalysisSection {
   id: string;
@@ -58,6 +60,8 @@ export default function AnalysisDetail() {
   
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview']));
   const [showConfidenceInfo, setShowConfidenceInfo] = useState(false);
+
+
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -264,6 +268,165 @@ export default function AnalysisDetail() {
               <Badge variant={(video as any).status === 'completed' ? 'default' : 'secondary'} className="text-xs">
                 {(video as any).status}
               </Badge>
+              {(video as any).status === 'completed' && (
+                <Button 
+                  size="sm"
+                  variant="outline"
+                  className="text-xs sm:text-sm px-3 sm:px-4"
+                  onClick={async () => {
+                    // Group analyses by type
+                    const overallAnalysis = (analyses as any[]).find(a => a.type === 'overall');
+                    const playerEvaluations = (analyses as any[]).filter(a => a.type === 'player_evaluation');
+                    const faceOffAnalyses = (analyses as any[]).filter(a => a.type === 'face_off');
+                    const transitionAnalyses = (analyses as any[]).filter(a => a.type === 'transition');
+                    const keyMoments = (analyses as any[]).filter(a => a.type === 'key_moment');
+                    
+                    // Create a hidden div to render the content
+                    const exportDiv = document.createElement('div');
+                    exportDiv.style.position = 'absolute';
+                    exportDiv.style.left = '-9999px';
+                    exportDiv.style.width = '800px';
+                    exportDiv.style.backgroundColor = 'white';
+                    exportDiv.style.padding = '40px';
+                    exportDiv.style.fontFamily = 'Arial, sans-serif';
+                    document.body.appendChild(exportDiv);
+                    
+                    // Build the HTML content matching the web UI style
+                    exportDiv.innerHTML = `
+                      <div style="margin-bottom: 30px;">
+                        <h1 style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">
+                          ${(video as any).title}
+                        </h1>
+                        <p style="color: #6b7280; font-size: 14px;">
+                          ${videoType || 'Game'} Analysis • ${(video as any).duration ? `${Math.floor((video as any).duration / 60)}:${((video as any).duration % 60).toString().padStart(2, '0')}` : 'Unknown duration'} • ${new Date((video as any).createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      
+                      ${overallAnalysis ? `
+                        <div style="margin-bottom: 30px;">
+                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Overall Analysis</h2>
+                          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px;">
+                            <p style="color: #4b5563; line-height: 1.6;">${overallAnalysis.content}</p>
+                            ${overallAnalysis.confidence ? `<p style="color: #6b7280; font-size: 14px; margin-top: 10px;">Confidence: ${overallAnalysis.confidence}%</p>` : ''}
+                          </div>
+                        </div>
+                      ` : ''}
+                      
+                      ${playerEvaluations.length > 0 ? `
+                        <div style="margin-bottom: 30px;">
+                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Player Evaluations (${playerEvaluations.length})</h2>
+                          ${playerEvaluations.slice(0, 10).map((evaluation, index) => `
+                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="font-weight: bold; color: #374151;">${evaluation.title || `Player Evaluation ${index + 1}`}</span>
+                                <span style="color: #6b7280; font-size: 14px;">
+                                  ${evaluation.timestamp ? `@ ${formatTimestamp(evaluation.timestamp)}` : ''} • ${evaluation.confidence}% confidence
+                                </span>
+                              </div>
+                              <p style="color: #4b5563; line-height: 1.6;">${evaluation.content}</p>
+                            </div>
+                          `).join('')}
+                          ${playerEvaluations.length > 10 ? `<p style="color: #6b7280; font-style: italic;">... and ${playerEvaluations.length - 10} more evaluations</p>` : ''}
+                        </div>
+                      ` : ''}
+                      
+                      ${faceOffAnalyses.length > 0 ? `
+                        <div style="margin-bottom: 30px;">
+                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Face-off Analysis (${faceOffAnalyses.length})</h2>
+                          ${faceOffAnalyses.map((analysis, index) => `
+                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="font-weight: bold; color: #374151;">${analysis.title || `Face-off ${index + 1}`}</span>
+                                <span style="color: #6b7280; font-size: 14px;">
+                                  ${analysis.timestamp ? `@ ${formatTimestamp(analysis.timestamp)}` : ''} • ${analysis.confidence}% confidence
+                                </span>
+                              </div>
+                              <p style="color: #4b5563; line-height: 1.6;">${analysis.content}</p>
+                            </div>
+                          `).join('')}
+                        </div>
+                      ` : ''}
+                      
+                      ${transitionAnalyses.length > 0 ? `
+                        <div style="margin-bottom: 30px;">
+                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Transition Analysis (${transitionAnalyses.length})</h2>
+                          ${transitionAnalyses.map((analysis, index) => `
+                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="font-weight: bold; color: #374151;">${analysis.title || `Transition ${index + 1}`}</span>
+                                <span style="color: #6b7280; font-size: 14px;">
+                                  ${analysis.timestamp ? `@ ${formatTimestamp(analysis.timestamp)}` : ''} • ${analysis.confidence}% confidence
+                                </span>
+                              </div>
+                              <p style="color: #4b5563; line-height: 1.6;">${analysis.content}</p>
+                            </div>
+                          `).join('')}
+                        </div>
+                      ` : ''}
+                      
+                      ${keyMoments.length > 0 ? `
+                        <div style="margin-bottom: 30px;">
+                          <h2 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">Key Moments (${keyMoments.length})</h2>
+                          ${keyMoments.map((moment, index) => `
+                            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="font-weight: bold; color: #374151;">${moment.title || `Moment ${index + 1}`}</span>
+                                <span style="color: #6b7280; font-size: 14px;">
+                                  ${moment.timestamp ? `@ ${formatTimestamp(moment.timestamp)}` : ''} • ${moment.confidence}% confidence
+                                </span>
+                              </div>
+                              <p style="color: #4b5563; line-height: 1.6;">${moment.content}</p>
+                            </div>
+                          `).join('')}
+                        </div>
+                      ` : ''}
+                    `;
+                    
+                    try {
+                      // Convert HTML to canvas
+                      const canvas = await html2canvas(exportDiv, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false
+                      });
+                      
+                      // Create PDF
+                      const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                      });
+                      
+                      const imgWidth = 210; // A4 width in mm
+                      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                      const pageHeight = 295; // A4 height in mm
+                      let heightLeft = imgHeight;
+                      let position = 0;
+                      
+                      // Add first page
+                      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                      heightLeft -= pageHeight;
+                      
+                      // Add additional pages if needed
+                      while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                      }
+                      
+                      // Save PDF
+                      pdf.save(`${(video as any).title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-analysis.pdf`);
+                    } finally {
+                      // Clean up
+                      document.body.removeChild(exportDiv);
+                    }
+                  }}
+                >
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Export
+                </Button>
+              )}
               {(video as any).youtubeUrl && (
                 <Button 
                   size="sm"

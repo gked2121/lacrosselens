@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 import { 
   Clock,
   Eye,
@@ -28,7 +29,7 @@ export function GameAnalysisMinimal({ video, analyses, formatTimestamp }: GameAn
           <h2 className="text-2xl sm:text-3xl font-light tracking-tight">Overview</h2>
           <div className="pl-4 sm:pl-8 border-l-2 border-gray-200 dark:border-gray-700">
             <p className="text-base sm:text-lg leading-relaxed sm:leading-8 text-gray-700 dark:text-gray-300">
-              {overallAnalysis.content}
+              {removeMarkdownFormatting(overallAnalysis.content)}
             </p>
             <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500">
               <span className="flex items-center gap-1">

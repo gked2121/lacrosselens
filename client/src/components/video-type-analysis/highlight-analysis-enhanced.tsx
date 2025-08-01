@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 import { 
   Trophy, 
   Star, 
@@ -46,7 +47,8 @@ interface ExpandableTextProps {
 
 function ExpandableText({ content, index, expandedSet, setExpandedSet, truncateLength, className }: ExpandableTextProps) {
   const isExpanded = expandedSet.has(index);
-  const shouldTruncate = content.length > truncateLength;
+  const cleanContent = removeMarkdownFormatting(content);
+  const shouldTruncate = cleanContent.length > truncateLength;
   
   const toggleExpansion = () => {
     const newSet = new Set(expandedSet);
@@ -59,13 +61,13 @@ function ExpandableText({ content, index, expandedSet, setExpandedSet, truncateL
   };
 
   if (!shouldTruncate) {
-    return <span className={className}>{content}</span>;
+    return <span className={className}>{cleanContent}</span>;
   }
 
   return (
     <>
       <span className={className}>
-        {isExpanded ? content : `${content.substring(0, truncateLength)}...`}
+        {isExpanded ? cleanContent : `${cleanContent.substring(0, truncateLength)}...`}
       </span>
       <Button
         variant="ghost"
@@ -1002,7 +1004,7 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                         </Badge>
                       </div>
                       <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                        {moment.content}
+                        {removeMarkdownFormatting(moment.content)}
                       </p>
                     </div>
                   </div>
@@ -1114,7 +1116,7 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
           <CardContent className="pt-6">
             <div className="prose prose-slate max-w-none">
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base">
-                {overallAnalysis.content}
+                {removeMarkdownFormatting(overallAnalysis.content)}
               </p>
             </div>
             <div className="mt-4 flex items-center gap-4">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Users, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import PlayerStatSheet from "./player-stat-sheet";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 
 interface PlayerEvaluation {
   id: number;
@@ -212,14 +213,14 @@ export default function PlayerEvaluationsGrouped({
                                       {label.trim()}
                                     </h4>
                                     <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed pl-2 sm:pl-4">
-                                      {content.join(':').trim()}
+                                      {removeMarkdownFormatting(content.join(':').trim())}
                                     </p>
                                   </div>
                                 );
                               }
                               return (
                                 <p key={idx} className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-                                  {section}
+                                  {removeMarkdownFormatting(section)}
                                 </p>
                               );
                             })}

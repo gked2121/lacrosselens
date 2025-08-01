@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 import { 
   Target, 
   Clock, 
@@ -64,7 +65,7 @@ export function DrillAnalysis({ video, analyses, formatTimestamp }: DrillAnalysi
           {overallAnalysis && (
             <div className="prose prose-sm max-w-none">
               <p className="text-muted-foreground leading-relaxed">
-                {overallAnalysis.content}
+                {removeMarkdownFormatting(overallAnalysis.content)}
               </p>
             </div>
           )}

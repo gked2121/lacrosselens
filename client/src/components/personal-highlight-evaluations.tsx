@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Users, ChevronDown, ChevronUp, BarChart3, User, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import PlayerStatSheet from "./player-stat-sheet";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 
 interface PlayerEvaluation {
   id: number;
@@ -211,7 +212,7 @@ export default function PersonalHighlightEvaluations({
                           {section.label}
                         </h4>
                         <p className="text-muted-foreground text-sm leading-relaxed">
-                          {section.content}
+                          {removeMarkdownFormatting(section.content)}
                         </p>
                       </div>
                     );
@@ -219,7 +220,7 @@ export default function PersonalHighlightEvaluations({
                   return (
                     <div key={idx} className="p-3 bg-white dark:bg-gray-800/50 rounded-md border border-gray-200 dark:border-gray-700">
                       <p className="text-muted-foreground text-sm leading-relaxed">
-                        {section.content}
+                        {removeMarkdownFormatting(section.content)}
                       </p>
                     </div>
                   );

@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 import { 
   Trophy,
   Users,
@@ -43,7 +44,7 @@ export function GameAnalysisClean({ video, analyses, formatTimestamp }: GameAnal
           <Card className="border-0 shadow-sm bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
             <CardContent className="pt-6">
               <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
-                {overallAnalysis.content}
+                {removeMarkdownFormatting(overallAnalysis.content)}
               </p>
               <div className="flex items-center gap-3 text-sm">
                 <Badge variant="secondary" className="bg-white/50 dark:bg-gray-800/50">

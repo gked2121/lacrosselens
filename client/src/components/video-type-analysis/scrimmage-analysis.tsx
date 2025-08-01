@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 import { 
   Swords, 
   Users, 
@@ -84,7 +85,7 @@ export function ScrimmageAnalysis({ video, analyses, formatTimestamp }: Scrimmag
           {overallAnalysis && (
             <div className="prose prose-sm max-w-none bg-white dark:bg-gray-900 rounded-lg p-4 border border-red-200 dark:border-red-800">
               <p className="text-muted-foreground leading-relaxed">
-                {overallAnalysis.content}
+                {removeMarkdownFormatting(overallAnalysis.content)}
               </p>
             </div>
           )}

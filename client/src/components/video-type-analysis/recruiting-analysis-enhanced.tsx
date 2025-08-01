@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { removeMarkdownFormatting } from "@/lib/markdown-utils";
 import { 
   Star, 
   TrendingUp, 
@@ -213,7 +214,7 @@ export function RecruitingAnalysisEnhanced({ video, analyses, formatTimestamp }:
           </CardHeader>
           <CardContent className="pt-6">
             <p className="text-muted-foreground leading-relaxed">
-              {overallAnalysis.content}
+              {removeMarkdownFormatting(overallAnalysis.content)}
             </p>
           </CardContent>
         </Card>
@@ -250,7 +251,7 @@ export function RecruitingAnalysisEnhanced({ video, analyses, formatTimestamp }:
                   )}
                 </div>
                 <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                  {evaluation.content}
+                  {removeMarkdownFormatting(evaluation.content)}
                 </p>
               </div>
             ))}
@@ -282,7 +283,7 @@ export function RecruitingAnalysisEnhanced({ video, analyses, formatTimestamp }:
                     </Badge>
                   </div>
                   <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                    {moment.content}
+                    {removeMarkdownFormatting(moment.content)}
                   </p>
                 </div>
               ))}

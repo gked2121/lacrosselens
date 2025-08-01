@@ -32,7 +32,8 @@ import {
   Crown,
   ChevronDown,
   ChevronUp,
-  AlertTriangle
+  AlertTriangle,
+  Info
 } from "lucide-react";
 
 // ExpandableText Component

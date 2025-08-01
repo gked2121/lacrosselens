@@ -175,23 +175,35 @@ Be accurate, not creative. Only report observable facts.`;
 
 // Phase 2: Format extracted data into specific analysis types
 const PHASE2_FORMATTING_PROMPTS = {
-  playerEvaluation: `Given the extracted JSON data, create detailed player evaluations.
+  playerEvaluation: `You're an experienced lacrosse coach evaluating players. Write in a direct, coaching voice.
 
-STRICT RULES:
-- ONLY evaluate players you can actually see in the video
-- NEVER make up player names, numbers, or teams
-- If this is a highlight tape, focus primarily on the featured player
-- Use exact descriptions from the JSON data (e.g., "player in white #23" not "Syracuse #23")
-- Include specific timestamps and observable actions
-- For recruiting potential, be appropriate to the actual level shown (high school, club, etc.)
-- If you cannot determine something, say "cannot be determined from video"
+Based on the JSON data, evaluate what you see:
 
-Focus on:
-- Observable technical skills
-- Decision-making visible in the clips
-- Physical attributes you can actually see
-- Areas for improvement based on what's shown
-- Appropriate level recruiting potential`,
+FORMAT YOUR RESPONSE LIKE THIS:
+
+**[Player Name/Number]**
+
+*Quick Take:* (2-3 sentences capturing the player's essence)
+
+**The Good:**
+• [Strong skill] - What I saw at [timestamp]
+• [Another strength] - Evidence from the film
+• [Best attribute] - How it shows up in games
+
+**Needs Work:**
+• [Area 1] - Specific drill recommendation
+• [Area 2] - What to focus on
+
+**Recruiting Level:** [Be realistic based on level shown]
+
+**Coach's Note:** [Personal observation that shows you really watched]
+
+REMEMBER:
+- Talk like you're at practice, not writing a thesis
+- Use real lacrosse terms (dodge names, defensive concepts)
+- Reference specific plays with timestamps
+- Give actionable feedback
+- If it's a highlight reel, say so - don't pretend it's a full game`,
   
   statistics: `Given the extracted JSON data, calculate and format comprehensive statistics:
 - Individual player stats (goals, assists, shots, shooting %, ground balls, caused turnovers)
@@ -200,27 +212,58 @@ Focus on:
 - Advanced metrics (points per possession, defensive efficiency)
 Include both raw numbers and percentages.`,
   
-  tactical: `Given the extracted JSON data, provide tactical analysis ONLY for what you can observe:
+  tactical: `You're a lacrosse coach breaking down film. Talk like you're in the film room with your team.
 
-STRICT RULES:
-- DO NOT make up team names (no "Syracuse", "Johns Hopkins", etc. unless clearly visible)
-- DO NOT assume college-level tactics for what might be high school play
-- ONLY describe formations and strategies you can actually see
-- Use generic terms like "attacking team" or "team in white jerseys"
-- If this is a highlight reel, note that tactical analysis is limited
+Based on the video data:
 
-Focus on observable patterns:
-- Offensive movements you can see
-- Defensive positioning that's visible
-- Transition play if shown
-- Only recommend strategies based on actual observed play`,
+**What We're Looking At:**
+(Describe the type of video - game film, highlights, practice)
+
+**Offensive Observations:**
+• What formations they're running (1-4-1, 2-2-2, etc.)
+• How they initiate offense
+• Ball movement patterns
+• Off-ball cuts and motion
+
+**Defensive Schemes:**
+• Man/zone tendencies
+• Slide packages
+• Communication visible
+• Defensive positioning
+
+**Transition Game:**
+• Clear patterns
+• Riding pressure
+• Fast break opportunities
+
+**Adjustments I'd Make:**
+• Against this offense...
+• To exploit what I see...
+
+Keep it real - if it's just highlights, say "Hard to see full systems from highlight clips, but here's what stands out..."
+
+Use actual lacrosse terminology but explain complex concepts briefly.`,
   
-  highlights: `Given the extracted JSON data, identify and describe:
-- Top 10 plays with timestamps
-- Best individual performances
-- Momentum-shifting moments
-- Technical skill demonstrations
-Rate each highlight 1-10 and explain why it's noteworthy.`
+  highlights: `You're a coach picking out the best plays to show the team. Be excited about great lacrosse!
+
+**TOP PLAYS FROM THE FILM:**
+
+Format each play like this:
+
+**[Timestamp] - [Quick Title]**
+Rating: ⭐⭐⭐⭐⭐ (1-5 stars)
+What happened: [Describe the play in 1-2 sentences]
+Why it matters: [What this shows about the player/team]
+
+Pick out:
+• The sickest goals
+• Best defensive plays
+• Clutch moments
+• Unselfish assists
+• Hustle plays
+• Technical skills that make you rewind
+
+Keep it hype but educational - explain WHY these plays matter for development.`
 };
 
 export class TwoPhaseGeminiAnalyzer {
@@ -265,8 +308,19 @@ export class TwoPhaseGeminiAnalyzer {
           responseMimeType: "application/json",
         },
         contents: [
-          youtubeUrl,
-          PHASE1_EXTRACTION_PROMPT + `\n\nIMPORTANT: You are analyzing THIS specific YouTube video: ${youtubeUrl}\nDO NOT analyze any other video.`
+          {
+            parts: [
+              {
+                fileData: {
+                  fileUri: youtubeUrl,
+                  mimeType: "video/mp4"
+                }
+              },
+              {
+                text: PHASE1_EXTRACTION_PROMPT + `\n\nIMPORTANT: You are analyzing THIS specific YouTube video: ${youtubeUrl}\nDO NOT analyze any other video.`
+              }
+            ]
+          }
         ]
       });
       

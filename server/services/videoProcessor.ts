@@ -331,43 +331,56 @@ export async function processYouTubeVideo(
       
       console.log(`Phase 2 complete: Generated formatted analyses`);
       
-      // Store overall analysis
-      if (comprehensiveData.tacticalObservations) {
-        await storage.createAnalysis({
-          videoId,
-          type: "overall",
-          title: "Game Overview",
-          content: tactical,
-          timestamp: 0,
-          confidence: 95,
-          metadata: {
-            comprehensiveData: comprehensiveData.videoMetadata,
-            statistics: statistics,
-            source: 'youtube'
-          }
-        });
-      }
+      // Store overall analysis (always store even if no tactical observations)
+      await storage.createAnalysis({
+        videoId,
+        type: "overall",
+        title: "Game Overview",
+        content: tactical || "Analysis based on available video data.",
+        timestamp: 0,
+        confidence: 95,
+        metadata: {
+          comprehensiveData: comprehensiveData.videoMetadata || {},
+          statistics: statistics,
+          source: 'youtube'
+        }
+      });
       
       // Process and store player evaluations
-      if (typeof playerEvaluations === 'string') {
-        // Parse player evaluations from formatted text
-        const evaluationSections = playerEvaluations.split(/Player #?\d+|Player in \w+/g).filter(Boolean);
-        for (let i = 0; i < comprehensiveData.individualPerformance.length && i < evaluationSections.length; i++) {
-          const player = comprehensiveData.individualPerformance[i];
+      if (typeof playerEvaluations === 'string' && playerEvaluations.trim().length > 0) {
+        // If no individual performances extracted, create one general evaluation
+        if (!comprehensiveData.individualPerformance || comprehensiveData.individualPerformance.length === 0) {
           await storage.createAnalysis({
             videoId,
             type: "player_evaluation",
-            title: `Player ${player.player}`,
-            content: evaluationSections[i].trim(),
+            title: `Player Evaluation`,
+            content: playerEvaluations,
             timestamp: 0,
             confidence: 95,
             metadata: {
-              stats: player.stats,
-              skills: player.skills,
-              athleticism: player.athleticism,
               source: 'youtube'
             }
           });
+        } else {
+          // Parse player evaluations from formatted text
+          const evaluationSections = playerEvaluations.split(/\*\*\[.*?\]\*\*/g).filter(s => s.trim().length > 50);
+          for (let i = 0; i < comprehensiveData.individualPerformance.length && i < evaluationSections.length; i++) {
+            const player = comprehensiveData.individualPerformance[i];
+            await storage.createAnalysis({
+              videoId,
+              type: "player_evaluation",
+              title: `Player ${player.player}`,
+              content: evaluationSections[i].trim(),
+              timestamp: 0,
+              confidence: 95,
+              metadata: {
+                stats: player.stats,
+                skills: player.skills,
+                athleticism: player.athleticism,
+                source: 'youtube'
+              }
+            });
+          }
         }
       }
       

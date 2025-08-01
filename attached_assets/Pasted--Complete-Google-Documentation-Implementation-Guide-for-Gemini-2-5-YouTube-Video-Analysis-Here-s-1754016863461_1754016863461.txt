@@ -1,0 +1,254 @@
+# Complete Google Documentation & Implementation Guide for Gemini 2.5 YouTube Video Analysis
+
+Here's everything you need from Google's official documentation to implement Gemini 2.5's YouTube video analysis capabilities in your app.
+
+## Essential Google Documentation
+
+### Core API Documentation
+- **[Gemini API Documentation](https://ai.google.dev/gemini-api/docs)**[1] - Main hub for all Gemini API information
+- **[Video Understanding Guide](https://ai.google.dev/gemini-api/docs/video-understanding)**[2] - Comprehensive guide for video processing
+- **[Gemini API Quickstart](https://ai.google.dev/gemini-api/docs/quickstart)**[3] - Getting started guide
+- **[API Reference](https://ai.google.dev/api)**[4] - Detailed API methods and classes
+- **[Gemini Cookbook (GitHub)](https://github.com/google-gemini/cookbook)**[5] - Practical examples and tutorials
+
+### Model-Specific Documentation
+- **[Gemini 2.5 Pro Documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro)**[6] - Advanced reasoning model specs
+- **[Gemini 2.5 Flash Documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash)**[7] - Fast processing model specs
+
+## Getting Started: API Key & Setup
+
+### 1. Obtain API Key
+Visit **[Google AI Studio](https://aistudio.google.com)**[8] to:
+- Sign in with your Google Account
+- Generate a free API key
+- Store it securely as environment variable `GEMINI_API_KEY`[3]
+
+### 2. SDK Installation
+
+**Python (3.9+):**
+```bash
+pip install -q -U google-genai
+```
+
+**JavaScript (Node.js v18+):**
+```bash
+npm install @google/genai
+```
+
+**Go:**
+```bash
+go get google.golang.org/genai
+```
+
+**Java (Maven):**
+```xml
+
+  
+    com.google.genai
+    google-genai
+    1.0.0
+  
+
+```
+
+## YouTube Video Processing Implementation
+
+### Basic YouTube URL Analysis
+
+**Python Example:**
+```python
+from google import genai
+from google.genai import types
+
+client = genai.Client()
+
+response = client.models.generate_content(
+    model='models/gemini-2.5-flash',
+    contents=types.Content(
+        parts=[
+            types.Part(
+                file_data=types.FileData(
+                    file_uri='https://www.youtube.com/watch?v=YOUR_VIDEO_ID'
+                )
+            ),
+            types.Part(text='Analyze this video and extract all key information.')
+        ]
+    )
+)
+
+print(response.text)
+```
+
+**JavaScript Example:**
+```javascript
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({});
+
+const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [
+        "Analyze this video and extract all key information.",
+        {
+            fileData: {
+                fileUri: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
+            },
+        },
+    ],
+});
+
+console.log(response.text);
+```
+
+**REST API:**
+```bash
+curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent" \
+  -H "x-goog-api-key: $GEMINI_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -X POST \
+  -d '{
+    "contents": [{
+      "parts":[
+        {"text": "Analyze this video and extract all key information."},
+        {
+          "file_data": {
+            "file_uri": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+          }
+        }
+      ]
+    }]
+  }'
+```
+
+## Advanced Features for Your App
+
+### 1. Timestamp-Specific Analysis
+```python
+# Ask about specific moments using MM:SS format
+prompt = "What happens at 02:30 and 05:15 in this video?"
+```
+
+### 2. Video Transcription with Visual Descriptions
+```python
+prompt = """
+Transcribe the audio from this video, giving timestamps for salient events. 
+Also provide visual descriptions of what's happening on screen.
+"""
+```
+
+### 3. Video Clipping and Custom Processing
+```python
+response = client.models.generate_content(
+    model='models/gemini-2.5-flash',
+    contents=types.Content(
+        parts=[
+            types.Part(
+                file_data=types.FileData(
+                    file_uri='https://www.youtube.com/watch?v=YOUR_VIDEO_ID'
+                ),
+                video_metadata=types.VideoMetadata(
+                    start_offset='60s',  # Start at 1 minute
+                    end_offset='300s',   # End at 5 minutes
+                    fps=2                # Custom frame rate
+                )
+            ),
+            types.Part(text='Summarize this video segment.')
+        ]
+    )
+)
+```
+
+## Technical Specifications & Limits
+
+### Video Processing Details[2]
+- **Supported Models**: All Gemini 2.0 and 2.5 models
+- **Context Windows**: 
+  - 2M context: Up to 2 hours (default) or 6 hours (low resolution)
+  - 1M context: Up to 1 hour (default) or 3 hours (low resolution)
+- **File Formats**: MP4, MPEG, MOV, AVI, FLV, MPG, WebM, WMV, 3GPP
+- **Processing Rate**: 1 frame per second, audio at 1Kbps
+- **Token Usage**: ~300 tokens/second (default) or ~100 tokens/second (low resolution)
+
+### YouTube-Specific Limitations[2]
+- **Free Tier**: Maximum 8 hours of YouTube video per day
+- **Paid Tier**: No video length limits
+- **Video Access**: Public videos only (no private/unlisted)
+- **Concurrent Videos**: Up to 10 videos per request (Gemini 2.5+)
+
+## App Integration Best Practices
+
+### 1. Environment Configuration
+```python
+import os
+from google import genai
+
+# Set up API key
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable not set")
+
+client = genai.Client(api_key=api_key)
+```
+
+### 2. Error Handling & Rate Limiting
+```python
+import time
+from google.genai import types
+
+def analyze_youtube_video(video_url, prompt):
+    try:
+        response = client.models.generate_content(
+            model='models/gemini-2.5-flash',
+            contents=types.Content(
+                parts=[
+                    types.Part(file_data=types.FileData(file_uri=video_url)),
+                    types.Part(text=prompt)
+                ]
+            )
+        )
+        return response.text
+    except Exception as e:
+        print(f"Error analyzing video: {e}")
+        return None
+```
+
+### 3. Optimize for Speed vs Quality
+```python
+# For faster responses, disable thinking
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=[video_url, prompt],
+    config=types.GenerateContentConfig(
+        thinking_config=types.ThinkingConfig(thinking_budget=0)
+    )
+)
+```
+
+## Additional Resources
+
+- **[Live API Documentation](https://developers.googleblog.com/en/gemini-2-5-flash-pro-live-api-veo-2-gemini-api/)**[9] - For real-time video processing
+- **[Video Understanding Blog Post](https://developers.googleblog.com/en/gemini-2-5-video-understanding/)**[10] - Advanced use cases and examples
+- **[Mobile Integration Tutorial](https://forum.cursor.com/t/tutorial-build-mobile-app-with-google-gemini-integration-using-cursor/44889)**[11] - Building mobile apps with Gemini
+
+This comprehensive documentation package provides everything needed to implement robust YouTube video analysis functionality using Gemini 2.5 in your application. The API supports multiple programming languages and deployment options, making it flexible for various app architectures.
+
+[1] https://ai.google.dev/gemini-api/docs
+[2] https://ai.google.dev/gemini-api/docs/video-understanding
+[3] https://ai.google.dev/gemini-api/docs/quickstart
+[4] https://ai.google.dev/api
+[5] https://github.com/google-gemini/cookbook
+[6] https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro
+[7] https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash
+[8] https://aistudio.google.com
+[9] https://developers.googleblog.com/en/gemini-2-5-flash-pro-live-api-veo-2-gemini-api/
+[10] https://developers.googleblog.com/en/gemini-2-5-video-understanding/
+[11] https://forum.cursor.com/t/tutorial-build-mobile-app-with-google-gemini-integration-using-cursor/44889
+[12] https://apidog.com/blog/how-to-use-google-gemini-2-5-flash-via-api/
+[13] https://www.youtube.com/watch?v=pFpxpAMqSmU
+[14] https://blog.promptlayer.com/gemini-2-5/
+[15] https://www.datacamp.com/tutorial/gemini-2-5-pro-api
+[16] https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/video-understanding
+[17] https://docs.litellm.ai/docs/providers/gemini
+[18] https://www.youtube.com/watch?v=vpmw6NcxX_8
+[19] https://www.reddit.com/r/ChatGPTCoding/comments/1jrp1tj/a_simple_guide_to_setting_up_gemini_25_pro_free/
+[20] https://www.reddit.com/r/Bard/comments/1j9thru/introducing_youtube_video_link_support_in_google/

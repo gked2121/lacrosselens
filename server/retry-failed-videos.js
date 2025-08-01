@@ -1,6 +1,6 @@
 // Simple script to retry failed YouTube videos
-import { processYouTubeVideo } from './services/videoProcessor.js';
-import { storage } from './storage.js';
+import { processYouTubeVideo } from './services/videoProcessor.ts';
+import { storage } from './storage.ts';
 
 console.log('Starting failed video retry process...');
 

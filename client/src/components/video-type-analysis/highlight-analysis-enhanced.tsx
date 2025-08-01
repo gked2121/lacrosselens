@@ -94,6 +94,10 @@ interface HighlightAnalysisEnhancedProps {
 }
 
 export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: HighlightAnalysisEnhancedProps) {
+  // Debug log to see what data is being passed
+  console.log('HighlightAnalysisEnhanced - analyses:', analyses);
+  console.log('Overall analysis metadata:', analyses.find(a => a.type === 'overall')?.metadata);
+  
   // State for expandable sections
   const [expandedShootingItems, setExpandedShootingItems] = useState<Set<number>>(new Set());
   const [expandedDodgingItems, setExpandedDodgingItems] = useState<Set<number>>(new Set());
@@ -114,54 +118,7 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
     setExpandedSet(newSet);
   };
 
-  // Expandable text component
-  const ExpandableText = ({ 
-    content, 
-    index, 
-    expandedSet, 
-    setExpandedSet, 
-    truncateLength = 150,
-    className = ""
-  }: {
-    content: string;
-    index: number;
-    expandedSet: Set<number>;
-    setExpandedSet: (set: Set<number>) => void;
-    truncateLength?: number;
-    className?: string;
-  }) => {
-    const isExpanded = expandedSet.has(index);
-    const shouldTruncate = content.length > truncateLength;
-    const displayContent = isExpanded || !shouldTruncate 
-      ? content 
-      : `${content.substring(0, truncateLength)}...`;
 
-    return (
-      <div className={className}>
-        <p className="leading-relaxed">{displayContent}</p>
-        {shouldTruncate && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => toggleExpansion(index, expandedSet, setExpandedSet)}
-            className="mt-2 p-0 h-auto text-xs hover:bg-transparent"
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="w-3 h-3 mr-1" />
-                Show less
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-3 h-3 mr-1" />
-                Show more
-              </>
-            )}
-          </Button>
-        )}
-      </div>
-    );
-  };
 
   const overallAnalysis = analyses?.find(a => a.type === 'overall');
   const playerEvaluations = analyses?.filter(a => a.type === 'player_evaluation') || [];
@@ -291,37 +248,62 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
     return { strengths: strengths.slice(0, 5), weaknesses: weaknesses.slice(0, 5) };
   };
 
-  // Use actual data from analyses
-  const goals = keyMoments.filter(k => 
-    k.content.toLowerCase().includes('goal') || 
-    k.title.toLowerCase().includes('goal')
-  ).length;
+  // Extract statistics from metadata (two-phase system stores structured data)
+  const extractedData = overallAnalysis?.metadata?.comprehensiveAnalysisData;
   
-  const assists = keyMoments.filter(k => 
-    k.content.toLowerCase().includes('assist') || 
-    k.title.toLowerCase().includes('assist')
-  ).length;
+  // Get player stats from metadata
+  let goals = 0;
+  let assists = 0;
+  let groundBalls = 0;
+  let causedTurnovers = 0;
+  let saves = 0;
+  let dodges = 0;
   
-  const saves = analyses.filter(a => 
-    a.content.toLowerCase().includes('save') && 
-    (a.type === 'key_moment' || a.type === 'player_evaluation')
-  ).length;
+  if (extractedData) {
+    // Handle both array and object format for comprehensiveAnalysisData
+    const data = Array.isArray(extractedData) ? extractedData[0] : extractedData;
+    
+    // Get individual performance stats
+    if (data?.individualPerformance?.length > 0) {
+      const playerStats = data.individualPerformance[0].stats;
+      goals = playerStats?.goals || 0;
+      assists = playerStats?.assists || 0;
+      groundBalls = playerStats?.groundBalls || 0;
+      causedTurnovers = playerStats?.causedTurnovers || 0;
+    }
+    
+    // Count dodges from plays
+    if (data?.plays) {
+      dodges = data.plays.filter((p: any) => 
+        p.playType === 'dodge' || 
+        p.playerActions?.some((pa: any) => pa.action.toLowerCase().includes('dodge'))
+      ).length;
+    }
+  }
   
-  // Use metadata if available, otherwise count mentions
-  const dodges = analyses.reduce((count, a) => {
-    if (a.metadata?.dodges) return count + a.metadata.dodges;
-    return count + (a.content.toLowerCase().includes('dodge') ? 1 : 0);
-  }, 0);
+  // Fallback to counting mentions in content if no metadata
+  if (!extractedData) {
+    goals = keyMoments.filter(k => 
+      k.content.toLowerCase().includes('goal') || 
+      k.title.toLowerCase().includes('goal')
+    ).length;
+    
+    assists = keyMoments.filter(k => 
+      k.content.toLowerCase().includes('assist') || 
+      k.title.toLowerCase().includes('assist')
+    ).length;
+    
+    saves = analyses.filter(a => 
+      a.content.toLowerCase().includes('save') && 
+      (a.type === 'key_moment' || a.type === 'player_evaluation')
+    ).length;
+    
+    dodges = analyses.filter(a => 
+      a.content.toLowerCase().includes('dodge')
+    ).length;
+  }
   
-  const checks = analyses.reduce((count, a) => {
-    if (a.metadata?.checks) return count + a.metadata.checks;
-    return count + (a.content.toLowerCase().includes('check') ? 1 : 0);
-  }, 0);
-  
-  const groundBalls = analyses.reduce((count, a) => {
-    if (a.metadata?.groundBalls) return count + a.metadata.groundBalls;
-    return count + (a.content.toLowerCase().includes('ground ball') ? 1 : 0);
-  }, 0);
+  const checks = causedTurnovers;
   
   const ratings = extractRatings();
   const skillMentions = extractSkillMentions();

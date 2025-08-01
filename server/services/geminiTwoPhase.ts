@@ -14,6 +14,8 @@ export interface ComprehensiveLacrosseData {
     gameType: string; // "full_game", "highlight", "practice", "drill"
     weather?: string; // "clear", "rain", "wind"
     field?: string; // "turf", "grass"
+    videoTitle?: string; // Actual title from video or YouTube
+    videoUrl?: string; // URL being analyzed
   };
   
   teams: {
@@ -146,6 +148,8 @@ CRITICAL RULES - FOLLOW THESE EXACTLY:
 5. Record exact timestamps for every observable action
 6. For highlight tapes, focus on the featured player if one is evident
 7. ONLY report what you can directly observe - no assumptions or fabrications
+8. Extract the ACTUAL video title and player name if shown in the video or title card
+9. DO NOT analyze a different video - ensure you're analyzing the exact URL provided
 
 Return a JSON object with this exact structure:
 {
@@ -253,6 +257,7 @@ export class TwoPhaseGeminiAnalyzer {
   static async extractFromYouTube(youtubeUrl: string): Promise<ComprehensiveLacrosseData> {
     try {
       console.log("Phase 1: Extracting comprehensive data from YouTube video...");
+      console.log("YouTube URL being analyzed:", youtubeUrl);
       
       const response = await ai.models.generateContent({
         model: "gemini-2.5-pro",
@@ -261,7 +266,7 @@ export class TwoPhaseGeminiAnalyzer {
         },
         contents: [
           youtubeUrl,
-          PHASE1_EXTRACTION_PROMPT
+          PHASE1_EXTRACTION_PROMPT + `\n\nIMPORTANT: You are analyzing THIS specific YouTube video: ${youtubeUrl}\nDO NOT analyze any other video.`
         ]
       });
       

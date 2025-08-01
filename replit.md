@@ -46,6 +46,7 @@ The system emphasizes a clean, modern aesthetic with a mobile-first approach. UI
     - AI analysis adheres to a 60% confidence threshold filter, ensuring only reliable insights are displayed.
     - AI is specifically prompted to use authentic lacrosse terminology, in-game communication, and NCAA-level metrics (e.g., Caused Turnover definition, Slides Drawn).
     - **CRITICAL**: AI now strictly analyzes only visible content - no fake team names (Syracuse, Johns Hopkins) unless actually shown in video. Uses descriptive identifiers like "player in white #7" when names aren't visible.
+    - **KNOWN ISSUE**: Gemini AI sometimes analyzes incorrect YouTube videos - the URL provided may result in analysis of a different video entirely. This appears to be a Gemini API limitation with YouTube URL processing.
     - PDF Export functionality using jspdf and html2canvas to generate clean, formatted PDFs matching the web UI design for both individual player stat sheets and full video analysis reports.
 
 ### Project Structure

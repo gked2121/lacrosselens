@@ -102,14 +102,32 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Extract just the hostname without port
+    const fullHost = req.get('host') || '';
+    const domain = fullHost.includes(':') ? fullHost.split(':')[0] : fullHost;
+    
+    // Use the first REPLIT_DOMAINS if we're on localhost
+    const authDomain = domain === '127.0.0.1' || domain === 'localhost' 
+      ? process.env.REPLIT_DOMAINS!.split(",")[0]
+      : domain;
+      
+    passport.authenticate(`replitauth:${authDomain}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Extract just the hostname without port
+    const fullHost = req.get('host') || '';
+    const domain = fullHost.includes(':') ? fullHost.split(':')[0] : fullHost;
+    
+    // Use the first REPLIT_DOMAINS if we're on localhost
+    const authDomain = domain === '127.0.0.1' || domain === 'localhost' 
+      ? process.env.REPLIT_DOMAINS!.split(",")[0]
+      : domain;
+      
+    passport.authenticate(`replitauth:${authDomain}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
@@ -120,7 +138,7 @@ export async function setupAuth(app: Express) {
       res.redirect(
         client.buildEndSessionUrl(config, {
           client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
+          post_logout_redirect_uri: `${req.protocol}://${req.get('host')}`,
         }).href
       );
     });

@@ -59,19 +59,19 @@ function ExpandableText({ content, index, expandedSet, setExpandedSet, truncateL
   };
 
   if (!shouldTruncate) {
-    return <p className={className}>{content}</p>;
+    return <span className={className}>{content}</span>;
   }
 
   return (
-    <div className="space-y-2">
-      <p className={className}>
+    <>
+      <span className={className}>
         {isExpanded ? content : `${content.substring(0, truncateLength)}...`}
-      </p>
+      </span>
       <Button
         variant="ghost"
         size="sm"
         onClick={toggleExpansion}
-        className="h-auto p-0 text-xs font-medium hover:no-underline flex items-center gap-1"
+        className="mt-1 h-auto p-0 text-xs font-medium hover:no-underline flex items-center gap-1"
       >
         {isExpanded ? (
           <>
@@ -83,7 +83,7 @@ function ExpandableText({ content, index, expandedSet, setExpandedSet, truncateL
           </>
         )}
       </Button>
-    </div>
+    </>
   );
 }
 
@@ -546,14 +546,16 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               <span className="text-xs text-green-600 font-medium">{analysis.confidence}%</span>
                             </div>
                           </div>
-                          <ExpandableText
-                            content={analysis.content}
-                            index={idx}
-                            expandedSet={expandedShootingItems}
-                            setExpandedSet={setExpandedShootingItems}
-                            truncateLength={80}
-                            className="text-sm text-green-800 dark:text-green-200"
-                          />
+                          <div>
+                            <ExpandableText
+                              content={analysis.content}
+                              index={idx}
+                              expandedSet={expandedShootingItems}
+                              setExpandedSet={setExpandedShootingItems}
+                              truncateLength={80}
+                              className="text-sm text-green-800 dark:text-green-200"
+                            />
+                          </div>
                         </div>
                       ));
                     })()}
@@ -666,14 +668,16 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               <span className="text-xs text-purple-600 font-medium">{analysis.confidence}%</span>
                             </div>
                           </div>
-                          <ExpandableText
-                            content={analysis.content}
-                            index={idx}
-                            expandedSet={expandedDodgingItems}
-                            setExpandedSet={setExpandedDodgingItems}
-                            truncateLength={80}
-                            className="text-sm text-purple-800 dark:text-purple-200"
-                          />
+                          <div>
+                            <ExpandableText
+                              content={analysis.content}
+                              index={idx}
+                              expandedSet={expandedDodgingItems}
+                              setExpandedSet={setExpandedDodgingItems}
+                              truncateLength={80}
+                              className="text-sm text-purple-800 dark:text-purple-200"
+                            />
+                          </div>
                         </div>
                       ));
                     })()}
@@ -787,14 +791,16 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               <span className="text-xs text-blue-600 font-medium">{analysis.confidence}%</span>
                             </div>
                           </div>
-                          <ExpandableText
-                            content={analysis.content}
-                            index={idx}
-                            expandedSet={expandedPassingItems}
-                            setExpandedSet={setExpandedPassingItems}
-                            truncateLength={80}
-                            className="text-sm text-blue-800 dark:text-blue-200"
-                          />
+                          <div>
+                            <ExpandableText
+                              content={analysis.content}
+                              index={idx}
+                              expandedSet={expandedPassingItems}
+                              setExpandedSet={setExpandedPassingItems}
+                              truncateLength={80}
+                              className="text-sm text-blue-800 dark:text-blue-200"
+                            />
+                          </div>
                         </div>
                       ));
                     })()}
@@ -1034,14 +1040,16 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 {strengths.slice(0, 3).map((strength, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
                     <ArrowUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <ExpandableText
-                      content={strength}
-                      index={index}
-                      expandedSet={expandedStrengths}
-                      setExpandedSet={setExpandedStrengths}
-                      truncateLength={200}
-                      className="text-sm text-green-800 dark:text-green-200"
-                    />
+                    <div>
+                      <ExpandableText
+                        content={strength}
+                        index={index}
+                        expandedSet={expandedStrengths}
+                        setExpandedSet={setExpandedStrengths}
+                        truncateLength={200}
+                        className="text-sm text-green-800 dark:text-green-200"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1075,14 +1083,16 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                 {weaknesses.slice(0, 3).map((weakness, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                     <ArrowDown className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                    <ExpandableText
-                      content={weakness}
-                      index={index}
-                      expandedSet={expandedWeaknesses}
-                      setExpandedSet={setExpandedWeaknesses}
-                      truncateLength={200}
-                      className="text-sm text-orange-800 dark:text-orange-200"
-                    />
+                    <div>
+                      <ExpandableText
+                        content={weakness}
+                        index={index}
+                        expandedSet={expandedWeaknesses}
+                        setExpandedSet={setExpandedWeaknesses}
+                        truncateLength={200}
+                        className="text-sm text-orange-800 dark:text-orange-200"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

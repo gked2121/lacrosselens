@@ -967,10 +967,63 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
             </div>
           </CardHeader>
           <CardContent className="pt-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <Star className="w-4 h-4 text-yellow-600" />
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Total Plays</span>
+                </div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{keyMoments.length}</p>
+              </div>
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <Trophy className="w-4 h-4 text-green-600" />
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Elite (9-10)</span>
+                </div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {keyMoments.filter((m: any) => {
+                    const match = m.content.match(/(\d+)\/10/);
+                    return match && parseInt(match[1]) >= 9;
+                  }).length}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <Zap className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Strong (7-8)</span>
+                </div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {keyMoments.filter((m: any) => {
+                    const match = m.content.match(/(\d+)\/10/);
+                    return match && parseInt(match[1]) >= 7 && parseInt(match[1]) < 9;
+                  }).length}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-purple-600" />
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Avg Confidence</span>
+                </div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {Math.round(keyMoments.reduce((acc: number, m: any) => acc + m.confidence, 0) / keyMoments.length)}%
+                </p>
+              </div>
+            </div>
+
+            {/* Key Moments Timeline */}
             <div className="space-y-6">
               {keyMoments.map((moment: any, index: number) => {
                 const ratingMatch = moment.content.match(/(\d+)\/10/);
                 const rating = ratingMatch ? parseInt(ratingMatch[1]) : null;
+                
+                // Extract play type from content
+                const playTypes = ['goal', 'assist', 'save', 'ground ball', 'caused turnover', 'dodge', 'shot', 'pass', 'clear', 'face-off'];
+                const detectedPlayType = playTypes.find(type => moment.content.toLowerCase().includes(type));
+                
+                // Extract player info
+                const playerMatch = moment.content.match(/(?:#(\d+)|player\s+(\d+)|number\s+(\d+))/i);
+                const playerNumber = playerMatch ? (playerMatch[1] || playerMatch[2] || playerMatch[3]) : null;
                 
                 return (
                   <div key={moment.id} className="relative pl-10 pb-6 last:pb-0">
@@ -980,9 +1033,10 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                     {index < keyMoments.length - 1 && (
                       <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-gradient-to-b from-yellow-300 to-orange-300"></div>
                     )}
-                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/10 dark:to-orange-950/10 rounded-xl p-5 border border-yellow-200 dark:border-yellow-800 shadow-md">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/10 dark:to-orange-950/10 rounded-xl p-5 border border-yellow-200 dark:border-yellow-800 shadow-md hover:shadow-lg transition-shadow">
+                      <div className="flex flex-col gap-3">
+                        {/* Header with badges */}
+                        <div className="flex flex-wrap items-center gap-2">
                           <Badge className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white">
                             <Clock className="w-3 h-3 mr-1" />
                             {formatTimestamp(moment.timestamp) || 'N/A'}
@@ -995,21 +1049,60 @@ export function HighlightAnalysisEnhanced({ video, analyses, formatTimestamp }: 
                               'bg-gradient-to-r from-red-600 to-pink-600'
                             }`}>
                               <Trophy className="w-3 h-3 mr-1" />
-                              {rating}/10 Elite
+                              {rating}/10 {rating >= 9 ? 'Elite' : rating >= 7 ? 'Strong' : 'Notable'}
+                            </Badge>
+                          )}
+                          {detectedPlayType && (
+                            <Badge variant="secondary" className="capitalize">
+                              {detectedPlayType}
+                            </Badge>
+                          )}
+                          {playerNumber && (
+                            <Badge variant="outline">
+                              #{playerNumber}
                             </Badge>
                           )}
                         </div>
-                        <Badge variant="outline" className="text-xs">
-                          {moment.confidence}% confidence
-                        </Badge>
+                        
+                        {/* Play description */}
+                        <div className="space-y-2">
+                          <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                            {removeMarkdownFormatting(moment.content)}
+                          </p>
+                          
+                          {/* Confidence indicator */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all ${
+                                  moment.confidence >= 80 ? 'bg-green-500' :
+                                  moment.confidence >= 60 ? 'bg-yellow-500' :
+                                  'bg-orange-500'
+                                }`}
+                                style={{ width: `${moment.confidence}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              {moment.confidence}% confidence
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                        {removeMarkdownFormatting(moment.content)}
-                      </p>
                     </div>
                   </div>
                 );
               })}
+            </div>
+
+            {/* Bottom insight */}
+            <div className="mt-6 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-slate-600 dark:text-slate-400 mt-0.5" />
+                <div className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="font-medium mb-1">Analysis Insight</p>
+                  <p>These moments represent the highest-impact plays identified by our AI analysis. Each play is evaluated based on technical execution, game situation, and overall impact on momentum.</p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -138,40 +138,63 @@ export interface ComprehensiveLacrosseData {
 }
 
 // Phase 1: Extract all data into comprehensive JSON
-const PHASE1_EXTRACTION_PROMPT = `You are an advanced lacrosse video analysis AI. Extract ONLY what you can ACTUALLY SEE in this video.
+const PHASE1_EXTRACTION_PROMPT = `Analyze this lacrosse video and extract data into JSON format.
 
-CRITICAL RULES - FOLLOW THESE EXACTLY:
-1. NEVER make up team names, player names, or any information not visible in the video
-2. NEVER assume this is a college game - many videos are high school, youth, or club lacrosse
-3. If you cannot see jersey numbers clearly, use descriptions like "player in white #7" or "attackman in blue"
-4. If you cannot determine the level of play, mark it as "unknown" - DO NOT GUESS
-5. Record exact timestamps for every observable action
-6. For highlight tapes, focus on the featured player if one is evident
-7. ONLY report what you can directly observe - no assumptions or fabrications
-8. Extract the ACTUAL video title and player name if shown in the video or title card
-9. DO NOT analyze a different video - ensure you're analyzing the exact URL provided
+IMPORTANT: Only report what you can see. Use descriptive identifiers like "player in white #88" if names aren't visible.
 
-Return a JSON object with this exact structure:
+Return this JSON structure:
 {
-  "videoMetadata": { ... },
-  "teams": { ... },
-  "plays": [ ... ],
-  "individualPerformance": [ ... ],
-  "gameFlow": { ... },
-  "tacticalObservations": { ... },
-  "coachingInsights": { ... }
+  "videoMetadata": {
+    "duration": estimated seconds,
+    "gameType": "highlight" or "full_game" or "practice",
+    "videoTitle": "actual title if visible"
+  },
+  "teams": {
+    "team1": {
+      "jerseyColor": "color",
+      "identifiedPlayers": [{"number": "88", "description": "LSM/defender", "position": "defense"}]
+    },
+    "team2": {
+      "jerseyColor": "color",
+      "identifiedPlayers": []
+    }
+  },
+  "plays": [
+    {
+      "playId": "1",
+      "startTime": seconds,
+      "endTime": seconds,
+      "playType": "ground_ball" or "shot" or "clear" or "dodge",
+      "playerActions": [
+        {"time": seconds, "player": "white #88", "action": "ground ball", "outcome": "success"}
+      ],
+      "result": "clear" or "goal" or "turnover"
+    }
+  ],
+  "individualPerformance": [
+    {
+      "player": "white #88",
+      "stats": {"goals": 0, "assists": 0, "groundBalls": 0, "causedTurnovers": 0}
+    }
+  ],
+  "gameFlow": {
+    "keyMoments": [
+      {"time": seconds, "description": "what happened", "impact": "high/medium/low"}
+    ]
+  },
+  "tacticalObservations": {
+    "offensiveStrategies": ["observed patterns"],
+    "defensiveStrategies": ["observed patterns"],
+    "transitionPatterns": ["observed patterns"]
+  },
+  "coachingInsights": {
+    "strengths": ["what this player/team does well"],
+    "weaknesses": ["areas for improvement"],
+    "recommendations": ["tactical adjustments"]
+  }
 }
 
-For each play, track ONLY what you can see:
-- Passes (describe players by jersey color/number if visible)
-- Dodges (type and outcome if clear)
-- Shots (location and result)
-- Defensive actions (if visible)
-- Ground balls (if observable)
-- DO NOT make up formations or strategies you cannot see
-- DO NOT assume team names or player identities
-
-Be accurate, not creative. Only report observable facts.`;
+Focus on extracting 5-10 key plays with accurate timestamps.`;
 
 // Phase 2: Format extracted data into specific analysis types
 const PHASE2_FORMATTING_PROMPTS = {

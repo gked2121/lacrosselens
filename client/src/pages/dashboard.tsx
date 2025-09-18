@@ -11,6 +11,15 @@ import { Badge } from "@/components/ui/badge";
 import { Video, Users, Target, Clock, Download, Plus, Play, LoaderPinwheel, CloudUpload, Sparkles, TrendingUp, Activity, BarChart3, ArrowRight, Eye, Calendar, FileVideo, Zap, Trophy } from "lucide-react";
 import { Link } from "wouter";
 
+type DashboardVideo = {
+  id: number | string;
+  title: string;
+  status: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  thumbnailUrl?: string | null;
+};
+
 export default function Dashboard() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
@@ -35,7 +44,7 @@ export default function Dashboard() {
     retry: false,
   });
 
-  const { data: videos, isLoading: videosLoading } = useQuery({
+  const { data: videos, isLoading: videosLoading } = useQuery<DashboardVideo[]>({
     queryKey: ["/api/videos"],
     retry: false,
   });
@@ -48,7 +57,7 @@ export default function Dashboard() {
     );
   }
 
-  const recentVideos = Array.isArray(videos) ? videos.slice(0, 3) : [];
+  const recentVideos = videos?.slice(0, 3) ?? [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
@@ -281,41 +290,46 @@ export default function Dashboard() {
                   </div>
                 ) : recentVideos.length > 0 ? (
                   <div className="space-y-3">
-                    {recentVideos.map((video: any) => (
-                      <Link key={video.id} href={`/analysis/${video.id}`}>
-                        <div className="group flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-600">
-                          <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 flex items-center justify-center">
-                            {video.thumbnailUrl ? (
-                              <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" />
-                            ) : (
-                              <Video className="w-6 h-6 text-slate-500 dark:text-slate-400" />
-                            )}
-                            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                              <Play className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {recentVideos.map((video) => {
+                      const timestamp = video.createdAt ?? video.updatedAt;
+                      const formattedDate = timestamp
+                        ? new Date(timestamp).toLocaleDateString()
+                        : "—";
+
+                      return (
+                        <Link key={video.id} href={`/analysis/${video.id}`}>
+                          <div className="group flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-600">
+                            <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-700 flex items-center justify-center">
+                              {video.thumbnailUrl ? (
+                                <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <Video className="w-6 h-6 text-slate-500 dark:text-slate-400" />
+                              )}
+                              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                <Play className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate group-hover:text-primary transition-colors">
-                              {video.title}
-                            </h4>
-                            <div className="flex items-center gap-4 mt-1">
-                              <Badge 
-                                variant={video.status === 'completed' ? 'default' : video.status === 'processing' ? 'secondary' : 'destructive'}
-                                className="text-xs"
-                              >
-                                {video.status === 'completed' && '✓ Complete'}
-                                {video.status === 'processing' && '⏳ Processing'}
-                                {video.status === 'failed' && '✗ Failed'}
-                              </Badge>
-                              <span className="text-xs text-slate-500 dark:text-slate-400">
-                                {new Date(video.uploadedAt).toLocaleDateString()}
-                              </span>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate group-hover:text-primary transition-colors">
+                                {video.title}
+                              </h4>
+                              <div className="flex items-center gap-4 mt-1">
+                                <Badge
+                                  variant={video.status === 'completed' ? 'default' : video.status === 'processing' ? 'secondary' : 'destructive'}
+                                  className="text-xs"
+                                >
+                                  {video.status === 'completed' && '✓ Complete'}
+                                  {video.status === 'processing' && '⏳ Processing'}
+                                  {video.status === 'failed' && '✗ Failed'}
+                                </Badge>
+                                <span className="text-xs text-slate-500 dark:text-slate-400">{formattedDate}</span>
+                              </div>
                             </div>
+                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                           </div>
-                          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-12">

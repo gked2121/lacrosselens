@@ -1,0 +1,445 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LacrosseLens - AI-Powered Lacrosse Video Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#1E40AF',
+                    secondary: '#059669',
+                    accent: '#DC2626',
+                    success: '#10B981',
+                    warning: '#F59E0B'
+                },
+                fontFamily: {
+                    'inter': ['Inter', 'sans-serif']
+                }
+            }
+        }
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-inter">
+    <!-- @COMPONENT: Header Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-play text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">LacrosseLens</span>
+                    </div>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">Dashboard</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900">Videos</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900">Teams</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900">Analytics</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-upload mr-2"></i>Upload Video
+                    </button>
+                    <div class="relative">
+                        <!-- Profile image not guaranteed to be square, using object-fit: cover -->
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Profile" class="w-10 h-10 rounded-full object-cover cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: Header Navigation -->
+
+    <div class="flex min-h-screen">
+        <!-- @COMPONENT: Sidebar Navigation -->
+        <aside class="w-64 bg-white shadow-sm border-r border-gray-200 hidden lg:block">
+            <div class="p-6">
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Main</h3>
+                        <nav class="space-y-2">
+                            <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-primary bg-blue-50 rounded-lg">
+                                <i class="fas fa-chart-bar mr-3 w-5"></i>Dashboard
+                            </a>
+                            <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                <i class="fas fa-video mr-3 w-5"></i>Video Library
+                            </a>
+                            <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                <i class="fas fa-users mr-3 w-5"></i>Team Management
+                            </a>
+                        </nav>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Analysis</h3>
+                        <nav class="space-y-2">
+                            <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                <i class="fas fa-crosshairs mr-3 w-5"></i>Face-Off Analysis
+                            </a>
+                            <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                <i class="fas fa-running mr-3 w-5"></i>Transition Intelligence
+                            </a>
+                            <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                <i class="fas fa-user-friends mr-3 w-5"></i>Player Evaluation
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar Navigation -->
+
+        <!-- @COMPONENT: Main Content Area -->
+        <main class="flex-1 p-6">
+            <!-- @COMPONENT: Dashboard Header -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                        <p class="text-gray-600 mt-1">Welcome back, Coach! Here's your team's latest analysis.</p>
+                    </div>
+                    <div class="mt-4 sm:mt-0 flex space-x-3">
+                        <button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Export Report
+                        </button>
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>New Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: Dashboard Header -->
+
+            <!-- @COMPONENT: Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Videos Analyzed</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">247</p>
+                            <p class="text-sm text-success mt-1">
+                                <i class="fas fa-arrow-up mr-1"></i>12% this month
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-video text-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Players Evaluated</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">42</p>
+                            <p class="text-sm text-success mt-1">
+                                <i class="fas fa-arrow-up mr-1"></i>8% this month
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-friends text-secondary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Analysis Accuracy</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">92%</p>
+                            <p class="text-sm text-success mt-1">
+                                <i class="fas fa-arrow-up mr-1"></i>3% this month
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-bullseye text-success text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Hours Saved</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">186</p>
+                            <p class="text-sm text-success mt-1">
+                                <i class="fas fa-arrow-up mr-1"></i>24% this month
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clock text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: Stats Cards -->
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- @COMPONENT: Video Analysis Interface -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-semibold text-gray-900">Latest Analysis</h2>
+                                <span class="bg-success text-white text-xs px-2 py-1 rounded-full">Processing Complete</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">Championship Game vs. Trinity High School</p>
+                        </div>
+
+                        <!-- Video Player Area -->
+                        <div class="relative bg-gray-900 aspect-video">
+                            <!-- A lacrosse game in action showing players on a field with analysis overlay -->
+                            <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=675" alt="Lacrosse game analysis" class="w-full h-full object-cover">
+                            
+                            <!-- Video Controls Overlay -->
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                                <div class="flex items-center justify-between text-white">
+                                    <div class="flex items-center space-x-4">
+                                        <button class="hover:text-primary transition-colors">
+                                            <i class="fas fa-play text-xl"></i>
+                                        </button>
+                                        <span class="text-sm">12:34 / 45:21</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <button class="hover:text-primary transition-colors">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                        <button class="hover:text-primary transition-colors">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Progress Bar -->
+                                <div class="w-full bg-gray-600 h-1 rounded-full mt-3">
+                                    <div class="bg-primary h-1 rounded-full" style="width: 28%"></div>
+                                </div>
+                            </div>
+
+                            <!-- AI Analysis Overlay -->
+                            <div class="absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg max-w-xs">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                                    <span class="text-xs font-medium">AI Analysis Active</span>
+                                </div>
+                                <p class="text-xs">Transition detected at 12:32. Player #27 creating separation with downhill dodge.</p>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Insights -->
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">AI Analysis Insights</h3>
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-primary pl-4">
+                                    <h4 class="font-medium text-gray-900">Player Evaluation - #27</h4>
+                                    <p class="text-sm text-gray-600 mt-1">"This kid is a problem. He's a big, athletic righty who can play both attack and middie. Classic downhill dodger who uses his size to get to the middle of the field."</p>
+                                    <span class="inline-block mt-2 text-xs bg-blue-100 text-primary px-2 py-1 rounded">Timestamp: 12:32</span>
+                                </div>
+                                
+                                <div class="border-l-4 border-secondary pl-4">
+                                    <h4 class="font-medium text-gray-900">Face-Off Analysis</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Superior grip positioning and timing. 78% win rate projected based on technique analysis. Recommend maintaining current form.</p>
+                                    <span class="inline-block mt-2 text-xs bg-green-100 text-secondary px-2 py-1 rounded">Timestamp: 08:15</span>
+                                </div>
+
+                                <div class="border-l-4 border-warning pl-4">
+                                    <h4 class="font-medium text-gray-900">Transition Opportunity</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Fast-break opportunity identified. Defense showing vulnerability on weak side. Consider exploiting in future possessions.</p>
+                                    <span class="inline-block mt-2 text-xs bg-yellow-100 text-warning px-2 py-1 rounded">Timestamp: 18:42</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Video Analysis Interface -->
+
+                <!-- @COMPONENT: Right Sidebar -->
+                <div class="space-y-6">
+                    <!-- Upload New Video -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Upload</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-sm text-gray-600 mb-2">Drop video files here or click to browse</p>
+                            <p class="text-xs text-gray-500">Supports MP4, MOV, AVI up to 2GB</p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Or analyze from YouTube</label>
+                            <div class="flex">
+                                <input type="url" placeholder="Paste YouTube URL" class="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button class="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Analysis -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Analysis</h3>
+                        <div class="space-y-3">
+                            <!-- @MAP: recentAnalysis.map(analysis => ( -->
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                                <div class="w-12 h-8 bg-gray-300 rounded flex-shrink-0">
+                                    <!-- Video thumbnail placeholder -->
+                                    <i class="fas fa-play text-gray-600 text-xs flex items-center justify-center h-full"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate" data-bind="analysis.title">Practice Session 3/15</p>
+                                    <p class="text-xs text-gray-500" data-bind="analysis.date">2 hours ago</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-block w-2 h-2 bg-success rounded-full"></span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                                <div class="w-12 h-8 bg-gray-300 rounded flex-shrink-0">
+                                    <i class="fas fa-play text-gray-600 text-xs flex items-center justify-center h-full"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">Scrimmage vs. Oak Hill</p>
+                                    <p class="text-xs text-gray-500">1 day ago</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-block w-2 h-2 bg-success rounded-full"></span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                                <div class="w-12 h-8 bg-gray-300 rounded flex-shrink-0">
+                                    <i class="fas fa-spinner fa-spin text-warning text-xs flex items-center justify-center h-full"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">Conference Semi-Final</p>
+                                    <p class="text-xs text-gray-500">Processing...</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-block w-2 h-2 bg-warning rounded-full animate-pulse"></span>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                    </div>
+
+                    <!-- Team Performance -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Team Performance</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Face-Off Win %</span>
+                                    <span class="font-medium">68%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-secondary h-2 rounded-full" style="width: 68%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Transition Success</span>
+                                    <span class="font-medium">74%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full" style="width: 74%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Shot Accuracy</span>
+                                    <span class="font-medium">82%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-success h-2 rounded-full" style="width: 82%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Right Sidebar -->
+            </div>
+
+            <!-- @COMPONENT: Mobile Upload Button (Fixed Position) -->
+            <div class="fixed bottom-6 right-6 lg:hidden">
+                <button class="bg-primary text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                    <i class="fas fa-plus text-xl"></i>
+                </button>
+            </div>
+            <!-- @END_COMPONENT: Mobile Upload Button -->
+        </main>
+        <!-- @END_COMPONENT: Main Content Area -->
+    </div>
+
+    <!-- @COMPONENT: Mobile Navigation Menu -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="grid grid-cols-4 py-2">
+            <button class="flex flex-col items-center py-2 text-primary">
+                <i class="fas fa-chart-bar text-xl mb-1"></i>
+                <span class="text-xs">Dashboard</span>
+            </button>
+            <button class="flex flex-col items-center py-2 text-gray-600">
+                <i class="fas fa-video text-xl mb-1"></i>
+                <span class="text-xs">Videos</span>
+            </button>
+            <button class="flex flex-col items-center py-2 text-gray-600">
+                <i class="fas fa-users text-xl mb-1"></i>
+                <span class="text-xs">Teams</span>
+            </button>
+            <button class="flex flex-col items-center py-2 text-gray-600">
+                <i class="fas fa-cog text-xl mb-1"></i>
+                <span class="text-xs">Settings</span>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Mobile Navigation Menu -->
+
+    <script>
+        // Encapsulated JavaScript for UI interactions
+        (function() {
+            // TODO: Implement Gemini Pro 2.5 API integration for video analysis
+            // TODO: Implement PostgreSQL database connections for user data
+            // TODO: Implement video upload and processing functionality
+            // TODO: Implement user authentication and session management
+            
+            // Simple UI interactions for demo purposes
+            document.addEventListener('DOMContentLoaded', function() {
+                // File upload drag and drop simulation
+                const uploadArea = document.querySelector('.border-dashed');
+                if (uploadArea) {
+                    uploadArea.addEventListener('click', function() {
+                        // TODO: Implement actual file upload functionality
+                        console.log('File upload clicked - integrate with backend');
+                    });
+                }
+
+                // Video player controls simulation
+                const playButton = document.querySelector('.fa-play');
+                if (playButton) {
+                    playButton.addEventListener('click', function() {
+                        // TODO: Implement video player controls
+                        console.log('Video play clicked - integrate video player');
+                    });
+                }
+
+                // Analysis item clicks
+                const analysisItems = document.querySelectorAll('.bg-gray-50');
+                analysisItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // TODO: Navigate to detailed analysis view
+                        console.log('Analysis item clicked - navigate to details');
+                    });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

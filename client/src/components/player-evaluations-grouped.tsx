@@ -20,7 +20,7 @@ interface PlayerEvaluation {
 
 interface PlayerEvaluationsGroupedProps {
   evaluations: PlayerEvaluation[];
-  formatTimestamp: (timestamp: number) => string;
+  formatTimestamp: (timestamp: number | null | undefined) => string;
 }
 
 export default function PlayerEvaluationsGrouped({ 

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import type { Analysis, Video } from "@shared/schema";
 import { 
   Users, 
   Trophy,
@@ -27,15 +28,23 @@ import {
   Zap
 } from "lucide-react";
 
-interface PlayerEvaluation {
-  id: number;
-  videoId: number;
-  videoTitle: string;
-  type: string;
-  content: string;
-  timestamp: number;
-  confidence: number;
-  metadata?: any;
+type PlayerEvaluationRecord = Analysis & { videoTitle: string };
+
+interface PlayerAccumulator {
+  player: string;
+  evaluations: PlayerEvaluationRecord[];
+  totalClips: number;
+  confidenceSum: number;
+  videos: Set<string>;
+}
+
+interface PlayerAggregate {
+  player: string;
+  evaluations: PlayerEvaluationRecord[];
+  totalClips: number;
+  avgConfidence: number;
+  videoCount: number;
+  videos: string[];
 }
 
 export default function PlayerEvaluation() {
@@ -57,30 +66,40 @@ export default function PlayerEvaluation() {
   }, [isAuthenticated, authLoading, toast]);
 
   // Fetch all videos
-  const { data: videos, isLoading: videosLoading } = useQuery({
+  const { data: videos = [], isLoading: videosLoading } = useQuery<Video[]>({
     queryKey: ["/api/videos"],
     retry: false,
   });
 
   // Fetch all player evaluations from all videos
-  const { data: allEvaluations, isLoading: evaluationsLoading } = useQuery({
+  const { data: allEvaluations = [], isLoading: evaluationsLoading } = useQuery<PlayerEvaluationRecord[]>({
     queryKey: ["/api/videos/all-evaluations"],
-    enabled: !!videos && (videos as any[]).length > 0,
+    enabled: videos.length > 0,
     queryFn: async () => {
-      // Fetch evaluations for all completed videos
-      const completedVideos = (videos as any[]).filter(v => v.status === 'completed');
-      const evaluationPromises = completedVideos.map(video => 
-        fetch(`/api/videos/${video.id}/analyses`, { credentials: 'include' })
-          .then(res => res.json())
-          .then(analyses => analyses
-            .filter((a: any) => a.type === 'player_evaluation')
-            .map((a: any) => ({ ...a, videoTitle: video.title }))
-          )
-      );
-      
+      const completedVideos = videos.filter((video) => video.status === 'completed');
+
+      const evaluationPromises = completedVideos.map(async (video) => {
+        const response = await fetch(`/api/videos/${video.id}/analyses`, {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to load analyses for video ${video.id}`);
+        }
+
+        const analyses: Analysis[] = await response.json();
+
+        return analyses
+          .filter((analysis): analysis is Analysis => analysis.type === 'player_evaluation')
+          .map((analysis) => ({
+            ...analysis,
+            videoTitle: video.title,
+          }));
+      });
+
       const results = await Promise.all(evaluationPromises);
       return results.flat();
-    }
+    },
   });
 
   if (authLoading || videosLoading || evaluationsLoading) {
@@ -96,42 +115,50 @@ export default function PlayerEvaluation() {
   }
 
   // Group evaluations by player
-  const playerGroups = (allEvaluations as PlayerEvaluation[] || []).reduce((acc: any, evaluation: PlayerEvaluation) => {
-    // Extract player identifier from content
-    const playerMatch = evaluation.content.match(/(?:Player\s+)?#?(\d+)|(\w+\s+Team\s+(?:Player|Member))/);
+  const playerGroups = allEvaluations.reduce<Record<string, PlayerAccumulator>>((acc, evaluation) => {
+    const playerMatch = evaluation.content.match(
+      /(?:Player\s+)?#?(\d+)|(\w+\s+Team\s+(?:Player|Member))/,
+    );
     const playerKey = playerMatch ? playerMatch[0] : 'Unknown Player';
-    
+
     if (!acc[playerKey]) {
       acc[playerKey] = {
         player: playerKey,
         evaluations: [],
         totalClips: 0,
-        avgConfidence: 0,
-        videos: new Set()
+        confidenceSum: 0,
+        videos: new Set<string>(),
       };
     }
-    
-    acc[playerKey].evaluations.push(evaluation);
-    acc[playerKey].totalClips++;
-    acc[playerKey].videos.add(evaluation.videoTitle);
-    
+
+    const accumulator = acc[playerKey];
+    accumulator.evaluations.push(evaluation);
+    accumulator.totalClips += 1;
+    accumulator.confidenceSum += evaluation.confidence ?? 0;
+    accumulator.videos.add(evaluation.videoTitle);
+
     return acc;
   }, {});
 
   // Calculate averages and sort by clip count
-  const sortedPlayers = Object.values(playerGroups)
-    .map((group: any) => ({
-      ...group,
-      avgConfidence: Math.round(
-        group.evaluations.reduce((sum: number, e: PlayerEvaluation) => sum + e.confidence, 0) / group.evaluations.length
-      ),
+  const sortedPlayers: PlayerAggregate[] = Object.values(playerGroups)
+    .map((group) => ({
+      player: group.player,
+      evaluations: group.evaluations,
+      totalClips: group.totalClips,
+      avgConfidence: group.evaluations.length
+        ? Math.round(group.confidenceSum / group.evaluations.length)
+        : 0,
       videoCount: group.videos.size,
-      videos: Array.from(group.videos)
+      videos: Array.from(group.videos),
     }))
-    .sort((a: any, b: any) => b.totalClips - a.totalClips);
+    .sort((a, b) => b.totalClips - a.totalClips);
 
   // Format timestamp helper
-  const formatTimestamp = (seconds: number) => {
+  const formatTimestamp = (seconds: number | null | undefined) => {
+    if (typeof seconds !== 'number') {
+      return '0:00';
+    }
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -188,7 +215,7 @@ export default function PlayerEvaluation() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Evaluations</p>
                     <p className="text-2xl font-bold">
-                      {sortedPlayers.reduce((sum: number, p: any) => sum + p.totalClips, 0)}
+                      {sortedPlayers.reduce((sum, player) => sum + player.totalClips, 0)}
                     </p>
                   </div>
                   <BarChart3 className="w-8 h-8 text-primary opacity-20" />
@@ -215,7 +242,8 @@ export default function PlayerEvaluation() {
                     <p className="text-sm text-muted-foreground">Avg Confidence</p>
                     <p className="text-2xl font-bold">
                       {Math.round(
-                        sortedPlayers.reduce((sum: number, p: any) => sum + p.avgConfidence, 0) / sortedPlayers.length
+                        sortedPlayers.reduce((sum, player) => sum + player.avgConfidence, 0) /
+                          sortedPlayers.length
                       )}%
                     </p>
                   </div>
@@ -237,7 +265,7 @@ export default function PlayerEvaluation() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {sortedPlayers.slice(0, 3).map((player: any, index: number) => (
+                {sortedPlayers.slice(0, 3).map((player, index) => (
                   <div key={player.player} className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
@@ -269,7 +297,7 @@ export default function PlayerEvaluation() {
 
           {sortedPlayers.length > 0 ? (
             <div className="space-y-4">
-              {sortedPlayers.map((player: any) => (
+              {sortedPlayers.map((player) => (
                 <Card key={player.player} className="shadow-soft hover:shadow-glow transition-all">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">

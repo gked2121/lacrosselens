@@ -272,11 +272,7 @@ export function GameAnalysisClean({ video, analyses, formatTimestamp }: GameAnal
           </div>
           
           <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-xl p-6">
-            <DetailedAnalysisView 
-              videoId={video.id}
-              playerEvaluations={playerEvaluations}
-              formatTimestamp={formatTimestamp}
-            />
+            <DetailedAnalysisView videoId={video.id} />
           </div>
         </section>
       )}

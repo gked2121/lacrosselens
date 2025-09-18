@@ -365,11 +365,7 @@ export function GameAnalysisModern({ video, analyses, formatTimestamp }: GameAna
         {/* Advanced Metrics Tab */}
         <TabsContent value="metrics" className="space-y-4">
           {playerEvaluations.length > 0 ? (
-            <DetailedAnalysisView 
-              videoId={video.id}
-              playerEvaluations={playerEvaluations}
-              formatTimestamp={formatTimestamp}
-            />
+            <DetailedAnalysisView videoId={video.id} />
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">

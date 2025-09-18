@@ -19,7 +19,49 @@ interface EnhancedAnalysisData {
   transitionDetails?: any[];
 }
 
+type SkillRatings = {
+  dodging: number;
+  shooting: number;
+  passing: number;
+  groundBalls: number;
+  defense: number;
+  offBall: number;
+  iq: number;
+  athleticism: number;
+};
+
+interface ExtractedPlayerInfo {
+  identifier: string | null;
+  jerseyNumber: string | null;
+  teamColor: string | null;
+  position: string | null;
+}
+
 export class EnhancedAnalysisProcessor {
+  private static toDecimalString(value: unknown, fallback = 0): string {
+    const numeric = typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+      ? Number.parseFloat(value)
+      : fallback;
+
+    const safeValue = Number.isFinite(numeric) ? numeric : fallback;
+    return safeValue.toFixed(2);
+  }
+
+  private static toOptionalDecimalString(value: unknown): string | null {
+    if (value === undefined || value === null) {
+      return null;
+    }
+
+    const numeric = typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+      ? Number.parseFloat(value)
+      : NaN;
+
+    return Number.isFinite(numeric) ? numeric.toFixed(2) : null;
+  }
   /**
    * Process and store enhanced analysis data with detailed categorization
    */
@@ -98,16 +140,25 @@ export class EnhancedAnalysisProcessor {
     ];
     
     jerseyPatterns.forEach(pattern => {
-      const matches = content.matchAll(pattern);
-      for (const match of matches) {
+      Array.from(content.matchAll(pattern)).forEach(match => {
         if (match[1] && match[2]) {
           identifiers.add(`#${match[1]} ${match[2]}`);
         } else if (match[2] && match[1]) {
           identifiers.add(`#${match[2]} ${match[1]}`);
         }
-      }
+      });
     });
-    
+
+    positionPatterns.forEach(pattern => {
+      Array.from(content.matchAll(pattern)).forEach(match => {
+        const position = match[1] || match[2];
+        const number = match[2] || match[1];
+        if (position && number) {
+          identifiers.add(`#${number} ${position}`);
+        }
+      });
+    });
+
     return Array.from(identifiers);
   }
 
@@ -173,7 +224,7 @@ export class EnhancedAnalysisProcessor {
           passingSkill: this.averageSkill(existing.passingSkill, skills.passing),
           groundBallSkill: this.averageSkill(existing.groundBallSkill, skills.groundBalls),
           defenseSkill: this.averageSkill(existing.defenseSkill, skills.defense),
-          offBallMovement: this.averageSkill(existing.offBallSkill, skills.offBall),
+          offBallMovement: this.averageSkill(existing.offBallMovement, skills.offBall),
           lacrosseIQ: this.averageSkill(existing.lacrosseIQ, skills.iq),
           updatedAt: new Date(),
         })
@@ -195,7 +246,7 @@ export class EnhancedAnalysisProcessor {
     const [playEvent] = await db.insert(playEvents).values({
       videoId,
       analysisId,
-      startTimestamp: timestamp || 0,
+      startTimestamp: this.toDecimalString(timestamp),
       eventType: 'faceoff',
       eventSubtype: this.extractFaceoffType(content),
       fieldZone: 'midfield',
@@ -244,8 +295,8 @@ export class EnhancedAnalysisProcessor {
     const [playEvent] = await db.insert(playEvents).values({
       videoId,
       analysisId,
-      startTimestamp: timestamp || 0,
-      endTimestamp: metadata?.endTimestamp,
+      startTimestamp: this.toDecimalString(timestamp),
+      endTimestamp: this.toOptionalDecimalString(metadata?.endTimestamp),
       eventType: 'transition',
       eventSubtype: metadata?.transitionType || 'clear',
       fieldZone: this.extractFieldZone(content),
@@ -274,8 +325,10 @@ export class EnhancedAnalysisProcessor {
       fieldSpacing: transitionInfo.fieldSpacing,
       successful: transitionInfo.successful,
       resultingOpportunity: transitionInfo.resultingOpportunity,
-      timeToComplete: transitionInfo.timeToComplete,
-      expectedSuccessRate: metadata?.clearingSuccess || metadata?.ridingSuccess,
+      timeToComplete: this.toOptionalDecimalString(transitionInfo.timeToComplete),
+      expectedSuccessRate: this.toOptionalDecimalString(
+        metadata?.clearingSuccess ?? metadata?.ridingSuccess,
+      ),
       executionQuality: this.calculateExecutionQuality(content),
     });
   }
@@ -296,7 +349,7 @@ export class EnhancedAnalysisProcessor {
     const [playEvent] = await db.insert(playEvents).values({
       videoId,
       analysisId,
-      startTimestamp: timestamp || 0,
+      startTimestamp: this.toDecimalString(timestamp),
       eventType: momentType,
       eventSubtype: this.extractEventSubtype(content, momentType),
       fieldZone: this.extractFieldZone(content),
@@ -315,7 +368,7 @@ export class EnhancedAnalysisProcessor {
   }
 
   // Helper methods for extraction and calculation
-  private static extractPlayerInfo(content: string, metadata: any): any {
+  private static extractPlayerInfo(content: string, metadata: any): ExtractedPlayerInfo {
     const jerseyMatch = content.match(/#(\d{1,2})\s+(white|dark|blue|red|green|yellow|orange|black|navy|maroon)/i) ||
                        content.match(/(white|dark|blue|red|green|yellow|orange|black|navy|maroon)\s+#(\d{1,2})/i);
     
@@ -329,9 +382,9 @@ export class EnhancedAnalysisProcessor {
     };
   }
 
-  private static extractSkillRatings(content: string): any {
+  private static extractSkillRatings(content: string): SkillRatings {
     // Extract skill ratings from content analysis
-    const skills = {
+    const skills: SkillRatings = {
       dodging: 70,
       shooting: 70,
       passing: 70,
@@ -375,8 +428,9 @@ export class EnhancedAnalysisProcessor {
     return skills;
   }
 
-  private static calculateOverallRating(skills: any): string {
-    const avg = Object.values(skills).reduce((a: number, b: number) => a + b, 0) / Object.values(skills).length;
+  private static calculateOverallRating(skills: SkillRatings): string {
+    const values = Object.values(skills);
+    const avg = values.reduce((total, value) => total + value, 0) / values.length;
     if (avg >= 85) return "4.5";
     if (avg >= 75) return "4.0";
     if (avg >= 65) return "3.5";
@@ -384,7 +438,7 @@ export class EnhancedAnalysisProcessor {
     return "2.5";
   }
 
-  private static calculatePotentialRating(content: string, skills: any): string {
+  private static calculatePotentialRating(content: string, skills: SkillRatings): string {
     let potential = parseFloat(this.calculateOverallRating(skills));
     
     // Increase potential based on positive indicators
@@ -417,7 +471,9 @@ export class EnhancedAnalysisProcessor {
   }
 
   private static averageSkill(existing: number | null, newValue: number): number {
-    if (!existing) return newValue;
+    if (existing === null || existing === undefined) {
+      return newValue;
+    }
     return Math.round((existing + newValue) / 2);
   }
 
@@ -538,7 +594,7 @@ export class EnhancedAnalysisProcessor {
     return db.insert(playEvents).values({
       videoId,
       analysisId,
-      startTimestamp: timestamp || 0,
+      startTimestamp: this.toDecimalString(timestamp),
       eventType: 'evaluation',
       primaryPlayerId: playerId,
       confidence: 85,

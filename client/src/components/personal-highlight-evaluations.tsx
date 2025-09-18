@@ -20,7 +20,7 @@ interface PlayerEvaluation {
 
 interface PersonalHighlightEvaluationsProps {
   evaluations: PlayerEvaluation[];
-  formatTimestamp: (timestamp: number) => string;
+  formatTimestamp: (timestamp: number | null | undefined) => string;
   playerName?: string; // e.g., "Dylan"
 }
 

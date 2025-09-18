@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerEvaluationsGrouped from "@/components/player-evaluations-grouped";
 import PersonalHighlightEvaluations from "@/components/personal-highlight-evaluations";
 import { DetailedAnalysisView } from "@/components/detailed-analysis-view";
+import type { Analysis } from "@shared/schema";
 import { 
   Trophy,
   Users,
@@ -16,32 +17,93 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-  Info,
-  FileText,
-  Target
+  Info
 } from "lucide-react";
 import { useState } from "react";
 
+type MetadataRecord = Record<string, unknown>;
+
+const getMetadataNumber = (
+  metadata: Analysis["metadata"],
+  key: string,
+): number | undefined => {
+  if (metadata && typeof metadata === "object") {
+    const value = (metadata as MetadataRecord)[key];
+    if (typeof value === "number") {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+const getMetadataString = (
+  metadata: Analysis["metadata"],
+  key: string,
+): string | undefined => {
+  if (metadata && typeof metadata === "object") {
+    const value = (metadata as MetadataRecord)[key];
+    if (typeof value === "string") {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+interface VideoSummary {
+  id: number;
+  title?: string | null;
+  metadata?: {
+    videoType?: string | null;
+  } | null;
+}
+
 interface GameAnalysisProps {
-  video: any;
-  analyses: any[];
-  formatTimestamp: (seconds: number | null) => string | null;
+  video: VideoSummary;
+  analyses: Analysis[];
+  formatTimestamp: (seconds: number | null) => string;
 }
 
 export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisProps) {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    () => new Set(["overall", "players"]),
+  );
 
-  const overallAnalysis = analyses?.find(a => a.type === 'overall');
-  const playerEvaluations = analyses?.filter(a => a.type === 'player_evaluation') || [];
-  const faceOffAnalyses = analyses?.filter(a => a.type === 'face_off') || [];
-  const transitionAnalyses = analyses?.filter(a => a.type === 'transition') || [];
-  const keyMoments = analyses?.filter(a => a.type === 'key_moment') || [];
+  const overallAnalysis = analyses.find((analysis) => analysis.type === "overall");
+  const playerEvaluations = analyses.filter(
+    (analysis): analysis is Analysis => analysis.type === "player_evaluation",
+  );
+  const faceOffAnalyses = analyses.filter(
+    (analysis): analysis is Analysis => analysis.type === "face_off",
+  );
+  const transitionAnalyses = analyses.filter(
+    (analysis): analysis is Analysis => analysis.type === "transition",
+  );
+  const keyMoments = analyses.filter(
+    (analysis): analysis is Analysis => analysis.type === "key_moment",
+  );
+
+  const timestampedAnalyses = analyses.filter(
+    (analysis): analysis is Analysis & { timestamp: number } =>
+      typeof analysis.timestamp === "number",
+  );
+
+  const timeSpan = timestampedAnalyses.length
+    ? {
+        earliest: Math.min(...timestampedAnalyses.map((analysis) => analysis.timestamp)),
+        latest: Math.max(...timestampedAnalyses.map((analysis) => analysis.timestamp)),
+      }
+    : null;
 
   // Extract real game metrics from our data
   const gameMetrics = {
     totalPlayers: playerEvaluations.length,
     avgPlayerConfidence: playerEvaluations.length > 0 
-      ? Math.round(playerEvaluations.reduce((sum, p) => sum + p.confidence, 0) / playerEvaluations.length)
+      ? Math.round(
+          playerEvaluations.reduce(
+            (sum, evaluation) => sum + (evaluation.confidence ?? 0),
+            0,
+          ) / playerEvaluations.length
+        )
       : 0,
     totalFaceoffs: faceOffAnalyses.length,
     faceoffWinRate: faceOffAnalyses.length > 0 
@@ -61,14 +123,11 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
       : 0,
     eliteMoments: keyMoments.length,
     gameIntensity: keyMoments.length > 8 ? 'Elite' : keyMoments.length > 4 ? 'High' : keyMoments.length > 1 ? 'Medium' : 'Low',
-    timeSpan: analyses.length > 0 ? {
-      earliest: Math.min(...analyses.filter(a => a.timestamp).map(a => a.timestamp)),
-      latest: Math.max(...analyses.filter(a => a.timestamp).map(a => a.timestamp))
-    } : null
+    timeSpan,
   };
 
   // Extract team data from player evaluations
-  const teamData = playerEvaluations.reduce((acc, player) => {
+  const teamData = playerEvaluations.reduce<Record<string, Analysis[]>>((acc, player) => {
     const isWhiteTeam = player.content.toLowerCase().includes('white') || 
                        player.content.toLowerCase().includes('light') ||
                        player.content.toLowerCase().includes('#1 ') ||
@@ -79,7 +138,7 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
     if (!acc[teamKey]) acc[teamKey] = [];
     acc[teamKey].push(player);
     return acc;
-  }, {} as Record<string, any[]>);
+  }, {});
 
   // Extract goals and scoring from key moments
   const scoringData = keyMoments.filter(moment => 
@@ -214,24 +273,39 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                 Team Performance Breakdown
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(teamData).map(([teamKey, players]) => (
-                  <div key={teamKey} className={`p-4 rounded-lg border ${
-                    teamKey === 'white' 
-                      ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-700'
-                      : 'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-700'
-                  }`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`w-3 h-3 rounded-full ${
-                        teamKey === 'white' ? 'bg-gray-400' : 'bg-slate-600'
-                      }`}></div>
-                      <span className="font-medium capitalize">{teamKey} Team</span>
-                      <Badge variant="outline">{players.length} players</Badge>
+                {Object.entries(teamData).map(([teamKey, teamPlayers]) => {
+                  const totalConfidence = teamPlayers.reduce(
+                    (sum, player) => sum + (player.confidence ?? 0),
+                    0,
+                  );
+                  const averageConfidence = teamPlayers.length
+                    ? Math.round(totalConfidence / teamPlayers.length)
+                    : 0;
+
+                  return (
+                    <div
+                      key={teamKey}
+                      className={`p-4 rounded-lg border ${
+                        teamKey === 'white'
+                          ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-700'
+                          : 'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            teamKey === 'white' ? 'bg-gray-400' : 'bg-slate-600'
+                          }`}
+                        ></div>
+                        <span className="font-medium capitalize">{teamKey} Team</span>
+                        <Badge variant="outline">{teamPlayers.length} players</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Avg Confidence: {averageConfidence}%
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Avg Confidence: {Math.round(players.reduce((sum, p) => sum + p.confidence, 0) / players.length)}%
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -316,10 +390,10 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                     </p>
                     <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t flex flex-wrap items-center gap-2 sm:gap-4">
                       <Badge variant="outline" className="text-xs">
-                        Confidence: {overallAnalysis.confidence}%
+                        Confidence: {overallAnalysis.confidence ?? 0}%
                       </Badge>
                       <Badge variant="outline" className="text-xs">
-                        Analysis Method: {overallAnalysis.metadata?.analysisMethod || 'Standard'}
+                        Analysis Method: {getMetadataString(overallAnalysis.metadata, 'analysisMethod') || 'Standard'}
                       </Badge>
                     </div>
                   </div>
@@ -343,7 +417,7 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                           return (
                             <PersonalHighlightEvaluations
                               evaluations={playerEvaluations}
-                              formatTimestamp={formatTimestamp as (timestamp: number) => string}
+                              formatTimestamp={formatTimestamp}
                               playerName={playerName}
                             />
                           );
@@ -353,7 +427,7 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                       /* Regular team game analysis */
                       <PlayerEvaluationsGrouped 
                         evaluations={playerEvaluations}
-                        formatTimestamp={formatTimestamp as (timestamp: number) => string}
+                        formatTimestamp={formatTimestamp}
                       />
                     )}
                   </div>
@@ -362,23 +436,29 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                 {/* Face-off Analysis */}
                 {section.id === 'faceoffs' && (
                   <div className="space-y-3 sm:space-y-4">
-                    {faceOffAnalyses.map((faceoff: any, index: number) => (
-                      <Card key={faceoff.id} className="shadow-sm hover:shadow-md transition-all">
+                    {faceOffAnalyses.map((faceoff, index) => {
+                      const winProbability = getMetadataNumber(
+                        faceoff.metadata,
+                        "winProbability",
+                      );
+
+                      return (
+                        <Card key={faceoff.id} className="shadow-sm hover:shadow-md transition-all">
                         <CardHeader className="p-3 sm:p-6">
                           <CardTitle className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <span>Face-off #{index + 1}</span>
                             <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                              {faceoff.metadata?.winProbability && (
-                                <Badge 
+                              {typeof winProbability === 'number' && (
+                                <Badge
                                   className={`text-xs ${
-                                    faceoff.metadata.winProbability >= 70 
-                                      ? 'bg-green-500 text-white' 
-                                      : faceoff.metadata.winProbability >= 50 
-                                      ? 'bg-amber-500 text-white' 
+                                    winProbability >= 70
+                                      ? 'bg-green-500 text-white'
+                                      : winProbability >= 50
+                                      ? 'bg-amber-500 text-white'
                                       : 'bg-red-500 text-white'
                                   }`}
                                 >
-                                  {faceoff.metadata.winProbability}% win probability
+                                  {winProbability}% win probability
                                 </Badge>
                               )}
                               <Badge variant="outline" className="text-xs">
@@ -399,31 +479,38 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                             </div>
                           )}
                         </CardContent>
-                      </Card>
-                    ))}
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
 
                 {/* Transition Analysis */}
                 {section.id === 'transitions' && (
                   <div className="space-y-3 sm:space-y-4">
-                    {transitionAnalyses.map((transition: any, index: number) => (
-                      <Card key={transition.id} className="shadow-sm hover:shadow-md transition-all">
+                    {transitionAnalyses.map((transition, index) => {
+                      const successProbability = getMetadataNumber(
+                        transition.metadata,
+                        "successProbability",
+                      );
+
+                      return (
+                        <Card key={transition.id} className="shadow-sm hover:shadow-md transition-all">
                         <CardHeader className="p-3 sm:p-6">
                           <CardTitle className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <span>Transition #{index + 1}</span>
                             <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                              {transition.metadata?.successProbability && (
-                                <Badge 
+                              {typeof successProbability === 'number' && (
+                                <Badge
                                   className={`text-xs ${
-                                    transition.metadata.successProbability >= 70 
-                                      ? 'bg-green-500 text-white' 
-                                      : transition.metadata.successProbability >= 50 
-                                      ? 'bg-amber-500 text-white' 
+                                    successProbability >= 70
+                                      ? 'bg-green-500 text-white'
+                                      : successProbability >= 50
+                                      ? 'bg-amber-500 text-white'
                                       : 'bg-red-500 text-white'
                                   }`}
                                 >
-                                  {transition.metadata.successProbability}% success rate
+                                  {successProbability}% success rate
                                 </Badge>
                               )}
                               <Badge variant="outline" className="text-xs">
@@ -444,16 +531,20 @@ export function GameAnalysis({ video, analyses, formatTimestamp }: GameAnalysisP
                             </div>
                           )}
                         </CardContent>
-                      </Card>
-                    ))}
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
 
                 {/* Key Moments */}
                 {section.id === 'moments' && (
                   <div className="space-y-3 sm:space-y-4">
-                    {keyMoments.map((moment: any, index: number) => (
-                      <div key={moment.id} className="p-3 sm:p-4 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
+                    {keyMoments.map((moment, index) => (
+                      <div
+                        key={moment.id}
+                        className="p-3 sm:p-4 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800"
+                      >
                         <div className="flex items-start gap-2 sm:gap-3">
                           <div className="flex-shrink-0">
                             <Sparkles className="w-5 h-5 text-orange-600 mt-0.5" />

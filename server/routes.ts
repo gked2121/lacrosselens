@@ -3,10 +3,65 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { upload, processVideoUpload, processYouTubeVideo } from "./services/videoProcessor";
-import { insertVideoSchema, insertTeamSchema, insertPlayerSchema } from "@shared/schema";
+import {
+  insertVideoSchema,
+  insertTeamSchema,
+  insertPlayerSchema,
+  type Analysis,
+} from "@shared/schema";
 import * as path from "path";
 import * as fs from "fs";
 import analyticsRouter from "./routes/analytics";
+import type { LacrosseAnalysis } from "./services/gemini";
+
+const isMetadataRecord = (
+  metadata: Analysis["metadata"],
+): metadata is Record<string, unknown> =>
+  metadata !== null && typeof metadata === "object";
+
+const getMetadataNumber = (
+  metadata: Analysis["metadata"],
+  key: string,
+): number | undefined => {
+  if (isMetadataRecord(metadata)) {
+    const value = metadata[key];
+    if (typeof value === "number") {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+const getMetadataString = (
+  metadata: Analysis["metadata"],
+  key: string,
+): string | undefined => {
+  if (isMetadataRecord(metadata)) {
+    const value = metadata[key];
+    if (typeof value === "string") {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+interface AggregatedPlayerMetrics {
+  playerName: string;
+  totalClips: number;
+  totalVideos: Set<number>;
+  averageConfidence: number;
+  totalActions: Record<string, number>;
+  skillsObserved: Set<string>;
+  videoAppearances: Array<{
+    videoId: number;
+    videoTitle: string;
+    clipCount: number;
+    timeRange: unknown;
+    confidence: number;
+  }>;
+  positions: Set<string>;
+  teams: Set<string>;
+}
 
 // Helper function to calculate average confidence from analyses
 async function calculateAverageConfidence(videoIds: number[]): Promise<number> {
@@ -298,40 +353,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { DetailedAnalysisExtractor } = await import("./services/detailedAnalysisExtractor");
       
       // Reconstruct the LacrosseAnalysis format from database analyses
-      const lacrosseAnalysis = {
-        overallAnalysis: analyses.find(a => a.type === 'overall')?.content || '',
+      const lacrosseAnalysis: LacrosseAnalysis = {
+        overallAnalysis: analyses.find((analysis) => analysis.type === 'overall')?.content || '',
         playerEvaluations: analyses
-          .filter(a => a.type === 'player_evaluation')
-          .map(a => ({
-            playerNumber: (a.metadata?.playerNumber as string) || undefined,
-            evaluation: a.content,
-            timestamp: a.timestamp || 0,
-            confidence: a.confidence || 0
+          .filter((analysis) => analysis.type === 'player_evaluation')
+          .map((analysis) => ({
+            playerNumber: getMetadataString(analysis.metadata, 'playerNumber'),
+            evaluation: analysis.content,
+            timestamp: analysis.timestamp ?? 0,
+            confidence: analysis.confidence ?? 0,
           })),
         faceOffAnalysis: analyses
-          .filter(a => a.type === 'face_off')
-          .map(a => ({
-            analysis: a.content,
-            timestamp: a.timestamp || 0,
-            winProbability: (a.metadata?.winProbability as number) || undefined,
-            confidence: a.confidence
+          .filter((analysis) => analysis.type === 'face_off')
+          .map((analysis) => ({
+            analysis: analysis.content,
+            timestamp: analysis.timestamp ?? 0,
+            winProbability: getMetadataNumber(analysis.metadata, 'winProbability'),
+            confidence: analysis.confidence ?? 0,
           })),
         transitionAnalysis: analyses
-          .filter(a => a.type === 'transition')
-          .map(a => ({
-            analysis: a.content,
-            timestamp: a.timestamp || 0,
-            successProbability: (a.metadata?.successProbability as number) || undefined,
-            confidence: a.confidence
+          .filter((analysis) => analysis.type === 'transition')
+          .map((analysis) => ({
+            analysis: analysis.content,
+            timestamp: analysis.timestamp ?? 0,
+            successProbability: getMetadataNumber(analysis.metadata, 'successProbability'),
+            confidence: analysis.confidence ?? 0,
           })),
         keyMoments: analyses
-          .filter(a => a.type === 'key_moment')
-          .map(a => ({
-            description: a.content,
-            timestamp: a.timestamp || 0,
-            type: (a.metadata?.momentType as string) || 'general',
-            confidence: a.confidence
-          }))
+          .filter((analysis) => analysis.type === 'key_moment')
+          .map((analysis) => ({
+            description: analysis.content,
+            timestamp: analysis.timestamp ?? 0,
+            type: getMetadataString(analysis.metadata, 'momentType') || 'general',
+            confidence: analysis.confidence ?? 0,
+          })),
       };
       
       // Extract detailed metrics
@@ -351,7 +406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const videos = await storage.getUserVideos(userId);
       
       // Get all player evaluations across all videos
-      const playerStatsMap = new Map<string, any>();
+      const playerStatsMap = new Map<string, AggregatedPlayerMetrics>();
       
       for (const video of videos.filter(v => v.status === 'completed')) {
         const analyses = await storage.getVideoAnalyses(video.id);
@@ -361,17 +416,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { DetailedAnalysisExtractor } = await import("./services/detailedAnalysisExtractor");
         
         // Reconstruct the LacrosseAnalysis format
-        const lacrosseAnalysis = {
+        const lacrosseAnalysis: LacrosseAnalysis = {
           overallAnalysis: '',
-          playerEvaluations: playerEvaluations.map(a => ({
-            playerNumber: (a.metadata?.playerNumber as string) || undefined,
-            evaluation: a.content,
-            timestamp: a.timestamp || 0,
-            confidence: a.confidence || 0
+          playerEvaluations: playerEvaluations.map((analysis) => ({
+            playerNumber: getMetadataString(analysis.metadata, 'playerNumber'),
+            evaluation: analysis.content,
+            timestamp: analysis.timestamp ?? 0,
+            confidence: analysis.confidence ?? 0,
           })),
           faceOffAnalysis: [],
           transitionAnalysis: [],
-          keyMoments: []
+          keyMoments: [],
         };
         
         // Extract detailed metrics
@@ -403,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
           
-          const playerStats = playerStatsMap.get(playerKey);
+          const playerStats = playerStatsMap.get(playerKey)!;
           
           // Update aggregated stats
           playerStats.totalClips += metrics.totalClips;
@@ -414,7 +469,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Aggregate actions
           Object.entries(metrics.actions).forEach(([action, count]) => {
-            playerStats.totalActions[action] = (playerStats.totalActions[action] || 0) + (count as number);
+            const numericCount = typeof count === 'number' ? count : 0;
+            playerStats.totalActions[action] = (playerStats.totalActions[action] || 0) + numericCount;
           });
           
           // Collect skills
@@ -451,14 +507,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Convert Map to array and process Sets
-      const aggregatedStats = Array.from(playerStatsMap.values()).map(stats => ({
-        ...stats,
+      const aggregatedStats = Array.from(playerStatsMap.values()).map((stats) => ({
+        playerName: stats.playerName,
+        totalClips: stats.totalClips,
         totalVideos: stats.totalVideos.size,
+        averageConfidence: Math.round(stats.averageConfidence),
+        totalActions: stats.totalActions,
         skillsObserved: Array.from(stats.skillsObserved),
         positions: Array.from(stats.positions),
         teams: Array.from(stats.teams),
-        averageConfidence: Math.round(stats.averageConfidence),
-        videoAppearances: stats.videoAppearances.sort((a: any, b: any) => b.clipCount - a.clipCount)
+        videoAppearances: [...stats.videoAppearances].sort(
+          (a, b) => b.clipCount - a.clipCount,
+        ),
       }));
       
       // Sort by total clips

@@ -10,6 +10,7 @@ import {
   type InsertTeam,
   type Video,
   type InsertVideo,
+  type VideoStatus,
   type Analysis,
   type InsertAnalysis,
   type Player,
@@ -33,7 +34,7 @@ export interface IStorage {
   getUserVideos(userId: string): Promise<Video[]>;
   getAllVideos(): Promise<Video[]>;
   getVideo(id: number): Promise<Video | undefined>;
-  updateVideoStatus(id: number, status: string): Promise<Video>;
+  updateVideoStatus(id: number, status: VideoStatus): Promise<Video>;
   updateVideo(id: number, updates: Partial<Video>): Promise<void>;
   
   // Analysis operations
@@ -106,7 +107,7 @@ export class DatabaseStorage implements IStorage {
     return video;
   }
 
-  async updateVideoStatus(id: number, status: string): Promise<Video> {
+  async updateVideoStatus(id: number, status: VideoStatus): Promise<Video> {
     const [video] = await db
       .update(videos)
       .set({ status, updatedAt: new Date() })

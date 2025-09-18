@@ -17,6 +17,22 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const VIDEO_STATUS = {
+  UPLOADING: "uploading",
+  PROCESSING: "processing",
+  COMPLETED: "completed",
+  FAILED: "failed",
+} as const;
+
+export const VIDEO_STATUS_VALUES = [
+  VIDEO_STATUS.UPLOADING,
+  VIDEO_STATUS.PROCESSING,
+  VIDEO_STATUS.COMPLETED,
+  VIDEO_STATUS.FAILED,
+] as const;
+
+export type VideoStatus = (typeof VIDEO_STATUS_VALUES)[number];
+
 // Session storage table for Replit Auth
 export const sessions = pgTable(
   "sessions",
@@ -59,7 +75,9 @@ export const videos = pgTable("videos", {
   thumbnailUrl: varchar("thumbnail_url"),
   userId: varchar("user_id").notNull().references(() => users.id),
   teamId: integer("team_id").references(() => teams.id),
-  status: varchar("status", { length: 50 }).notNull().default("uploading"), // uploading, processing, completed, failed
+  status: varchar("status", { length: 50 })
+    .notNull()
+    .default(VIDEO_STATUS.UPLOADING), // uploading, processing, completed, failed
   userPrompt: text("user_prompt"), // Custom analysis prompt
   playerNumber: varchar("player_number", { length: 10 }),
   teamName: varchar("team_name", { length: 100 }),

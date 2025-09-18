@@ -1,12 +1,13 @@
 import { processYouTubeVideo } from './server/services/videoProcessor';
 import { storage } from './server/storage';
+import { VIDEO_STATUS } from '@shared/schema';
 
 async function processVideo30() {
   try {
     console.log("Processing video #30...");
     
     // Update status to uploading first
-    await storage.updateVideoStatus(30, 'uploading');
+    await storage.updateVideoStatus(30, VIDEO_STATUS.UPLOADING);
     
     // Process the video
     await processYouTubeVideo(

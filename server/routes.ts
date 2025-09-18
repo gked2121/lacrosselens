@@ -8,6 +8,8 @@ import {
   insertTeamSchema,
   insertPlayerSchema,
   type Analysis,
+  VIDEO_STATUS,
+  type VideoStatus,
 } from "@shared/schema";
 import * as path from "path";
 import * as fs from "fs";
@@ -44,6 +46,11 @@ const getMetadataString = (
   }
   return undefined;
 };
+
+const RETRYABLE_VIDEO_STATUSES: ReadonlyArray<VideoStatus> = [
+  VIDEO_STATUS.UPLOADING,
+  VIDEO_STATUS.PROCESSING,
+];
 
 interface AggregatedPlayerMetrics {
   playerName: string;
@@ -157,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         thumbnailUrl: null,
         userId,
         teamId: teamId ? parseInt(teamId) : null,
-        status: "uploading",
+        status: VIDEO_STATUS.UPLOADING,
         userPrompt,
         playerNumber,
         teamName,
@@ -203,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         thumbnailUrl: null,
         userId,
         teamId: teamId ? parseInt(teamId) : null,
-        status: "uploading",
+        status: VIDEO_STATUS.UPLOADING,
         userPrompt,
         playerNumber,
         teamName,
@@ -408,7 +415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all player evaluations across all videos
       const playerStatsMap = new Map<string, AggregatedPlayerMetrics>();
       
-      for (const video of videos.filter(v => v.status === 'completed')) {
+      for (const video of videos.filter(v => v.status === VIDEO_STATUS.COMPLETED)) {
         const analyses = await storage.getVideoAnalyses(video.id);
         const playerEvaluations = analyses.filter(a => a.type === 'player_evaluation');
         
@@ -540,7 +547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all transition analyses across all videos
       const transitionData = await Promise.all(
         videos
-          .filter(v => v.status === 'completed')
+          .filter(v => v.status === VIDEO_STATUS.COMPLETED)
           .map(async (video) => {
             const analyses = await storage.getVideoAnalyses(video.id);
             const transitions = analyses.filter(a => a.type === 'transition');
@@ -610,7 +617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all face-off analyses across all videos
       const faceoffData = await Promise.all(
         videos
-          .filter(v => v.status === 'completed')
+          .filter(v => v.status === VIDEO_STATUS.COMPLETED)
           .map(async (video) => {
             const analyses = await storage.getVideoAnalyses(video.id);
             const faceoffs = analyses.filter(a => a.type === 'face_off');
@@ -744,8 +751,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const videos = await storage.getUserVideos(userId);
 
-      const completedVideos = videos.filter(v => v.status === 'completed');
-      const processingVideos = videos.filter(v => v.status === 'processing');
+      const completedVideos = videos.filter(v => v.status === VIDEO_STATUS.COMPLETED);
+      const processingVideos = videos.filter(v => v.status === VIDEO_STATUS.PROCESSING);
 
       // Get all analyses for completed videos to calculate meaningful metrics
       let totalPlayerEvaluations = 0;
@@ -820,8 +827,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const videos = await storage.getUserVideos(userId);
       
-      // Find videos that are uploaded but not processed
-      const unprocessedVideos = videos.filter(v => v.status === 'uploaded');
+      // Find videos that are stuck in non-terminal states
+      const unprocessedVideos = videos.filter(video =>
+        RETRYABLE_VIDEO_STATUSES.includes(video.status as VideoStatus),
+      );
       
       console.log(`Found ${unprocessedVideos.length} unprocessed videos for user ${userId}`);
       
@@ -866,12 +875,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      if (video.status !== 'failed') {
+      if (video.status !== VIDEO_STATUS.FAILED) {
         return res.status(400).json({ message: "Only failed videos can be retried" });
       }
-      
+
       // Update status to processing
-      await storage.updateVideoStatus(videoId, "processing");
+      await storage.updateVideoStatus(videoId, VIDEO_STATUS.PROCESSING);
       
       // Retry processing based on video type
       if (video.youtubeUrl) {

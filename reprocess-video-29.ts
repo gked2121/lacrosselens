@@ -1,5 +1,6 @@
 import { processYouTubeVideo } from './server/services/videoProcessor';
 import { storage } from './server/storage';
+import { VIDEO_STATUS } from '@shared/schema';
 
 async function reprocessVideo29() {
   try {
@@ -11,7 +12,7 @@ async function reprocessVideo29() {
     );
     
     // Update status
-    await storage.updateVideoStatus(29, 'uploading');
+    await storage.updateVideoStatus(29, VIDEO_STATUS.UPLOADING);
     
     // Process with fixed extraction
     await processYouTubeVideo(

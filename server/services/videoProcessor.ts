@@ -2,6 +2,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "../storage";
+import { VIDEO_STATUS } from "@shared/schema";
 import { analyzeLacrosseVideo, analyzeLacrosseVideoFromYouTube } from "./gemini";
 import { generateVideoThumbnail, getVideoMetadata, getYouTubeThumbnail } from "./thumbnailGenerator";
 import { AdvancedVideoAnalyzer } from "./advancedVideoAnalysis";
@@ -63,7 +64,7 @@ export async function processVideoUpload(
     console.log(`Starting video processing for video ${videoId}: ${title}`);
     
     // Update video status to processing
-    await storage.updateVideoStatus(videoId, "processing");
+    await storage.updateVideoStatus(videoId, VIDEO_STATUS.PROCESSING);
     
     // Get video metadata
     console.log(`Getting video metadata for ${filePath}`);
@@ -220,18 +221,18 @@ export async function processVideoUpload(
     } catch (analysisError) {
       console.error("Error during two-phase analysis:", analysisError);
       // Update video status to failed on error
-      await storage.updateVideoStatus(videoId, "failed");
+      await storage.updateVideoStatus(videoId, VIDEO_STATUS.FAILED);
       throw analysisError;
     }
     
     // Update video status to completed
-    await storage.updateVideoStatus(videoId, "completed");
+    await storage.updateVideoStatus(videoId, VIDEO_STATUS.COMPLETED);
     console.log(`Video ${videoId} processing completed successfully`);
     
   } catch (error) {
     console.error("Error processing video:", error);
     // Update video status to failed
-    await storage.updateVideoStatus(videoId, "failed");
+    await storage.updateVideoStatus(videoId, VIDEO_STATUS.FAILED);
     throw error;
   }
 }
@@ -254,7 +255,7 @@ export async function processYouTubeVideo(
     console.log(`Starting YouTube video processing for video ${videoId}: ${title}`);
     
     // Update video status to processing
-    await storage.updateVideoStatus(videoId, "processing");
+    await storage.updateVideoStatus(videoId, VIDEO_STATUS.PROCESSING);
     
     // Extract video ID from URL
     const ytVideoId = YouTubeMetadataService.extractVideoId(youtubeUrl);
@@ -448,12 +449,12 @@ export async function processYouTubeVideo(
     }
 
     // Update video status to completed
-    await storage.updateVideoStatus(videoId, "completed");
+    await storage.updateVideoStatus(videoId, VIDEO_STATUS.COMPLETED);
   } catch (error) {
     console.error(`Error processing YouTube video ${videoId}:`, error);
     console.error(`Full error details:`, error instanceof Error ? error.message : error);
     console.error(`Stack trace:`, error instanceof Error ? error.stack : 'No stack trace');
-    await storage.updateVideoStatus(videoId, "failed");
+    await storage.updateVideoStatus(videoId, VIDEO_STATUS.FAILED);
     throw error;
   }
 }
